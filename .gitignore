@@ -31,3 +31,4 @@ dist-ssr
 # Fichiers sources du CDC
 cdc.pages
 cdc_extracted/
+.vercel

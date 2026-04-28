@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, XCircle, ArrowRight, Trophy, Zap } from 'lucide-react';
+import clsx from 'clsx';
 import Badge from '../../ui/Badge/Badge';
 import Button from '../../ui/Button/Button';
+import { ACADEMY_THEMES } from '../../../data/themes';
 import styles from './AcademyPreview.module.css';
 
-/* Question de démonstration — les vraies sont en BDD */
+/* Question de démonstration — les vraies questions viennent de Supabase */
 const DEMO_QUESTION = {
   theme: 'Fiscalité',
   question: 'Quel est le taux du Prélèvement Forfaitaire Unique (PFU) appliqué sur les plus-values mobilières en France ?',
@@ -20,29 +22,16 @@ const DEMO_QUESTION = {
     'Le PFU (ou "flat tax") s\'applique à 30 % : 12,8 % d\'impôt sur le revenu + 17,2 % de prélèvements sociaux. Sauf si le barème progressif est plus avantageux pour toi.',
 };
 
-/* Thèmes de l'académie */
-const ACADEMY_THEMES = [
-  { emoji: '🏠', name: 'Immobilier', modules: 8, locked: false },
-  { emoji: '🏦', name: 'Retraite', modules: 6, locked: false },
-  { emoji: '📈', name: 'Enrichissement', modules: 10, locked: false },
-  { emoji: '📊', name: 'Fiscalité', modules: 7, locked: true },
-  { emoji: '🛡️', name: 'Protection', modules: 5, locked: true },
-  { emoji: '🎁', name: 'Transmission', modules: 4, locked: true },
-];
-
-const QUIZ_STATES = { idle: 'idle', answered: 'answered' };
-
 export default function AcademyPreview() {
   const [selected, setSelected] = useState(null);
-  const [quizState, setQuizState] = useState(QUIZ_STATES.idle);
+
+  const isAnswered = selected !== null;
+  const isCorrect = selected === DEMO_QUESTION.correct;
 
   const handleAnswer = (id) => {
-    if (quizState !== QUIZ_STATES.idle) return;
+    if (isAnswered) return;
     setSelected(id);
-    setQuizState(QUIZ_STATES.answered);
   };
-
-  const isCorrect = selected === DEMO_QUESTION.correct;
 
   return (
     <section id="academie" className={styles.section}>
@@ -63,7 +52,7 @@ export default function AcademyPreview() {
             {ACADEMY_THEMES.map((theme) => (
               <div
                 key={theme.name}
-                className={[styles.themeCard, theme.locked ? styles.themeCardLocked : ''].join(' ')}
+                className={clsx(styles.themeCard, theme.locked && styles.themeCardLocked)}
               >
                 <span className={styles.themeEmoji}>{theme.emoji}</span>
                 <div className={styles.themeInfo}>
@@ -102,37 +91,33 @@ export default function AcademyPreview() {
               {DEMO_QUESTION.options.map((opt) => {
                 const isSelected = selected === opt.id;
                 const isRight = opt.id === DEMO_QUESTION.correct;
-                const showResult = quizState === QUIZ_STATES.answered;
-
-                let stateClass = '';
-                if (showResult) {
-                  if (isRight) stateClass = styles.optionCorrect;
-                  else if (isSelected) stateClass = styles.optionWrong;
-                  else stateClass = styles.optionDimmed;
-                } else if (isSelected) {
-                  stateClass = styles.optionSelected;
-                }
 
                 return (
                   <button
                     key={opt.id}
-                    className={[styles.option, stateClass].join(' ')}
+                    className={clsx(
+                      styles.option,
+                      isAnswered && isRight && styles.optionCorrect,
+                      isAnswered && isSelected && !isRight && styles.optionWrong,
+                      isAnswered && !isSelected && !isRight && styles.optionDimmed,
+                      !isAnswered && isSelected && styles.optionSelected,
+                    )}
                     onClick={() => handleAnswer(opt.id)}
-                    disabled={showResult}
+                    disabled={isAnswered}
                     aria-pressed={isSelected}
                   >
                     <span className={styles.optionLetter}>{opt.id.toUpperCase()}</span>
                     <span className={styles.optionText}>{opt.text}</span>
-                    {showResult && isRight && <CheckCircle size={16} className={styles.iconCorrect} />}
-                    {showResult && isSelected && !isRight && <XCircle size={16} className={styles.iconWrong} />}
+                    {isAnswered && isRight && <CheckCircle size={16} className={styles.iconCorrect} />}
+                    {isAnswered && isSelected && !isRight && <XCircle size={16} className={styles.iconWrong} />}
                   </button>
                 );
               })}
             </div>
 
             {/* Explication après réponse */}
-            {quizState === QUIZ_STATES.answered && (
-              <div className={[styles.explanation, isCorrect ? styles.explCorrect : styles.explWrong].join(' ')}>
+            {isAnswered && (
+              <div className={clsx(styles.explanation, isCorrect ? styles.explCorrect : styles.explWrong)}>
                 {isCorrect ? (
                   <p>
                     <Trophy size={16} className={styles.trophyIcon} />
@@ -153,7 +138,7 @@ export default function AcademyPreview() {
               <div className={styles.progressBar}>
                 <div
                   className={styles.progressFill}
-                  style={{ width: quizState === QUIZ_STATES.answered && isCorrect ? '62%' : '60%' }}
+                  style={{ width: isAnswered && isCorrect ? '62%' : '60%' }}
                 />
               </div>
               <span className={styles.progressGrade}>B+</span>

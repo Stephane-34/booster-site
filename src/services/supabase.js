@@ -3,10 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  // En développement, on prévient clairement sans crasher.
+/* Avertissement uniquement en développement — évite de divulguer la config en prod. */
+if (import.meta.env.DEV && (!SUPABASE_URL || !SUPABASE_ANON_KEY)) {
   console.warn(
-    '[Booster] Variables Supabase manquantes. Copie .env.example en .env.local et renseigne VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY.'
+    '[Booster] Variables Supabase manquantes. Copie .env.example en .env.local.'
   );
 }
 

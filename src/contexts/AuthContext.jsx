@@ -8,11 +8,18 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    /* Récupère la session existante au montage */
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    /* Récupère la session existante au montage.
+       Le catch garantit que loading ne reste pas bloqué à true si Supabase est inaccessible. */
+    supabase.auth.getSession()
+      .then(({ data }) => {
+        setUser(data?.session?.user ?? null);
+      })
+      .catch(() => {
+        setUser(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     /* Écoute les changements d'état d'auth (login / logout / refresh token) */
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {

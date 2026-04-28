@@ -19,10 +19,10 @@ const DEMO_PORTFOLIO = {
 };
 
 const DEMO_TRANSACTIONS = [
-  { date: '28 avr.', type: 'Versement', amount: 100, status: 'success' },
-  { date: '01 avr.', type: 'Versement', amount: 100, status: 'success' },
-  { date: '01 mars', type: 'Versement', amount: 100, status: 'success' },
-  { date: '28 fév.', type: 'Dividende reçu', amount: 41.2, status: 'success' },
+  { id: 'tx-apr-28', date: '28 avr.', type: 'Versement', amount: 100 },
+  { id: 'tx-apr-01', date: '01 avr.', type: 'Versement', amount: 100 },
+  { id: 'tx-mar-01', date: '01 mars', type: 'Versement', amount: 100 },
+  { id: 'tx-feb-28', date: '28 fév.', type: 'Dividende reçu', amount: 41.2 },
 ];
 
 export default function Dashboard() {
@@ -175,8 +175,8 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {DEMO_TRANSACTIONS.map((tx, i) => (
-                  <tr key={i}>
+                {DEMO_TRANSACTIONS.map((tx) => (
+                  <tr key={tx.id}>
                     <td className={styles.tdDate}>{tx.date}</td>
                     <td>{tx.type}</td>
                     <td className={styles.tdAmount}>+{formatCurrency(tx.amount)}</td>

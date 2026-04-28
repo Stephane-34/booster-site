@@ -1,76 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import clsx from 'clsx';
 import {
-  Home, PiggyBank, BookOpen, BarChart2, Shield, RefreshCw,
   ChevronRight, Trophy, Star, Zap, CheckCircle, XCircle, Lock
 } from 'lucide-react';
 import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
+import { ACADEMY_THEMES } from '../../data/themes';
+import { useQuiz } from '../../hooks/useQuiz';
 import styles from './Academy.module.css';
-
-/* Données statiques — en prod, elles viennent de Supabase */
-const THEMES = [
-  {
-    id: 'immobilier',
-    icon: Home,
-    name: 'Immobilier',
-    desc: 'SCPI, effet de levier, taxe foncière, stratégies d\'optimisation.',
-    modules: 8,
-    locked: false,
-    color: 'violet',
-    progress: 62,
-  },
-  {
-    id: 'retraite',
-    icon: PiggyBank,
-    name: 'Retraite',
-    desc: 'PER, simulation de retraite, stratégies de versement.',
-    modules: 6,
-    locked: false,
-    color: 'blue',
-    progress: 33,
-  },
-  {
-    id: 'enrichissement',
-    icon: BarChart2,
-    name: 'Enrichissement',
-    desc: 'Règle des 72, ETF world, DCA, diversification internationale.',
-    modules: 10,
-    locked: false,
-    color: 'green',
-    progress: 0,
-  },
-  {
-    id: 'fiscalite',
-    icon: BookOpen,
-    name: 'Fiscalité',
-    desc: 'PFU, PEA, abattements assurance-vie, optimisation fiscale.',
-    modules: 7,
-    locked: true,
-    color: 'orange',
-    progress: 0,
-  },
-  {
-    id: 'protection',
-    icon: Shield,
-    name: 'Protection',
-    desc: 'Prévoyance, arrêt maladie, invalidité, couverture optimale.',
-    modules: 5,
-    locked: true,
-    color: 'teal',
-    progress: 0,
-  },
-  {
-    id: 'transmission',
-    icon: RefreshCw,
-    name: 'Transmission',
-    desc: 'Succession, donations, optimisation patrimoniale familiale.',
-    modules: 4,
-    locked: true,
-    color: 'pink',
-    progress: 0,
-  },
-];
 
 const QUESTIONS = [
   {
@@ -119,38 +57,18 @@ const QUESTIONS = [
 
 export default function Academy() {
   const [selectedTheme, setSelectedTheme] = useState(null);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [score, setScore] = useState(0);
-  const [quizDone, setQuizDone] = useState(false);
-
-  const handleAnswer = (questionId, optionId) => {
-    if (answers[questionId] !== undefined) return;
-
-    const question = QUESTIONS[currentQuestion];
-    const correct = optionId === question.correct;
-
-    setAnswers((prev) => ({ ...prev, [questionId]: optionId }));
-    if (correct) setScore((s) => s + 1);
-  };
-
-  const nextQuestion = () => {
-    if (currentQuestion < QUESTIONS.length - 1) {
-      setCurrentQuestion((q) => q + 1);
-    } else {
-      setQuizDone(true);
-    }
-  };
-
-  const resetQuiz = () => {
-    setCurrentQuestion(0);
-    setAnswers({});
-    setScore(0);
-    setQuizDone(false);
-  };
-
-  const q = QUESTIONS[currentQuestion];
-  const answered = answers[q?.id] !== undefined;
+  const {
+    currentQuestion: q,
+    currentIndex,
+    answers,
+    score,
+    isDone: quizDone,
+    isAnswered: answered,
+    totalQuestions,
+    answer: handleAnswer,
+    next: nextQuestion,
+    reset: resetQuiz,
+  } = useQuiz(QUESTIONS);
 
   return (
     <div className={styles.page}>
@@ -196,7 +114,7 @@ export default function Academy() {
         <section className={styles.themesSection}>
           <h2 className={styles.sectionTitle}>Tes parcours</h2>
           <div className={styles.themesGrid}>
-            {THEMES.map((theme) => (
+            {ACADEMY_THEMES.map((theme) => (
               <ThemeCard
                 key={theme.id}
                 theme={theme}
@@ -215,7 +133,7 @@ export default function Academy() {
               Quiz du jour
             </h2>
             <span className={styles.quizProgress}>
-              {currentQuestion + 1} / {QUESTIONS.length}
+              {currentIndex + 1} / {totalQuestions}
             </span>
           </div>
 
@@ -225,7 +143,7 @@ export default function Academy() {
               <div className={styles.quizProgressBar}>
                 <div
                   className={styles.quizProgressFill}
-                  style={{ width: `${((currentQuestion) / QUESTIONS.length) * 100}%` }}
+                  style={{ width: `${(currentIndex / totalQuestions) * 100}%` }}
                 />
               </div>
 
@@ -241,19 +159,16 @@ export default function Academy() {
                   const isRight = opt.id === q.correct;
                   const showResult = answered;
 
-                  let cls = styles.option;
-                  if (showResult) {
-                    if (isRight) cls += ` ${styles.optionCorrect}`;
-                    else if (isSelected) cls += ` ${styles.optionWrong}`;
-                    else cls += ` ${styles.optionDimmed}`;
-                  } else if (isSelected) {
-                    cls += ` ${styles.optionSelected}`;
-                  }
-
                   return (
                     <button
                       key={opt.id}
-                      className={cls}
+                      className={clsx(
+                        styles.option,
+                        showResult && isRight && styles.optionCorrect,
+                        showResult && isSelected && !isRight && styles.optionWrong,
+                        showResult && !isSelected && !isRight && styles.optionDimmed,
+                        !showResult && isSelected && styles.optionSelected,
+                      )}
                       onClick={() => handleAnswer(q.id, opt.id)}
                       disabled={answered}
                     >
@@ -268,14 +183,14 @@ export default function Academy() {
 
               {answered && (
                 <>
-                  <div className={[
+                  <div className={clsx(
                     styles.explanation,
-                    answers[q.id] === q.correct ? styles.explCorrect : styles.explWrong
-                  ].join(' ')}>
+                    answers[q.id] === q.correct ? styles.explCorrect : styles.explWrong,
+                  )}>
                     <p>{q.explanation}</p>
                   </div>
                   <Button variant="primary" size="md" onClick={nextQuestion} className={styles.nextBtn}>
-                    {currentQuestion < QUESTIONS.length - 1 ? 'Question suivante' : 'Voir mes résultats'}
+                    {currentIndex < totalQuestions - 1 ? 'Question suivante' : 'Voir mes résultats'}
                     <ChevronRight size={16} />
                   </Button>
                 </>
@@ -297,12 +212,12 @@ function ThemeCard({ theme, isSelected, onSelect }) {
 
   return (
     <div
-      className={[
+      className={clsx(
         styles.themeCard,
         styles[`theme-${theme.color}`],
-        theme.locked ? styles.themeCardLocked : '',
-        isSelected ? styles.themeCardSelected : '',
-      ].join(' ')}
+        theme.locked && styles.themeCardLocked,
+        isSelected && styles.themeCardSelected,
+      )}
       onClick={onSelect}
       role={theme.locked ? 'presentation' : 'button'}
       tabIndex={theme.locked ? -1 : 0}
