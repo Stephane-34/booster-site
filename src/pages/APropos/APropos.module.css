@@ -1,0 +1,165 @@
+/* ─── Page À propos ──────────────────────────────────────── */
+.page {
+  padding-top: calc(var(--nav-height) + var(--space-16));
+  padding-bottom: var(--space-24);
+  min-height: 100dvh;
+}
+
+/* ─── Genèse ─────────────────────────────────────────────── */
+.genesis {
+  max-width: 760px;
+  margin: 0 auto var(--space-16);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.genesisTitle {
+  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+  font-weight: var(--weight-extrabold);
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.15;
+}
+
+.genesisText {
+  font-size: var(--text-lg);
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 640px;
+}
+
+/* ─── Deux piliers ───────────────────────────────────────── */
+.pillars {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  margin-bottom: var(--space-16);
+}
+
+.pillarCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl, 20px);
+  transition: transform var(--transition-base), border-color var(--transition-base);
+}
+
+.pillarCard:hover {
+  transform: translateY(-3px);
+}
+
+.pillar-primary {
+  border-color: rgba(168, 85, 247, 0.25);
+}
+
+.pillar-primary:hover {
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+.pillar-accent {
+  border-color: rgba(74, 222, 128, 0.2);
+}
+
+.pillar-accent:hover {
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+.pillarEmoji {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.pillarContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pillarSubtitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.pillarTitle {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.pillarBody {
+  font-size: var(--text-base);
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ─── Conclusion ─────────────────────────────────────────── */
+.closing {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--color-border);
+}
+
+.closingTitle {
+  font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+  font-weight: var(--weight-extrabold);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.closingText {
+  font-size: var(--text-base);
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.closingActions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .pillars {
+    grid-template-columns: 1fr;
+  }
+
+  .pillarCard {
+    padding: var(--space-6);
+  }
+
+  .closingActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .closingActions > * {
+    width: 100%;
+    justify-content: center;
+  }
+}

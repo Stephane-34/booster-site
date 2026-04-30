@@ -11,6 +11,7 @@ import styles from './Header.module.css';
 const NAV_LINKS = [
   { label: 'Accueil', to: '/' },
   { label: 'Académie', to: '/academie' },
+  { label: 'À propos', to: '/a-propos' },
 ];
 
 export default function Header() {
