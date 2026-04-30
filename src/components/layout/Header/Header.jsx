@@ -7,21 +7,21 @@ import Modal from '../../ui/Modal/Modal';
 import AuthForm from '../../sections/AuthForm/AuthForm';
 import styles from './Header.module.css';
 
-/* Liens de navigation standard */
+/* cta: true → pill vert (même style pour Investir et Académie) */
 const NAV_LINKS = [
-  { label: 'Accueil', to: '/' },
-  { label: 'Ton projet', to: '/ton-projet' },
-  { label: 'Académie', to: '/academie' },
-  { label: 'À propos', to: '/a-propos' },
+  { label: 'Accueil',    to: '/',           cta: false },
+  { label: 'Ton projet', to: '/ton-projet', cta: false },
+  { label: 'Investir',   to: '/investir',   cta: true  },
+  { label: 'Académie',   to: '/academie',   cta: true  },
+  { label: 'À propos',   to: '/a-propos',   cta: false },
 ];
 
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled]   = useState(false);
+  const [menuOpen, setMenuOpen]   = useState(false);
   const [authModal, setAuthModal] = useState(false);
-  const [authTab, setAuthTab] = useState('login');
+  const [authTab, setAuthTab]     = useState('login');
 
-  /* Détecter le scroll pour changer l'apparence du header */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -36,57 +36,38 @@ export default function Header() {
     setMenuOpen(false);
   };
 
-  const openSignup = () => {
-    setAuthTab('signup');
-    setAuthModal(true);
-    setMenuOpen(false);
-  };
-
   return (
     <>
       <header className={clsx(styles.header, scrolled && styles.scrolled)}>
         <div className={`container ${styles.inner}`}>
           {/* Logo */}
           <Link to="/" className={styles.logo} onClick={closeMenu}>
-            <div className={styles.logoIcon}>
-              <TrendingUp size={18} />
-            </div>
+            <div className={styles.logoIcon}><TrendingUp size={18} /></div>
             <span className={styles.logoText}>Booster</span>
           </Link>
 
           {/* Navigation desktop */}
           <nav className={styles.nav} aria-label="Navigation principale">
-            {NAV_LINKS.map(({ label, to }) => (
+            {NAV_LINKS.map(({ label, to, cta }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={to === '/'}
                 className={({ isActive }) =>
-                  clsx(styles.navLink, isActive && styles.navLinkActive)
+                  cta
+                    ? clsx(styles.navLinkInvest, isActive && styles.navLinkInvestActive)
+                    : clsx(styles.navLink, isActive && styles.navLinkActive)
                 }
               >
                 {label}
               </NavLink>
             ))}
-
-            {/* Lien "Investir" mis en valeur avec une couleur distincte */}
-            <NavLink
-              to="/investir"
-              className={({ isActive }) =>
-                clsx(styles.navLinkInvest, isActive && styles.navLinkInvestActive)
-              }
-            >
-              Investir
-            </NavLink>
           </nav>
 
-          {/* Actions desktop */}
+          {/* Actions — connexion uniquement */}
           <div className={styles.actions}>
             <Button variant="ghost" size="sm" onClick={openLogin}>
               Connexion
-            </Button>
-            <Button variant="primary" size="sm" onClick={openSignup}>
-              Commencer
             </Button>
           </div>
 
@@ -105,42 +86,34 @@ export default function Header() {
         {menuOpen && (
           <div className={styles.mobileMenu}>
             <nav>
-              {NAV_LINKS.map(({ label, to }) => (
+              {NAV_LINKS.map(({ label, to, cta }) => (
                 <NavLink
                   key={to}
                   to={to}
                   end={to === '/'}
-                  className={styles.mobileNavLink}
+                  className={clsx(
+                    styles.mobileNavLink,
+                    cta && styles.mobileNavLinkInvest,
+                  )}
                   onClick={closeMenu}
                 >
                   {label}
                 </NavLink>
               ))}
-              <NavLink
-                to="/investir"
-                className={clsx(styles.mobileNavLink, styles.mobileNavLinkInvest)}
-                onClick={closeMenu}
-              >
-                Investir
-              </NavLink>
             </nav>
             <div className={styles.mobileActions}>
               <Button variant="outline" size="md" onClick={openLogin} className={styles.mobileBtn}>
                 Connexion
-              </Button>
-              <Button variant="primary" size="md" onClick={openSignup} className={styles.mobileBtn}>
-                Commencer gratuitement
               </Button>
             </div>
           </div>
         )}
       </header>
 
-      {/* Modale d'authentification */}
       <Modal
         isOpen={authModal}
         onClose={() => setAuthModal(false)}
-        title={authTab === 'login' ? 'Connexion' : 'Créer un compte'}
+        title="Connexion"
       >
         <AuthForm
           defaultTab={authTab}
