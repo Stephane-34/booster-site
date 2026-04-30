@@ -4,10 +4,10 @@ import styles from './Footer.module.css';
 
 const LINKS = {
   produit: [
-    { label: 'Investir', to: '/investir' },
+    { label: 'Ton projet', to: '/ton-projet' },
     { label: 'Académie', to: '/academie' },
+    { label: 'Investir', to: '/investir' },
     { label: 'Simulateur', to: '/investir#simulateur' },
-    { label: 'Tarifs', to: '/investir#tarifs' },
   ],
   legal: [
     { label: 'Mentions légales', to: '/mentions-legales' },

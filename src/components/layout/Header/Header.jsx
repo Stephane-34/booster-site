@@ -10,6 +10,7 @@ import styles from './Header.module.css';
 /* Liens de navigation standard */
 const NAV_LINKS = [
   { label: 'Accueil', to: '/' },
+  { label: 'Ton projet', to: '/ton-projet' },
   { label: 'Académie', to: '/academie' },
   { label: 'À propos', to: '/a-propos' },
 ];

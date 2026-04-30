@@ -18,6 +18,20 @@
   max-width: 600px;
 }
 
+.sectionDesc {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  max-width: 520px;
+  text-align: center;
+}
+
+/* Conteneur des étapes centré */
+.steps {
+  max-width: 640px;
+  margin-inline: auto;
+}
+
 /* Tabs */
 .tabs {
   display: flex;
