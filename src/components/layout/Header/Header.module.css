@@ -80,26 +80,24 @@
   background: rgba(168, 85, 247, 0.1);
 }
 
-/* Lien "Investir" — bouton pill vert distinct */
+/* Liens Investir et Académie — texte vert, sans border */
 .navLinkInvest {
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   color: var(--color-accent);
-  border: 1.5px solid var(--color-accent);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   text-decoration: none;
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .navLinkInvest:hover {
-  background: var(--color-accent);
-  color: #0a0014;
+  background: rgba(74, 222, 128, 0.1);
 }
 
 .navLinkInvestActive {
-  background: var(--color-accent);
-  color: #0a0014;
+  color: var(--color-accent);
+  background: rgba(74, 222, 128, 0.1);
 }
 
 /* Version mobile */
