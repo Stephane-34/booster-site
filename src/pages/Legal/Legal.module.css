@@ -1,0 +1,133 @@
+/* ─── Layout commun aux pages légales ───────────────────── */
+.page {
+  padding-top: calc(var(--nav-height) + var(--space-12));
+  padding-bottom: var(--space-24);
+  min-height: 100dvh;
+}
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+/* En-tête de page */
+.header {
+  margin-bottom: var(--space-10);
+  padding-bottom: var(--space-8);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tag {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+  font-weight: var(--weight-extrabold);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+}
+
+.date {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Corps de l'article */
+.body h2 {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  margin: var(--space-8) 0 var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.body h3 {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: var(--space-5) 0 var(--space-2);
+}
+
+.body p {
+  font-size: var(--text-sm);
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-4);
+}
+
+.body ul,
+.body ol {
+  padding-left: var(--space-6);
+  margin: 0 0 var(--space-4);
+}
+
+.body li {
+  font-size: var(--text-sm);
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-1);
+}
+
+.body a {
+  color: var(--color-primary-light);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.body a:hover {
+  color: var(--color-text);
+}
+
+.body strong {
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+}
+
+/* Encadré d'information */
+.infoBox {
+  background: rgba(168, 85, 247, 0.07);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  margin: var(--space-6) 0;
+}
+
+.infoBox p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* Tableau simple */
+.body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-4) 0 var(--space-6);
+}
+
+.body th,
+.body td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-size: var(--text-sm);
+  border: 1px solid var(--color-border);
+}
+
+.body th {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.body td {
+  color: var(--color-text-secondary);
+}

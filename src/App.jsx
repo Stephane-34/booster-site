@@ -3,8 +3,12 @@ import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/layout/Header/Header';
 import Footer from './components/layout/Footer/Footer';
 import Home from './pages/Home';
+import Investir from './pages/Investir';
 import Academy from './pages/Academy';
 import Dashboard from './pages/Dashboard';
+import MentionsLegales from './pages/Legal/MentionsLegales';
+import CGU from './pages/Legal/CGU';
+import Confidentialite from './pages/Legal/Confidentialite';
 
 export default function App() {
   return (
@@ -14,8 +18,12 @@ export default function App() {
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/investir" element={<Investir />} />
             <Route path="/academie" element={<Academy />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/mentions-legales" element={<MentionsLegales />} />
+            <Route path="/cgu" element={<CGU />} />
+            <Route path="/confidentialite" element={<Confidentialite />} />
           </Routes>
         </main>
         <Footer />

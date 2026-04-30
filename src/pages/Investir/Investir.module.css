@@ -1,0 +1,4 @@
+/* Décale le contenu sous le header fixe */
+.page {
+  padding-top: var(--nav-height);
+}

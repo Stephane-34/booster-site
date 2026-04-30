@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, TrendingUp } from 'lucide-react';
+import clsx from 'clsx';
 import Button from '../../ui/Button/Button';
 import Modal from '../../ui/Modal/Modal';
 import AuthForm from '../../sections/AuthForm/AuthForm';
 import styles from './Header.module.css';
 
+/* Liens de navigation standard */
 const NAV_LINKS = [
   { label: 'Accueil', to: '/' },
   { label: 'Académie', to: '/academie' },
-  { label: 'Nos offres', to: '/#offres' },
-  { label: 'À propos', to: '/#apropos' },
 ];
 
 export default function Header() {
@@ -26,7 +26,6 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  /* Fermer le menu mobile au changement de route */
   const closeMenu = () => setMenuOpen(false);
 
   const openLogin = () => {
@@ -43,7 +42,7 @@ export default function Header() {
 
   return (
     <>
-      <header className={[styles.header, scrolled ? styles.scrolled : ''].join(' ')}>
+      <header className={clsx(styles.header, scrolled && styles.scrolled)}>
         <div className={`container ${styles.inner}`}>
           {/* Logo */}
           <Link to="/" className={styles.logo} onClick={closeMenu}>
@@ -59,13 +58,24 @@ export default function Header() {
               <NavLink
                 key={to}
                 to={to}
+                end={to === '/'}
                 className={({ isActive }) =>
-                  [styles.navLink, isActive ? styles.navLinkActive : ''].join(' ')
+                  clsx(styles.navLink, isActive && styles.navLinkActive)
                 }
               >
                 {label}
               </NavLink>
             ))}
+
+            {/* Lien "Investir" mis en valeur avec une couleur distincte */}
+            <NavLink
+              to="/investir"
+              className={({ isActive }) =>
+                clsx(styles.navLinkInvest, isActive && styles.navLinkInvestActive)
+              }
+            >
+              Investir
+            </NavLink>
           </nav>
 
           {/* Actions desktop */}
@@ -97,12 +107,20 @@ export default function Header() {
                 <NavLink
                   key={to}
                   to={to}
+                  end={to === '/'}
                   className={styles.mobileNavLink}
                   onClick={closeMenu}
                 >
                   {label}
                 </NavLink>
               ))}
+              <NavLink
+                to="/investir"
+                className={clsx(styles.mobileNavLink, styles.mobileNavLinkInvest)}
+                onClick={closeMenu}
+              >
+                Investir
+              </NavLink>
             </nav>
             <div className={styles.mobileActions}>
               <Button variant="outline" size="md" onClick={openLogin} className={styles.mobileBtn}>

@@ -4,10 +4,10 @@ import styles from './Footer.module.css';
 
 const LINKS = {
   produit: [
-    { label: 'Notre offre', to: '/#offres' },
+    { label: 'Investir', to: '/investir' },
     { label: 'Académie', to: '/academie' },
-    { label: 'Simulateur', to: '/#simulateur' },
-    { label: 'Tarifs', to: '/#tarifs' },
+    { label: 'Simulateur', to: '/investir#simulateur' },
+    { label: 'Tarifs', to: '/investir#tarifs' },
   ],
   legal: [
     { label: 'Mentions légales', to: '/mentions-legales' },
@@ -15,8 +15,8 @@ const LINKS = {
     { label: 'CGU', to: '/cgu' },
   ],
   contact: [
-    { label: 'Prendre RDV', to: '/#rdv' },
-    { label: 'contact@booster.fr', to: 'mailto:contact@booster.fr' },
+    { label: 'Prendre RDV', to: '/investir#rdv' },
+    { label: 'contact@booster.lu', to: 'mailto:contact@booster.lu' },
   ],
 };
 
