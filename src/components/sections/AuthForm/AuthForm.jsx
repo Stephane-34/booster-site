@@ -1,19 +1,21 @@
 import { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, CheckCircle } from 'lucide-react';
 import Button from '../../ui/Button/Button';
-import { signIn, signUp } from '../../../services/supabase';
+import { signIn, signUp, resetPassword } from '../../../services/supabase';
 import styles from './AuthForm.module.css';
 
 export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess }) {
-  const [tab, setTab] = useState(defaultTab);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [tab, setTab]               = useState(defaultTab); // 'login' | 'signup' | 'forgot'
+  const [loading, setLoading]       = useState(false);
+  const [error, setError]           = useState('');
+  const [resetSent, setResetSent]   = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [fields, setFields] = useState({ name: '', email: '', password: '' });
+  const [fields, setFields]         = useState({ name: '', email: '', password: '' });
 
   const switchTab = (t) => {
     setTab(t);
     setError('');
+    setResetSent(false);
     onTabChange?.(t);
   };
 
@@ -30,14 +32,18 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
     try {
       if (tab === 'login') {
         await signIn(fields.email, fields.password);
-      } else {
+        onSuccess?.();
+      } else if (tab === 'signup') {
         if (fields.password.length < 8) {
           setError('Le mot de passe doit contenir au moins 8 caractères.');
           return;
         }
         await signUp(fields.email, fields.password, fields.name);
+        onSuccess?.();
+      } else if (tab === 'forgot') {
+        await resetPassword(fields.email);
+        setResetSent(true);
       }
-      onSuccess?.();
     } catch (err) {
       setError(
         err.message === 'Invalid login credentials'
@@ -49,6 +55,63 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
     }
   };
 
+  /* ─── Vue mot de passe oublié ─────────────────────────── */
+  if (tab === 'forgot') {
+    return (
+      <div className={styles.wrapper}>
+        <button className={styles.backLink} onClick={() => switchTab('login')}>
+          <ArrowLeft size={14} />
+          Retour à la connexion
+        </button>
+
+        {resetSent ? (
+          <div className={styles.successBox}>
+            <CheckCircle size={32} className={styles.successIcon} />
+            <p className={styles.successTitle}>Email envoyé !</p>
+            <p className={styles.successDesc}>
+              Vérifie ta boîte mail et clique sur le lien pour réinitialiser ton mot de passe.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className={styles.forgotHeader}>
+              <p className={styles.forgotTitle}>Mot de passe oublié ?</p>
+              <p className={styles.forgotDesc}>
+                Saisis ton email et on t'envoie un lien de réinitialisation.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className={styles.form} noValidate>
+              <div className={styles.field}>
+                <label htmlFor="forgot-email" className={styles.label}>Email</label>
+                <div className={styles.inputWrapper}>
+                  <Mail size={16} className={styles.inputIcon} />
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    className={styles.input}
+                    placeholder="ton@email.com"
+                    value={fields.email}
+                    onChange={updateField('email')}
+                    required
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              {error && <p className={styles.error} role="alert">{error}</p>}
+
+              <Button type="submit" variant="primary" size="lg" loading={loading} className={styles.submitBtn}>
+                Envoyer le lien
+              </Button>
+            </form>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  /* ─── Vue connexion / inscription ─────────────────────── */
   return (
     <div className={styles.wrapper}>
       {/* Tabs */}
@@ -72,7 +135,7 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
       </div>
 
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
-        {/* Champ prénom (inscription seulement) */}
+        {/* Prénom (inscription seulement) */}
         {tab === 'signup' && (
           <div className={styles.field}>
             <label htmlFor="auth-name" className={styles.label}>Prénom</label>
@@ -112,12 +175,23 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
 
         {/* Mot de passe */}
         <div className={styles.field}>
-          <label htmlFor="auth-password" className={styles.label}>
-            Mot de passe
-            {tab === 'signup' && (
-              <span className={styles.labelHint}>(min. 8 caractères)</span>
+          <div className={styles.labelRow}>
+            <label htmlFor="auth-password" className={styles.label}>
+              Mot de passe
+              {tab === 'signup' && (
+                <span className={styles.labelHint}>(min. 8 caractères)</span>
+              )}
+            </label>
+            {tab === 'login' && (
+              <button
+                type="button"
+                className={styles.forgotLink}
+                onClick={() => switchTab('forgot')}
+              >
+                Mot de passe oublié ?
+              </button>
             )}
-          </label>
+          </div>
           <div className={styles.inputWrapper}>
             <Lock size={16} className={styles.inputIcon} />
             <input
@@ -141,18 +215,9 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
           </div>
         </div>
 
-        {/* Message d'erreur */}
-        {error && (
-          <p className={styles.error} role="alert">{error}</p>
-        )}
+        {error && <p className={styles.error} role="alert">{error}</p>}
 
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          loading={loading}
-          className={styles.submitBtn}
-        >
+        <Button type="submit" variant="primary" size="lg" loading={loading} className={styles.submitBtn}>
           {tab === 'login' ? 'Se connecter' : 'Créer mon compte'}
         </Button>
 

@@ -12,6 +12,7 @@ import APropos from './pages/APropos';
 import MentionsLegales from './pages/Legal/MentionsLegales';
 import CGU from './pages/Legal/CGU';
 import Confidentialite from './pages/Legal/Confidentialite';
+import EmailConfirmed from './pages/EmailConfirmed';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/cgu" element={<CGU />} />
             <Route path="/confidentialite" element={<Confidentialite />} />
+            <Route path="/email-confirmed" element={<EmailConfirmed />} />
           </Routes>
         </main>
         <Footer />
