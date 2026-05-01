@@ -75,8 +75,8 @@ export default function Dashboard() {
         {/* Colonne principale */}
         <main className={styles.main}>
           {/* KPIs */}
-          <div className={styles.kpiGrid}>
-            <KpiCard
+          <div className={styles.metricsGrid}>
+            <MetricCard
               icon={TrendingUp}
               label="Valeur du portefeuille"
               value={formatCurrency(DEMO_PORTFOLIO.value)}
@@ -84,14 +84,14 @@ export default function Dashboard() {
               positive
               accent="primary"
             />
-            <KpiCard
+            <MetricCard
               icon={PiggyBank}
               label="Capital investi"
               value={formatCurrency(DEMO_PORTFOLIO.invested)}
               delta="Versements cumulés"
               accent="neutral"
             />
-            <KpiCard
+            <MetricCard
               icon={ArrowUpRight}
               label="Performance"
               value={`+${DEMO_PORTFOLIO.performance} %`}
@@ -99,7 +99,7 @@ export default function Dashboard() {
               positive
               accent="accent"
             />
-            <KpiCard
+            <MetricCard
               icon={BookOpen}
               label="Dividendes reçus"
               value={formatCurrency(DEMO_PORTFOLIO.dividends)}
@@ -177,9 +177,9 @@ export default function Dashboard() {
               <tbody>
                 {DEMO_TRANSACTIONS.map((tx) => (
                   <tr key={tx.id}>
-                    <td className={styles.tdDate}>{tx.date}</td>
+                    <td className={styles.cellDate}>{tx.date}</td>
                     <td>{tx.type}</td>
-                    <td className={styles.tdAmount}>+{formatCurrency(tx.amount)}</td>
+                    <td className={styles.cellAmount}>+{formatCurrency(tx.amount)}</td>
                     <td>
                       <Badge variant="accent">Effectué</Badge>
                     </td>
@@ -196,12 +196,12 @@ export default function Dashboard() {
           <div className={styles.sideCard}>
             <h3 className={styles.sideTitle}>Répartition</h3>
             <div className={styles.allocationBar}>
-              <div className={styles.allocFonds} style={{ width: '40%' }} />
-              <div className={styles.allocUC} style={{ width: '60%' }} />
+              <div className={styles.allocationFonds} style={{ width: '40%' }} />
+              <div className={styles.allocationUC} style={{ width: '60%' }} />
             </div>
             <div className={styles.allocLegend}>
-              <span><span className={styles.dotFonds} />Fonds € — 40 %</span>
-              <span><span className={styles.dotUC} />UC — 60 %</span>
+              <span><span className={styles.legendDotFonds} />Fonds € — 40 %</span>
+              <span><span className={styles.legendDotUC} />UC — 60 %</span>
             </div>
           </div>
 
@@ -250,18 +250,18 @@ export default function Dashboard() {
   );
 }
 
-/* ─── KPI Card ────────────────────────────────────────────── */
-function KpiCard({ icon: Icon, label, value, delta, positive, accent }) {
+/* ─── Metric Card ─────────────────────────────────────────── */
+function MetricCard({ icon: Icon, label, value, delta, positive, accent }) {
   return (
-    <div className={[styles.kpiCard, styles[`kpi-${accent}`]].join(' ')}>
-      <div className={styles.kpiIcon}>
+    <div className={[styles.metricCard, styles[`metric-${accent}`]].join(' ')}>
+      <div className={styles.metricIcon}>
         <Icon size={18} />
       </div>
       <div>
-        <p className={styles.kpiLabel}>{label}</p>
-        <p className={styles.kpiValue}>{value}</p>
+        <p className={styles.metricLabel}>{label}</p>
+        <p className={styles.metricValue}>{value}</p>
         {delta && (
-          <p className={[styles.kpiDelta, positive ? styles.positive : ''].join(' ')}>
+          <p className={[styles.metricDelta, positive ? styles.positive : ''].join(' ')}>
             {delta}
           </p>
         )}

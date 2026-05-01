@@ -125,14 +125,14 @@ export default function Calculator({ onCTAClick }) {
 
           {/* Comparaison avec le Livret A — valeurs issues du useMemo, aucun recalcul ici */}
           <div className={styles.comparison}>
-            <p className={styles.compLabel}>Comparé à un Livret A (3 %)</p>
-            <div className={styles.compRow}>
+            <p className={styles.comparisonLabel}>Comparé à un Livret A (3 %)</p>
+            <div className={styles.comparisonRow}>
               <span>Livret A</span>
-              <span className={styles.compValueLow}>{formatCurrency(simulation.livretAValue)}</span>
+              <span className={styles.comparisonValueLow}>{formatCurrency(simulation.livretAValue)}</span>
             </div>
-            <div className={styles.compRow}>
+            <div className={styles.comparisonRow}>
               <span>Booster ({DEFAULT_RATE} %)</span>
-              <span className={styles.compValueHigh}>{formatCurrency(simulation.boosterValue)}</span>
+              <span className={styles.comparisonValueHigh}>{formatCurrency(simulation.boosterValue)}</span>
             </div>
             <div className={styles.compDiff}>
               +{formatCurrency(simulation.boosterValue - simulation.livretAValue)} de plus

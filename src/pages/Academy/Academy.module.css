@@ -333,8 +333,8 @@
   animation: fadeIn 0.3s ease;
 }
 
-.explCorrect { background: rgba(74, 222, 128, 0.08); border: 1px solid rgba(74, 222, 128, 0.2); }
-.explWrong { background: rgba(248, 113, 113, 0.08); border: 1px solid rgba(248, 113, 113, 0.2); }
+.explanationCorrect { background: rgba(74, 222, 128, 0.08); border: 1px solid rgba(74, 222, 128, 0.2); }
+.explanationWrong { background: rgba(248, 113, 113, 0.08); border: 1px solid rgba(248, 113, 113, 0.2); }
 
 .nextBtn { align-self: flex-end; }
 

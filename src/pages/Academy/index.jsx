@@ -185,7 +185,7 @@ export default function Academy() {
                 <>
                   <div className={clsx(
                     styles.explanation,
-                    answers[q.id] === q.correct ? styles.explCorrect : styles.explWrong,
+                    answers[q.id] === q.correct ? styles.explanationCorrect : styles.explanationWrong,
                   )}>
                     <p>{q.explanation}</p>
                   </div>

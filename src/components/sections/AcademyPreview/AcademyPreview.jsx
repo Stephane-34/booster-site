@@ -117,7 +117,7 @@ export default function AcademyPreview() {
 
             {/* Explication après réponse */}
             {isAnswered && (
-              <div className={clsx(styles.explanation, isCorrect ? styles.explCorrect : styles.explWrong)}>
+              <div className={clsx(styles.explanation, isCorrect ? styles.explanationCorrect : styles.explanationWrong)}>
                 {isCorrect ? (
                   <p>
                     <Trophy size={16} className={styles.trophyIcon} />

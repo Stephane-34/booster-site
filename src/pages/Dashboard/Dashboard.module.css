@@ -56,15 +56,15 @@
   align-items: start;
 }
 
-/* KPIs */
-.kpiGrid {
+/* Métriques */
+.metricsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 }
 
-.kpiCard {
+.metricCard {
   display: flex;
   align-items: flex-start;
   gap: var(--space-4);
@@ -75,9 +75,9 @@
   transition: border-color var(--transition-fast);
 }
 
-.kpiCard:hover { border-color: var(--color-border-active); }
+.metricCard:hover { border-color: var(--color-border-active); }
 
-.kpiIcon {
+.metricIcon {
   width: 44px;
   height: 44px;
   border-radius: var(--radius-lg);
@@ -87,24 +87,24 @@
   flex-shrink: 0;
 }
 
-.kpi-primary .kpiIcon { background: rgba(168, 85, 247, 0.15); color: var(--color-primary-light); }
-.kpi-accent .kpiIcon { background: rgba(74, 222, 128, 0.12); color: var(--color-accent); }
-.kpi-neutral .kpiIcon { background: var(--color-surface); color: var(--color-text-secondary); }
+.metric-primary .metricIcon { background: rgba(168, 85, 247, 0.15); color: var(--color-primary-light); }
+.metric-accent .metricIcon  { background: rgba(74, 222, 128, 0.12); color: var(--color-accent); }
+.metric-neutral .metricIcon { background: var(--color-surface); color: var(--color-text-secondary); }
 
-.kpiLabel {
+.metricLabel {
   font-size: var(--text-xs);
   color: var(--color-text-muted);
   margin-bottom: var(--space-1);
 }
 
-.kpiValue {
+.metricValue {
   font-size: var(--text-xl);
   font-weight: var(--weight-extrabold);
   color: var(--color-text);
   letter-spacing: -0.02em;
 }
 
-.kpiDelta {
+.metricDelta {
   font-size: var(--text-xs);
   color: var(--color-text-muted);
   margin-top: 2px;
@@ -176,7 +176,7 @@
   color: var(--color-text-muted);
 }
 
-/* Tableau */
+/* Tableau des transactions */
 .tableCard {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -219,8 +219,8 @@
   border-bottom: none;
 }
 
-.tdDate { color: var(--color-text-muted); }
-.tdAmount { font-weight: var(--weight-semibold); color: var(--color-accent); }
+.cellDate   { color: var(--color-text-muted); }
+.cellAmount { font-weight: var(--weight-semibold); color: var(--color-accent); }
 
 /* Sidebar */
 .sidebar {
@@ -256,7 +256,7 @@
   justify-content: space-between;
 }
 
-/* Allocation */
+/* Répartition (allocation) */
 .allocationBar {
   height: 10px;
   background: var(--color-bg);
@@ -265,14 +265,14 @@
   display: flex;
 }
 
-.allocFonds {
+.allocationFonds {
   height: 100%;
   background: var(--color-primary);
   border-radius: var(--radius-full) 0 0 var(--radius-full);
   transition: width 0.5s ease;
 }
 
-.allocUC {
+.allocationUC {
   flex: 1;
   height: 100%;
   background: var(--color-accent);
@@ -293,8 +293,8 @@
   gap: var(--space-2);
 }
 
-.dotFonds { width: 8px; height: 8px; border-radius: 50%; background: var(--color-primary); display: inline-block; }
-.dotUC { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); display: inline-block; }
+.legendDotFonds { width: 8px; height: 8px; border-radius: 50%; background: var(--color-primary); display: inline-block; }
+.legendDotUC    { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent);  display: inline-block; }
 
 /* Académie sidebar */
 .progressRow {
@@ -356,7 +356,7 @@
 }
 
 @media (max-width: 600px) {
-  .kpiGrid {
+  .metricsGrid {
     grid-template-columns: 1fr;
   }
 
