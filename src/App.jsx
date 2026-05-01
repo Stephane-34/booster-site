@@ -13,6 +13,7 @@ import MentionsLegales from './pages/Legal/MentionsLegales';
 import CGU from './pages/Legal/CGU';
 import Confidentialite from './pages/Legal/Confidentialite';
 import EmailConfirmed from './pages/EmailConfirmed';
+import ResetPassword from './pages/ResetPassword';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="/cgu" element={<CGU />} />
             <Route path="/confidentialite" element={<Confidentialite />} />
             <Route path="/email-confirmed" element={<EmailConfirmed />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Routes>
         </main>
         <Footer />
