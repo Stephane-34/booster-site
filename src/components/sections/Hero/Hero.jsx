@@ -70,9 +70,6 @@ export default function Hero({ onCTAClick }) {
               Commencer gratuitement
               <ArrowRight size={18} />
             </Button>
-            <Button variant="outline" size="lg" as="a" href="#offres">
-              Voir nos offres
-            </Button>
           </div>
 
           {/* Points de réassurance */}
@@ -164,8 +161,10 @@ export default function Hero({ onCTAClick }) {
       </div>
 
       {/* Séparateur bas */}
-      <div className={styles.scrollHint}>
-        <div className={styles.scrollDot} />
+      <div className={styles.scrollHint} aria-hidden="true">
+        <svg className={styles.scrollArrow} width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 3v14M4 11l6 6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </div>
     </section>
   );
