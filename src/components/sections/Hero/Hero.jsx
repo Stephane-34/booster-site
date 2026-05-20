@@ -14,7 +14,7 @@ const PHONE_STATS = [
 const REASSURANCE = [
   { icon: Shield, text: '0% de frais d\'entrée' },
   { icon: TrendingUp, text: 'Dès 50 €/mois' },
-  { icon: Zap, text: 'Ouverture en 5 minutes' },
+  { icon: Zap, text: 'Ouverture en ligne simplifiée avec un expert' },
 ];
 
 export default function Hero({ onCTAClick }) {
@@ -60,14 +60,13 @@ export default function Hero({ onCTAClick }) {
           </h1>
 
           <p className={styles.subtitle}>
-            Ton argent mérite mieux qu'un livret A à 3 %. Investis dans des produits
-            luxembourgeois avec 0 % de frais d'entrée, et forme-toi à la finance
-            personnelle de manière ludique.
+            Ton argent mérite mieux qu'un livret bancaire, investis à partir de 50 euros
+            par mois et forme-toi à la finance personnelle de manière ludique.
           </p>
 
           <div className={styles.ctaGroup}>
             <Button variant="primary" size="lg" onClick={onCTAClick}>
-              Commencer gratuitement
+              Créer mon compte
               <ArrowRight size={18} />
             </Button>
           </div>

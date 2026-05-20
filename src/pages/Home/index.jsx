@@ -42,8 +42,9 @@ function AcademyStrip() {
         <div className={styles.stripHeader}>
           <Badge variant="accent">Académie</Badge>
           <h2 className={styles.stripTitle}>
-            Apprends la finance{' '}
-            <span className="gradient-text">module par module</span>
+            Apprends la gestion personnelle{' '}
+            <span className="gradient-text">module par module</span>{' '}
+            gratuitement
           </h2>
         </div>
 
