@@ -1,3 +1,126 @@
+/* ─── Section Qui sommes-nous ? ──────────────────────────── */
+.whoSection {
+  padding: var(--space-16) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.whoHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto var(--space-12);
+}
+
+.whoTitle {
+  font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+  font-weight: var(--weight-extrabold);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.whoIntro {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.whoFeatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin-bottom: var(--space-10);
+}
+
+.whoCard {
+  display: flex;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  transition: border-color var(--transition-fast);
+}
+
+.whoCard:hover {
+  border-color: var(--color-border-active);
+}
+
+.whoCardIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(168, 85, 247, 0.12);
+  border-radius: var(--radius-md);
+  color: var(--color-primary-light);
+}
+
+.whoCardSubtitle {
+  font-size: var(--text-sm);
+  color: var(--color-primary-light);
+  font-weight: var(--weight-semibold);
+  margin: 0 0 var(--space-1);
+}
+
+.whoCardTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+}
+
+.whoCardText {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.whoConclusion {
+  text-align: center;
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+  max-width: 600px;
+  margin: 0 auto var(--space-8);
+  line-height: 1.6;
+}
+
+.whoExpertise {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.whoTag {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-medium);
+}
+
+@media (max-width: 640px) {
+  .whoFeatures {
+    grid-template-columns: 1fr;
+  }
+
+  .whoCard {
+    flex-direction: column;
+  }
+}
+
 /* ─── Section mini-cartes Académie ───────────────────────── */
 .academyStrip {
   padding: var(--space-16) 0 var(--space-12);
