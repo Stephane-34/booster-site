@@ -121,6 +121,120 @@
   }
 }
 
+/* ─── Section Nos offres ─────────────────────────────────── */
+.offersSection {
+  padding: var(--space-16) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.offersHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  margin-bottom: var(--space-12);
+}
+
+.offersTitle {
+  font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+  font-weight: var(--weight-extrabold);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.offersGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+.offerCard {
+  border-radius: var(--radius-2xl);
+  padding: 2px;
+  transition: transform var(--transition-fast);
+}
+
+.offerCard:hover {
+  transform: translateY(-4px);
+}
+
+.offerCardInvest {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.6), rgba(124, 58, 237, 0.3));
+}
+
+.offerCardAcademy {
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.5), rgba(22, 163, 74, 0.25));
+}
+
+.offerCardInner {
+  background: var(--color-bg-secondary);
+  border-radius: calc(var(--radius-2xl) - 2px);
+  padding: var(--space-8);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.offerEmoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.offerTitle {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.offerText {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin: 0;
+  flex: 1;
+}
+
+.offerPerks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.offerPerks li {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  font-weight: var(--weight-medium);
+  padding-left: var(--space-5);
+  position: relative;
+}
+
+.offerPerks li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+  font-weight: var(--weight-bold);
+}
+
+.offerBtn {
+  align-self: flex-start;
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 720px) {
+  .offersGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ─── Section mini-cartes Académie ───────────────────────── */
 .academyStrip {
   padding: var(--space-16) 0 var(--space-12);

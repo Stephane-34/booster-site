@@ -19,6 +19,7 @@ export default function Home() {
       <Hero onCTAClick={() => setAuthModal(true)} />
       <AcademyStrip />
       <WhoWeAre />
+      <Offers />
       <Testimonials />
 
       <Modal
@@ -97,6 +98,71 @@ function WhoWeAre() {
           {EXPERTISE.map((tag) => (
             <span key={tag} className={styles.whoTag}>{tag}</span>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Section Nos offres ─────────────────────────────────── */
+function Offers() {
+  return (
+    <section className={styles.offersSection}>
+      <div className="container">
+        <div className={styles.offersHeader}>
+          <Badge variant="primary">Nos offres</Badge>
+          <h2 className={styles.offersTitle}>
+            Deux façons de{' '}
+            <span className="gradient-text">construire ton avenir</span>
+          </h2>
+        </div>
+
+        <div className={styles.offersGrid}>
+          {/* Carte Investir */}
+          <div className={clsx(styles.offerCard, styles.offerCardInvest)}>
+            <div className={styles.offerCardInner}>
+              <div className={styles.offerEmoji}>📈</div>
+              <h3 className={styles.offerTitle}>Investir</h3>
+              <p className={styles.offerText}>
+                Accède à une sélection rigoureuse de produits d'investissement
+                luxembourgeois adaptés aux jeunes actifs. Dès 50 €/mois, place ton
+                argent dans des solutions à 0 % de frais d'entrée et fais-le travailler
+                pour toi, accompagné d'un expert à chaque étape.
+              </p>
+              <ul className={styles.offerPerks}>
+                <li>0 % de frais d'entrée</li>
+                <li>Dès 50 € / mois</li>
+                <li>Accompagnement par un expert</li>
+              </ul>
+              <Button variant="primary" size="md" as={Link} to="/investir" className={styles.offerBtn}>
+                Découvrir l'offre
+                <ArrowRight size={16} />
+              </Button>
+            </div>
+          </div>
+
+          {/* Carte Académie */}
+          <div className={clsx(styles.offerCard, styles.offerCardAcademy)}>
+            <div className={styles.offerCardInner}>
+              <div className={styles.offerEmoji}>🎓</div>
+              <h3 className={styles.offerTitle}>Académie</h3>
+              <p className={styles.offerText}>
+                Forme-toi à la finance personnelle module par module, gratuitement.
+                Des quiz hebdomadaires, des vidéos et une bibliothèque complète pour
+                apprendre à ton rythme — et ne plus jamais subir les décisions
+                financières que tu ne comprends pas.
+              </p>
+              <ul className={styles.offerPerks}>
+                <li>Accès 100 % gratuit</li>
+                <li>Quiz & vidéos interactifs</li>
+                <li>Suivi de progression personnalisé</li>
+              </ul>
+              <Button variant="outline" size="md" as={Link} to="/academie" className={styles.offerBtn}>
+                Explorer l'Académie
+                <ArrowRight size={16} />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
