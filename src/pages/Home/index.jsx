@@ -17,7 +17,6 @@ export default function Home() {
   return (
     <>
       <Hero onCTAClick={() => setAuthModal(true)} />
-      <AcademyStrip />
       <WhoWeAre />
       <Offers />
       <Testimonials />
@@ -121,8 +120,10 @@ function Offers() {
           {/* Carte Investir */}
           <div className={clsx(styles.offerCard, styles.offerCardInvest)}>
             <div className={styles.offerCardInner}>
-              <div className={styles.offerEmoji}>📈</div>
-              <h3 className={styles.offerTitle}>Investir</h3>
+              <div className={styles.offerCardHead}>
+                <span className={styles.offerEmoji}>📈</span>
+                <h3 className={styles.offerTitle}>Investir</h3>
+              </div>
               <p className={styles.offerText}>
                 Accède à une sélection rigoureuse de produits d'investissement
                 luxembourgeois adaptés aux jeunes actifs. Dès 50 €/mois, place ton
@@ -134,7 +135,7 @@ function Offers() {
                 <li>Dès 50 € / mois</li>
                 <li>Accompagnement par un expert</li>
               </ul>
-              <Button variant="primary" size="md" as={Link} to="/investir" className={styles.offerBtn}>
+              <Button variant="accent" size="md" as={Link} to="/investir" className={styles.offerBtn}>
                 Découvrir l'offre
                 <ArrowRight size={16} />
               </Button>
@@ -144,69 +145,37 @@ function Offers() {
           {/* Carte Académie */}
           <div className={clsx(styles.offerCard, styles.offerCardAcademy)}>
             <div className={styles.offerCardInner}>
-              <div className={styles.offerEmoji}>🎓</div>
-              <h3 className={styles.offerTitle}>Académie</h3>
+              <div className={styles.offerCardHead}>
+                <span className={styles.offerEmoji}>🎓</span>
+                <h3 className={styles.offerTitle}>Académie</h3>
+              </div>
               <p className={styles.offerText}>
                 Forme-toi à la finance personnelle module par module, gratuitement.
                 Des quiz hebdomadaires, des vidéos et une bibliothèque complète pour
                 apprendre à ton rythme — et ne plus jamais subir les décisions
                 financières que tu ne comprends pas.
               </p>
-              <ul className={styles.offerPerks}>
-                <li>Accès 100 % gratuit</li>
-                <li>Quiz & vidéos interactifs</li>
-                <li>Suivi de progression personnalisé</li>
-              </ul>
-              <Button variant="outline" size="md" as={Link} to="/academie" className={styles.offerBtn}>
+              <div className={styles.offerModules}>
+                {ACADEMY_THEMES.map((theme) => {
+                  const Icon = theme.icon;
+                  return (
+                    <div
+                      key={theme.id}
+                      className={clsx(styles.offerModule, theme.locked && styles.offerModuleLocked)}
+                    >
+                      <Icon size={13} />
+                      <span>{theme.name}</span>
+                      {theme.locked && <Lock size={10} className={styles.offerModuleLock} />}
+                    </div>
+                  );
+                })}
+              </div>
+              <Button variant="accent" size="md" as={Link} to="/academie" className={styles.offerBtn}>
                 Explorer l'Académie
                 <ArrowRight size={16} />
               </Button>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Mini-strip des 6 parcours académie ────────────────── */
-function AcademyStrip() {
-  return (
-    <section className={styles.academyStrip}>
-      <div className="container">
-        <div className={styles.stripHeader}>
-          <Badge variant="accent">Académie</Badge>
-          <h2 className={styles.stripTitle}>
-            Apprends la gestion personnelle{' '}
-            <span className="gradient-text">module par module</span>{' '}
-            gratuitement
-          </h2>
-        </div>
-
-        <div className={styles.stripCards}>
-          {ACADEMY_THEMES.map((theme) => {
-            const Icon = theme.icon;
-            return (
-              <div
-                key={theme.id}
-                className={clsx(styles.miniCard, theme.locked && styles.miniCardLocked)}
-              >
-                <div className={styles.miniCardIcon}>
-                  <Icon size={18} />
-                </div>
-                <span className={styles.miniCardName}>{theme.name}</span>
-                <span className={styles.miniCardModules}>{theme.modules} modules</span>
-                {theme.locked && <Lock size={11} className={styles.miniCardLockIcon} />}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className={styles.stripCta}>
-          <Button variant="primary" size="md" as={Link} to="/academie">
-            Explorer l'Académie
-            <ArrowRight size={16} />
-          </Button>
         </div>
       </div>
     </section>
