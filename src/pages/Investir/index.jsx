@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { CheckCircle, TrendingUp, Info, ArrowRight } from 'lucide-react';
+import { CheckCircle, TrendingUp, Info, ArrowRight, Landmark, BarChart2, Percent } from 'lucide-react';
 import clsx from 'clsx';
 import OfferTabs from '../../components/sections/OfferTabs/OfferTabs';
 import BookingCTA from '../../components/sections/BookingCTA/BookingCTA';
@@ -32,25 +32,37 @@ export default function Investir() {
 }
 
 /* ─── Hero assurance vie ──────────────────────────────────── */
-const AV_POINTS = [
-  "Enveloppe fiscale avantageuse : abattement annuel de 4 600 € sur les gains après 8 ans",
-  "Capital disponible à tout moment — rachats partiels libres et sans pénalité",
-  "Transmission optimisée hors succession, jusqu'à 152 500 € par bénéficiaire",
-  "Deux poches : fonds euros (capital garanti) + unités de compte (rendement potentiel)",
-  "Protection renforcée par le droit luxembourgeois — triangle de sécurité unique en Europe",
-];
-
-const AV_STATS = [
-  { value: '152 500 €', label: "Exonération de droits par bénéficiaire" },
-  { value: '4 600 €',   label: "Abattement annuel sur les gains après 8 ans" },
-  { value: '0 %',       label: "Frais d'entrée — chaque euro travaille pour vous" },
+const AV_GLASS_SECTIONS = [
+  {
+    icon: Landmark,
+    title: 'Comment ça fonctionne ?',
+    content: "Un contrat entre vous et un assureur : vous versez, l'assureur fait fructifier. Votre argent n'est jamais bloqué — vous pouvez effectuer des rachats partiels ou totaux à tout moment, sans pénalité. Vous choisissez librement le rythme : versement initial, versements libres ou programmés (mensuel, trimestriel…).",
+  },
+  {
+    icon: BarChart2,
+    title: 'Fonds euros vs Unités de compte',
+    rows: [
+      { label: 'Fonds en euros', detail: 'Capital garanti + effet cliquet — les intérêts sont définitivement acquis. Rendement modéré, idéal pour sécuriser.' },
+      { label: 'Unités de compte', detail: 'Investi sur les marchés (actions, ETF, SCPI…). Capital non garanti, mais rendement potentiel nettement supérieur.' },
+    ],
+  },
+  {
+    icon: Percent,
+    title: 'Une fiscalité très avantageuse',
+    items: [
+      { highlight: 'Avant 8 ans', text: 'Gains soumis au PFU de 30 % (12,8 % IR + 17,2 % prélèvements sociaux).' },
+      { highlight: 'Après 8 ans', text: 'Abattement annuel de 4 600 € sur les gains (9 200 € en couple) — exonéré d\'IR en dessous.' },
+      { highlight: 'Succession', text: 'Capital hors succession. Chaque bénéficiaire bénéficie de 152 500 € nets d\'impôts (versements avant 70 ans).' },
+    ],
+  },
 ];
 
 function HeroAV({ onCTAClick }) {
   return (
     <section className={styles.heroAV}>
-      <div className={`container ${styles.heroAVInner}`}>
-        <div className={styles.heroAVContent}>
+      <div className="container">
+        {/* Titre centré */}
+        <div className={styles.heroAVHead}>
           <Badge variant="primary">Assurance vie</Badge>
           <h1 className={styles.heroAVTitle}>
             Mon assurance vie,{' '}
@@ -58,31 +70,57 @@ function HeroAV({ onCTAClick }) {
             de l'épargne
           </h1>
           <p className={styles.heroAVDesc}>
-            Souvent mal comprise, l'assurance vie est pourtant le placement préféré des
-            Français — et pour de bonnes raisons. C'est l'outil idéal pour un jeune actif
-            qui veut faire fructifier son argent sans le bloquer.
+            L'outil le plus puissant pour transformer tes économies d'aujourd'hui en gros projets demain.
           </p>
-          <ul className={styles.heroAVPoints}>
-            {AV_POINTS.map((point) => (
-              <li key={point} className={styles.heroAVPoint}>
-                <CheckCircle size={16} className={styles.heroAVCheck} />
-                <span>{point}</span>
-              </li>
-            ))}
-          </ul>
           <Button variant="accent" size="lg" onClick={onCTAClick}>
             Créer mon compte
             <ArrowRight size={18} />
           </Button>
         </div>
 
-        <div className={styles.heroAVStats}>
-          {AV_STATS.map(({ value, label }) => (
-            <div key={label} className={styles.statCard}>
-              <span className={styles.statValue}>{value}</span>
-              <span className={styles.statLabel}>{label}</span>
-            </div>
-          ))}
+        {/* Glass card */}
+        <div className={styles.glassCard}>
+          <p className={styles.glassIntro}>
+            L'assurance vie est souvent considérée comme le « couteau suisse » de l'épargne en France.
+            Contrairement à ce que son nom pourrait laisser penser, il ne s'agit pas principalement d'une
+            assurance décès, mais d'un produit d'épargne et de placement qui permet de se constituer un
+            capital de son vivant, avec des avantages fiscaux très intéressants.
+          </p>
+
+          <div className={styles.glassSections}>
+            {AV_GLASS_SECTIONS.map(({ icon: Icon, title, content, rows, items }) => (
+              <div key={title} className={styles.glassSection}>
+                <div className={styles.glassSectionHead}>
+                  <div className={styles.glassSectionIcon}><Icon size={16} /></div>
+                  <h3 className={styles.glassSectionTitle}>{title}</h3>
+                </div>
+
+                {content && <p className={styles.glassSectionText}>{content}</p>}
+
+                {rows && (
+                  <div className={styles.glassRows}>
+                    {rows.map(({ label, detail }) => (
+                      <div key={label} className={styles.glassRow}>
+                        <span className={styles.glassRowLabel}>{label}</span>
+                        <span className={styles.glassRowDetail}>{detail}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {items && (
+                  <ul className={styles.glassItems}>
+                    {items.map(({ highlight, text }) => (
+                      <li key={highlight} className={styles.glassItem}>
+                        <span className={styles.glassItemHighlight}>{highlight}</span>
+                        <span className={styles.glassItemText}>{text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
