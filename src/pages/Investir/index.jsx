@@ -547,25 +547,24 @@ const RETRAITE_POINTS = [
   "Stratégie de désensibilisation progressive du risque à l'approche de la retraite",
 ];
 
-function TabRetraite() {
-  const [age, setAge]         = useState(25);
-  const [salary, setSalary]   = useState(2500);
-  const [monthly, setMonthly] = useState(100);
+const REPLACEMENT_RATES = [
+  { statut: 'Fonctionnaire',              rate: 0.75 },
+  { statut: 'Cadre',                      rate: 0.65 },
+  { statut: 'Salarié',                    rate: 0.55 },
+  { statut: 'TNS (Travailleur Non Salarié)', rate: 0.25 },
+];
 
-  const result = useMemo(() => {
-    const monthsNow    = Math.max(0, (65 - age) * 12);
-    const monthsLater  = Math.max(0, (65 - (age + 10)) * 12);
-    const capitalNow   = computeFutureValue(monthly, RATE_BOOSTER, monthsNow);
-    const capitalLater = computeFutureValue(monthly, RATE_BOOSTER, monthsLater);
-    const pension      = Math.round(salary * 0.50);
-    const gap          = salary - pension;
-    return {
-      capitalNow, capitalLater, capitalLoss: capitalNow - capitalLater,
-      pension, gap,
-      capitalNeeded: gap * 12 * 20,
-      replacementRate: Math.round((pension / salary) * 100),
-    };
-  }, [age, salary, monthly]);
+function TabRetraite() {
+  const [salary, setSalary]         = useState(2000);
+  const [age, setAge]               = useState(25);
+  const [retirementAge, setRetirementAge] = useState(65);
+  const [monthly, setMonthly]       = useState(100);
+  const [rate, setRate]             = useState(5);
+
+  const capital = useMemo(() => {
+    const months = Math.max(0, (retirementAge - age) * 12);
+    return computeFutureValue(monthly, rate / 100, months);
+  }, [age, retirementAge, monthly, rate]);
 
   return (
     <div className={styles.panel}>
@@ -586,72 +585,72 @@ function TabRetraite() {
           ))}
         </ul>
 
+        {/* Simulateur taux de remplacement */}
         <SimCard title="Simulateur taux de remplacement">
-          <div className={styles.simControls}>
-            <SliderGroup label="Salaire net mensuel actuel" value={formatCurrency(salary)}>
-              <input type="range" min={1000} max={8000} step={100} value={salary}
-                onChange={(e) => setSalary(Number(e.target.value))} className={styles.simSlider} />
-            </SliderGroup>
+          <SliderGroup label="Salaire net mensuel de référence" value={formatCurrency(salary)}>
+            <input type="range" min={500} max={8000} step={100} value={salary}
+              onChange={(e) => setSalary(Number(e.target.value))} className={styles.simSlider} />
+          </SliderGroup>
+          <div className={styles.rateTable}>
+            <div className={styles.rateTableHead}>
+              <span>Statut</span>
+              <span>Taux</span>
+              <span>Rente estimée</span>
+              <span>Manque / mois</span>
+            </div>
+            {REPLACEMENT_RATES.map(({ statut, rate: r }) => {
+              const pension = Math.round(salary * r);
+              const gap     = salary - pension;
+              return (
+                <div key={statut} className={styles.rateTableRow}>
+                  <span className={styles.rateTableStatut}>{statut}</span>
+                  <span className={styles.rateTableRate}>{Math.round(r * 100)} %</span>
+                  <span className={styles.rateTablePension}>{formatCurrency(pension)}</span>
+                  <span className={clsx(styles.rateTableGap, gap > 0 && styles.rateTableGapNeg)}>
+                    -{formatCurrency(gap)}
+                  </span>
+                </div>
+              );
+            })}
           </div>
-          <div className={styles.simResult}>
-            <div className={styles.retirementGrid}>
-              <div className={styles.retirementStat}>
-                <span className={styles.retirementVal}>{result.replacementRate} %</span>
-                <span className={styles.retirementStatLabel}>Taux de remplacement estimé</span>
-              </div>
-              <div className={styles.retirementStat}>
-                <span className={clsx(styles.retirementVal, styles.retirementNeg)}>
-                  -{formatCurrency(result.gap)}/mois
-                </span>
-                <span className={styles.retirementStatLabel}>Manque à gagner mensuel</span>
-              </div>
-            </div>
-            <div className={styles.simCompRow}>
-              <span>Retraite estimée (50 % du salaire)</span>
-              <span className={styles.simValueLow}>{formatCurrency(result.pension)}/mois</span>
-            </div>
-            <div className={styles.simCompRow}>
-              <span>Capital à constituer (65 → 85 ans)</span>
-              <span className={styles.simValueHigh}>{formatCurrency(result.capitalNeeded)}</span>
-            </div>
-            <p className={styles.simNote}>
-              Estimation indicative basée sur un taux de remplacement moyen de 50 % au régime général.
-            </p>
-          </div>
+          <p className={styles.simNote}>
+            Estimation indicative. Les taux réels varient selon la carrière et le régime.
+          </p>
         </SimCard>
 
-        <SimCard title="Mon capital à 65 ans">
+        {/* Simulateur capital retraite */}
+        <SimCard title="Mon capital à la retraite">
           <div className={styles.simControls}>
             <SliderGroup label="Mon âge actuel" value={`${age} ans`}>
-              <input type="range" min={18} max={45} step={1} value={age}
+              <input type="range" min={18} max={60} step={1} value={age}
                 onChange={(e) => setAge(Number(e.target.value))} className={styles.simSlider} />
             </SliderGroup>
-            <SliderGroup label="Versement mensuel" value={formatCurrency(monthly)}>
-              <input type="range" min={50} max={500} step={50} value={monthly}
+            <SliderGroup label="Âge de retraite souhaité" value={`${retirementAge} ans`}>
+              <input type="range" min={55} max={70} step={1} value={retirementAge}
+                onChange={(e) => setRetirementAge(Number(e.target.value))} className={styles.simSlider} />
+            </SliderGroup>
+            <SliderGroup label="Capacité d'épargne mensuelle" value={formatCurrency(monthly)}>
+              <input type="range" min={50} max={2000} step={50} value={monthly}
                 onChange={(e) => setMonthly(Number(e.target.value))} className={styles.simSlider} />
+            </SliderGroup>
+            <SliderGroup label="Taux de rentabilité souhaité" value={`${rate} %`}>
+              <input type="range" min={1} max={10} step={0.5} value={rate}
+                onChange={(e) => setRate(Number(e.target.value))} className={styles.simSlider} />
             </SliderGroup>
           </div>
           <div className={styles.simResult}>
             <div className={styles.simResultMain}>
-              <span className={styles.simResultLabel}>Capital estimé à 65 ans</span>
-              <span className={styles.simResultValue}>{formatCurrency(result.capitalNow)}</span>
+              <span className={styles.simResultLabel}>
+                Capital estimé à {retirementAge} ans
+              </span>
+              <span className={styles.simResultValue}>{formatCurrency(capital)}</span>
               <span className={styles.simResultSub}>
-                en commençant à {age} ans ({65 - age} ans d'épargne)
+                {retirementAge - age} ans d'épargne · {formatCurrency(monthly)}/mois · {rate} %/an
               </span>
             </div>
-            {result.capitalLoss > 0 && (
-              <>
-                <div className={styles.simCompRow}>
-                  <span>En commençant dans 10 ans</span>
-                  <span className={styles.simValueLow}>{formatCurrency(result.capitalLater)}</span>
-                </div>
-                <div className={styles.simDiff}>
-                  -{formatCurrency(result.capitalLoss)} perdus en attendant
-                </div>
-              </>
-            )}
             <p className={styles.simNote}>
-              Simulation à {(RATE_BOOSTER * 100).toFixed(0)} % annuel. Ne constitue pas un conseil.
+              Formule : versement × ((1 + taux/12)^(durée×12) − 1) / (taux/12).
+              Ne constitue pas un conseil en investissement.
             </p>
           </div>
         </SimCard>
