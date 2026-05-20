@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom';
-import { TrendingUp, Share2, Globe, MessageCircle } from 'lucide-react';
+import { Share2, Globe, MessageCircle } from 'lucide-react';
 import styles from './Footer.module.css';
 
 const LINKS = {
   produit: [
-    { label: 'Ton projet', to: '/ton-projet' },
     { label: 'Académie', to: '/academie' },
     { label: 'Investir', to: '/investir' },
     { label: 'Simulateur', to: '/investir#simulateur' },
@@ -27,9 +26,7 @@ export default function Footer() {
         {/* Colonne marque */}
         <div className={styles.brand}>
           <Link to="/" className={styles.logo}>
-            <div className={styles.logoIcon}>
-              <TrendingUp size={16} />
-            </div>
+            <img src="/logo-rocket.png" className={styles.logoImg} alt="Booster" />
             <span>Booster</span>
           </Link>
           <p className={styles.tagline}>

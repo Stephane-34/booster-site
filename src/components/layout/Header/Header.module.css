@@ -32,16 +32,12 @@
   flex-shrink: 0;
 }
 
-.logoIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+.logoImg {
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-md);
-  color: #fff;
-  box-shadow: 0 4px 12px var(--color-primary-glow);
+  object-fit: cover;
+  display: block;
 }
 
 .logoText {

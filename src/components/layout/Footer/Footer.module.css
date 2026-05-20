@@ -22,15 +22,12 @@
   margin-bottom: var(--space-4);
 }
 
-.logoIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+.logoImg {
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
-  color: #fff;
+  object-fit: cover;
+  display: block;
 }
 
 .tagline {

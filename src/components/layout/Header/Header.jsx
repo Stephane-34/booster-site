@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Menu, X, TrendingUp } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import clsx from 'clsx';
 import Button from '../../ui/Button/Button';
 import Modal from '../../ui/Modal/Modal';
@@ -9,11 +9,9 @@ import styles from './Header.module.css';
 
 /* cta: true → pill vert (même style pour Investir et Académie) */
 const NAV_LINKS = [
-  { label: 'Accueil',    to: '/',           cta: false },
-  { label: 'Ton projet', to: '/ton-projet', cta: false },
-  { label: 'Investir',   to: '/investir',   cta: true  },
-  { label: 'Académie',   to: '/academie',   cta: true  },
-  { label: 'À propos',   to: '/a-propos',   cta: false },
+  { label: 'Accueil',  to: '/',         cta: false },
+  { label: 'Investir', to: '/investir', cta: true  },
+  { label: 'Académie', to: '/academie', cta: true },
 ];
 
 export default function Header() {
@@ -42,7 +40,7 @@ export default function Header() {
         <div className={`container ${styles.inner}`}>
           {/* Logo */}
           <Link to="/" className={styles.logo} onClick={closeMenu}>
-            <div className={styles.logoIcon}><TrendingUp size={18} /></div>
+            <img src="/logo-rocket.png" className={styles.logoImg} alt="Booster" />
             <span className={styles.logoText}>Booster</span>
           </Link>
 

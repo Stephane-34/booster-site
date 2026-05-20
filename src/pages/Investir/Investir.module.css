@@ -380,17 +380,19 @@
 
 .tabs {
   display: flex;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  width: 100%;
+  background: rgba(74, 222, 128, 0.06);
+  border: 1px solid rgba(74, 222, 128, 0.25);
   border-radius: var(--radius-full);
-  padding: 4px;
+  padding: 5px;
   gap: 4px;
-  width: fit-content;
   margin: 0 auto var(--space-10);
 }
 
 .tab {
-  padding: var(--space-2) var(--space-5);
+  flex: 1;
+  text-align: center;
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-full);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
@@ -402,9 +404,10 @@
 .tab:hover { color: var(--color-text); }
 
 .tabActive {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  color: #fff;
-  box-shadow: 0 4px 12px var(--color-primary-glow);
+  background: linear-gradient(135deg, var(--color-accent-dark), var(--color-accent));
+  color: #0a0a0a;
+  font-weight: var(--weight-semibold);
+  box-shadow: 0 4px 14px rgba(74, 222, 128, 0.35);
 }
 
 .tabContent {
@@ -580,7 +583,7 @@
   flex-direction: column;
   align-items: center;
   flex-shrink: 0;
-  width: 18px;
+  width: 36px;
 }
 
 .timelineDot {
@@ -591,6 +594,23 @@
   box-shadow: 0 0 8px var(--color-primary-glow);
   flex-shrink: 0;
   margin-top: 4px;
+}
+
+.timelineNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 50%;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-primary-light);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .timelineConnector {
@@ -635,6 +655,65 @@
   color: var(--color-text-secondary);
   line-height: 1.55;
   margin: 0;
+}
+
+/* ─── Profils immobilier ──────────────────────────────────── */
+.immoProfiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.immoProfileCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  transition: border-color var(--transition-fast);
+}
+
+.immoProfileCard:hover {
+  border-color: var(--color-border-active);
+}
+
+.immoProfileHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.immoProfileIcon {
+  color: var(--color-primary-light);
+  flex-shrink: 0;
+}
+
+.immoProfileLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+}
+
+.immoProfileSub {
+  font-size: var(--text-xs);
+  color: var(--color-primary-light);
+  font-weight: var(--weight-semibold);
+}
+
+.immoProfileDesc {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 580px) {
+  .immoProfiles {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ─── Grille projets personnels ───────────────────────────── */

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { CheckCircle, TrendingUp, Info, ArrowRight, Landmark, BarChart2, Percent } from 'lucide-react';
+import { CheckCircle, TrendingUp, Info, ArrowRight, Landmark, BarChart2, Percent, Shield, Rocket } from 'lucide-react';
 import clsx from 'clsx';
 import OfferTabs from '../../components/sections/OfferTabs/OfferTabs';
 import BookingCTA from '../../components/sections/BookingCTA/BookingCTA';
@@ -399,20 +399,34 @@ function TabEpargner() {
 
 /* ── 2. Projet immobilier ─────────────────────────────────── */
 const IMMO_TIMELINE = [
-  { step: '01', title: "Définir son projet",                   detail: "Budget, localisation, surface, critères essentiels.",                                  tag: "Mois 1" },
-  { step: '02', title: "Constituer l'apport",                  detail: "Votre assurance vie Booster fait travailler votre épargne pendant cette phase.",         tag: "Mois 1 → 18+" },
-  { step: '03', title: "Recherche active du bien",             detail: "Visites, comparaisons, négociation du prix.",                                           tag: "Mois 12 → 24" },
-  { step: '04', title: "Offre d'achat acceptée",               detail: "Lettre d'intention formelle au vendeur.",                                               tag: "Mois 20" },
-  { step: '05', title: "Compromis de vente",                   detail: "Signature chez le notaire, dépôt de séquestre (5–10 %).",                               tag: "Mois 21" },
-  { step: '06', title: "Dossier de financement",               detail: "Comparaison des offres bancaires, assurance emprunteur.",                                tag: "Mois 22–24" },
-  { step: '07', title: "Acte définitif + remise des clés",     detail: "Signature notariale, virement du financement — vous êtes propriétaire.",                 tag: "Mois 28" },
+  { title: "L'offre d'achat",                          detail: "Tu as trouvé la perle ! Tu fais une proposition de prix. Si elle est acceptée, le bien t'est réservé." },
+  { title: "Le compromis de vente",                    detail: "Signature chez le notaire. Un dépôt de garantie (le séquestre) te sera demandé : c'est une avance sur les frais de notaire pour prouver ton sérieux." },
+  { title: "La recherche de financement",              detail: "Tu as en général 3 mois pour obtenir ton crédit. La banque étudiera ton comportement financier (salaires, absence d'agios, gestion du découvert pour voir si tu sais épargner). Ton taux d'effort (crédit + assurance) ne doit pas dépasser 35 % de tes revenus." },
+  { title: "L'assurance emprunteur",                   detail: "Obligatoire (Décès, Invalidité, PTIA). Tu devras remplir un questionnaire de santé. Anticipe ! Les analyses médicales peuvent prendre plus d'un mois. Sans assurance, pas de prêt." },
+  { title: "L'Apport, la Caution et l'épargne résiduelle", detail: "Ton apport paye les frais annexes. Ton dossier doit être validé par une société de caution. Si ton apport est trop faible ou si tu ne gardes pas assez d'épargne après l'achat pour les imprévus, elle refusera. Sans caution l'hypothèque étant souvent refusée, la banque ne prête pas." },
+  { title: "Offre de prêt & 11 jours",                 detail: "Tu signes le récépissé de l'offre. Tu as 11 jours de réflexion obligatoires avant de renvoyer l'offre signée. Conseil : les frais de dossier et de garantie sont prélevés à ce moment, alimente bien ton compte pour éviter un impayé !" },
+  { title: "La signature définitive",                  detail: "Le grand jour chez le notaire. On te remet les clés. Tu es propriétaire ! 🎉" },
 ];
 
-const IMMO_POINTS = [
-  "Rachat partiel possible à tout moment — vous restez maître de votre timing d'achat",
-  "Profil équilibré recommandé pour un horizon 3-7 ans",
-  "Accès aux SCPI : rendement immobilier (4-6 % brut/an) sans contrainte de gestion locative",
-  "0 % de frais d'entrée — chaque euro épargné travaille entièrement pour votre apport",
+const IMMO_PROFILES = [
+  {
+    title: 'Sécuritaire',
+    subtitle: '< 3 ans',
+    icon: Shield,
+    back: "Achat prévu d'ici 3 ans : On sécurise à 100 % sur le Fonds Euro pour ne prendre aucun risque sur ton apport.",
+  },
+  {
+    title: 'Équilibré',
+    subtitle: '3 à 5 ans',
+    icon: BarChart2,
+    back: "Achat prévu entre 3 et 5 ans : Un mix prudent pour dynamiser un peu l'épargne tout en limitant les risques de perte à l'approche de la date.",
+  },
+  {
+    title: 'Dynamique',
+    subtitle: '> 5 ans',
+    icon: Rocket,
+    back: "Achat lointain : On va chercher du rendement sur les marchés financiers pour faire grossir ton apport plus vite, en profitant du temps devant nous.",
+  },
 ];
 
 function TabImmobilier() {
@@ -436,40 +450,50 @@ function TabImmobilier() {
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
         <Badge variant="primary">Projet immobilier</Badge>
-        <h3 className={styles.panelTitle}>Constituez votre apport autrement</h3>
+        <h3 className={styles.panelTitle}>Prépare ton futur chez-toi 🏠</h3>
         <p className={styles.panelDesc}>
-          Vous visez un achat immobilier dans 3 à 7 ans ? L'assurance vie est l'outil
-          idéal pour faire fructifier votre futur apport tout en restant disponible.
+          Acheter ton premier appart' te semble lointain ? Détrompe-toi ! La clé,
+          c'est l'anticipation. Découvre les coulisses d'un achat et bâtis l'apport
+          qui convaincra les banques.
         </p>
       </div>
       <div className={styles.panelBody}>
-        <ul className={styles.checkList}>
-          {IMMO_POINTS.map((p) => (
-            <li key={p} className={styles.checkItem}>
-              <CheckCircle size={16} className={styles.checkIcon} /><span>{p}</span>
-            </li>
-          ))}
-        </ul>
 
+        {/* Timeline */}
         <div className={styles.timeline}>
-          <p className={styles.timelineHeading}>Timeline d'un achat immobilier</p>
+          <p className={styles.timelineHeading}>La Timeline d'un achat réussi 🔑</p>
           {IMMO_TIMELINE.map((item, i) => (
-            <div key={item.step} className={styles.timelineItem}>
+            <div key={item.title} className={styles.timelineItem}>
               <div className={styles.timelineLeft}>
-                <div className={styles.timelineDot} />
+                <div className={styles.timelineNum}>{i + 1}</div>
                 {i < IMMO_TIMELINE.length - 1 && <div className={styles.timelineConnector} />}
               </div>
               <div className={styles.timelineContent}>
-                <div className={styles.timelineTop}>
-                  <strong className={styles.timelineItemTitle}>{item.title}</strong>
-                  <span className={styles.timelineTag}>{item.tag}</span>
-                </div>
+                <strong className={styles.timelineItemTitle}>{item.title}</strong>
                 <p className={styles.timelineDetail}>{item.detail}</p>
               </div>
             </div>
           ))}
         </div>
 
+        {/* Profils de risque */}
+        <div>
+          <p className={styles.profilesLabel}>Choisis ton camp (Profils de Risque)</p>
+          <div className={styles.immoProfiles}>
+            {IMMO_PROFILES.map(({ title, subtitle, icon: Icon, back }) => (
+              <div key={title} className={styles.immoProfileCard}>
+                <div className={styles.immoProfileHead}>
+                  <Icon size={20} className={styles.immoProfileIcon} />
+                  <span className={styles.immoProfileLabel}>{title}</span>
+                </div>
+                <span className={styles.immoProfileSub}>{subtitle}</span>
+                <p className={styles.immoProfileDesc}>{back}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Simulateur */}
         <SimCard title="Quand aurai-je mon apport ?">
           <div className={styles.simControls}>
             <SliderGroup label="Apport visé" value={formatCurrency(target)}>
@@ -496,6 +520,7 @@ function TabImmobilier() {
     </div>
   );
 }
+
 
 /* ── 3. Projet personnel ──────────────────────────────────── */
 const PERSONAL_PROJECTS = [
