@@ -32,6 +32,7 @@ export default function App() {
             <Route path="/investir" element={<Investir />} />
             <Route path="/academie" element={<Academy />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            {/* Redirige les anciens liens /ton-projet vers /investir — à conserver tant que des partages externes peuvent pointer cette URL */}
             <Route path="/ton-projet" element={<TonProjet />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/cgu" element={<CGU />} />

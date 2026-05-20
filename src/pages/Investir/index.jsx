@@ -11,8 +11,11 @@ import { computeFutureValue, computeRequiredMonthly, computeMonthsToGoal } from 
 import { formatCurrency } from '../../utils/formatters';
 import styles from './Investir.module.css';
 
-const RATE_BOOSTER  = 0.05;   // 5 % annuel
-const RATE_LIVRET_A = 0.015;  // 1,5 % annuel
+/* Taux utilisés uniquement à des fins d'illustration dans les simulateurs.
+   5 % est le rendement moyen cible du portefeuille Booster — non garanti.
+   1,5 % est le taux réglementé du Livret A en vigueur au 1er février 2025. */
+const RATE_BOOSTER  = 0.05;
+const RATE_LIVRET_A = 0.015;
 
 /* ─── Page principale ─────────────────────────────────────── */
 export default function Investir() {
@@ -624,10 +627,12 @@ const RETRAITE_POINTS = [
   "Stratégie de désensibilisation progressive du risque à l'approche de la retraite",
 ];
 
+/* Taux de remplacement moyens estimés par le COR (Conseil d'Orientation des Retraites).
+   Les TNS sont particulièrement pénalisés par la réforme de 2023. */
 const REPLACEMENT_RATES = [
-  { statut: 'Fonctionnaire',              rate: 0.75 },
-  { statut: 'Cadre',                      rate: 0.65 },
-  { statut: 'Salarié',                    rate: 0.55 },
+  { statut: 'Fonctionnaire',                rate: 0.75 },
+  { statut: 'Cadre',                        rate: 0.65 },
+  { statut: 'Salarié',                      rate: 0.55 },
   { statut: 'TNS (Travailleur Non Salarié)', rate: 0.25 },
 ];
 
@@ -639,6 +644,7 @@ function TabRetraite() {
   const [rate, setRate]             = useState(5);
 
   const capital = useMemo(() => {
+    /* Math.max(0, …) évite les mois négatifs si l'âge actuel dépasse l'âge de retraite */
     const months = Math.max(0, (retirementAge - age) * 12);
     return computeFutureValue(monthly, rate / 100, months);
   }, [age, retirementAge, monthly, rate]);

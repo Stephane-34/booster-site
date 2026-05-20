@@ -10,6 +10,8 @@ import { ACADEMY_THEMES } from '../../data/themes';
 import { useQuiz } from '../../hooks/useQuiz';
 import styles from './Academy.module.css';
 
+/* Questions codées en dur pour la démo. La prochaine étape est de les charger
+   depuis Supabase via getQuizQuestions(theme) une fois le back-office de contenu en place. */
 const QUESTIONS = [
   {
     id: 1,
@@ -91,7 +93,7 @@ export default function Academy() {
             </p>
           </div>
 
-          {/* Statistiques utilisateur */}
+          {/* Statistiques utilisateur — valeurs statiques en attendant la persistance Supabase */}
           <div className={styles.heroStats}>
             <div className={styles.statBox}>
               <span className={styles.statValue}>B+</span>
@@ -263,6 +265,7 @@ function ThemeCard({ theme, isSelected, onSelect }) {
 
 function QuizResults({ score, total, onReset }) {
   const pct = Math.round((score / total) * 100);
+  /* Barème aligné sur la notation académique française : A ≥ 80 %, B+ ≥ 60 %, C ≥ 40 % */
   const grade = pct >= 80 ? 'A' : pct >= 60 ? 'B+' : pct >= 40 ? 'C' : 'D';
 
   return (
