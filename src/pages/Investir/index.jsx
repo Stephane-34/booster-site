@@ -280,13 +280,31 @@ function ProjectTabs({ onCTAClick }) {
    ══════════════════════════════════════════════════════════ */
 
 /* ── 1. Épargner et fructifier ────────────────────────────── */
-const STEPS_EPARGNER = [
-  { number: '01', title: 'Versez régulièrement (méthode DCA)',
-    desc: "Investir un montant fixe chaque mois réduit l'impact des fluctuations de marché. Pas besoin de surveiller les cours." },
-  { number: '02', title: 'Laissez les intérêts composer',
-    desc: "À 5 % net par an, votre capital double en ~14 ans. Chaque année supplémentaire compte exponentiellement." },
-  { number: '03', title: 'Adaptez le risque à votre horizon',
-    desc: 'Court terme → fonds euros sécurisé. Long terme → unités de compte orientées croissance mondiale.' },
+const RISK_PROFILES = [
+  {
+    label: 'Profil Sécuritaire',
+    emoji: '🛡️',
+    allocation: '100 % Fonds Euro',
+    desc: "Ton capital est garanti à 100 %, il ne peut pas baisser. Tu gagnes un peu moins, mais tu dors sur tes deux oreilles.",
+    barEuro: 100,
+    barUC: 0,
+  },
+  {
+    label: 'Profil Équilibré',
+    emoji: '⚖️',
+    allocation: '70 % Fonds Euro / 30 % Actions & ETF',
+    desc: "Une base solide qui ne bouge pas, boostée par une dose de marchés financiers pour aller chercher plus de performance.",
+    barEuro: 70,
+    barUC: 30,
+  },
+  {
+    label: 'Profil Dynamique',
+    emoji: '🚀',
+    allocation: '30 % Fonds Euro / 70 % Actions & ETF',
+    desc: "Le temps est ton meilleur allié. Ton capital fluctue, mais tu maximises tes chances de forte croissance sur le long terme.",
+    barEuro: 30,
+    barUC: 70,
+  },
 ];
 
 function TabEpargner() {
@@ -300,26 +318,60 @@ function TabEpargner() {
   return (
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
-        <Badge variant="primary">Stratégie</Badge>
-        <h3 className={styles.panelTitle}>Faites travailler votre argent, même à petit budget</h3>
+        <Badge variant="primary">Épargner et fructifier</Badge>
+        <h3 className={styles.panelTitle}>Fais travailler ton argent 🚀</h3>
         <p className={styles.panelDesc}>
-          100 € par mois placés à 25 ans valent plus du double qu'à 35 ans.
-          Le temps est votre meilleur allié.
+          Laisser 1 000 € sur un compte courant pendant tes études, c'est accepter que ton pouvoir
+          d'achat diminue à cause de l'inflation. Ton argent doit devenir un moteur, pas un poids mort.
         </p>
       </div>
       <div className={styles.panelBody}>
-        <div className={styles.steps}>
-          {STEPS_EPARGNER.map((step, i) => (
-            <div key={step.number} className={styles.step}>
-              <div className={styles.stepNum}>{step.number}</div>
-              {i < STEPS_EPARGNER.length - 1 && <div className={styles.stepLine} />}
-              <div className={styles.stepContent}>
-                <h4 className={styles.stepTitle}>{step.title}</h4>
-                <p className={styles.stepDesc}>{step.desc}</p>
-              </div>
-            </div>
-          ))}
+
+        {/* Règle des 3 ans */}
+        <div className={styles.ruleCard}>
+          <div className={styles.ruleCardHead}>
+            <span className={styles.ruleCardEmoji}>⏳</span>
+            <h4 className={styles.ruleCardTitle}>La règle des 3 ans</h4>
+          </div>
+          <p className={styles.ruleCardText}>
+            Pour qu'un placement soit efficace, il lui faut de l'oxygène. L'horizon idéal ?
+            Minimum 3 ans pour lisser les variations des marchés financiers. Si tu commences
+            en première année, ton épargne arrive à maturité pile pour ton diplôme. Tu pourras
+            alors financer ta vie active (caution d'appartement, première voiture) ou laisser
+            la magie des intérêts composés continuer d'opérer.
+          </p>
         </div>
+
+        {/* Profils de risque */}
+        <div>
+          <p className={styles.profilesLabel}>Choisis ton camp — Les profils de risque</p>
+          <div className={styles.profiles}>
+            {RISK_PROFILES.map(({ label, emoji, allocation, desc, barEuro, barUC }) => (
+              <div key={label} className={styles.profileCard}>
+                <div className={styles.profileHead}>
+                  <span className={styles.profileEmoji}>{emoji}</span>
+                  <span className={styles.profileLabel}>{label}</span>
+                </div>
+                <span className={styles.profileAllocation}>{allocation}</span>
+                <div className={styles.profileBar}>
+                  {barEuro > 0 && (
+                    <div className={styles.profileBarEuro} style={{ width: `${barEuro}%` }} title={`Fonds Euro ${barEuro}%`} />
+                  )}
+                  {barUC > 0 && (
+                    <div className={styles.profileBarUC} style={{ width: `${barUC}%` }} title={`Actions & ETF ${barUC}%`} />
+                  )}
+                </div>
+                <p className={styles.profileDesc}>{desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className={styles.profileLegend}>
+            <span><span className={styles.legendDotEuro} />Fonds Euro</span>
+            <span><span className={styles.legendDotUC} />Actions & ETF</span>
+          </div>
+        </div>
+
+        {/* Simulateur */}
         <SimCard title="L'effet du temps sur votre capital">
           <div className={styles.simControls}>
             <SliderGroup label="Versement mensuel" value={formatCurrency(monthly)}>
