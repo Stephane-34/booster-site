@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, CheckCircle, Calendar } from 'lucide-react';
 import Button from '../../ui/Button/Button';
 import { signIn, signUp, resetPassword } from '../../../services/supabase';
 import styles from './AuthForm.module.css';
@@ -10,7 +10,13 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
   const [error, setError]           = useState('');
   const [resetSent, setResetSent]   = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [fields, setFields]         = useState({ name: '', email: '', password: '' });
+  const [fields, setFields]         = useState({
+    firstName: '',
+    lastName:  '',
+    age:       '',
+    email:     '',
+    password:  '',
+  });
 
   const switchTab = (t) => {
     setTab(t);
@@ -38,7 +44,16 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
           setError('Le mot de passe doit contenir au moins 8 caractères.');
           return;
         }
-        await signUp(fields.email, fields.password, fields.name);
+        const ageNum = fields.age ? Number(fields.age) : null;
+        if (ageNum !== null && (Number.isNaN(ageNum) || ageNum < 13 || ageNum > 120)) {
+          setError('Renseigne un âge valide (entre 13 et 120 ans).');
+          return;
+        }
+        await signUp(fields.email, fields.password, {
+          firstName: fields.firstName.trim(),
+          lastName:  fields.lastName.trim(),
+          age:       ageNum,
+        });
         onSuccess?.();
       } else if (tab === 'forgot') {
         await resetPassword(fields.email);
@@ -135,24 +150,61 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
       </div>
 
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
-        {/* Prénom (inscription seulement) */}
+        {/* Identité (inscription seulement) */}
         {tab === 'signup' && (
-          <div className={styles.field}>
-            <label htmlFor="auth-name" className={styles.label}>Prénom</label>
-            <div className={styles.inputWrapper}>
-              <User size={16} className={styles.inputIcon} />
-              <input
-                id="auth-name"
-                type="text"
-                className={styles.input}
-                placeholder="Ton prénom"
-                value={fields.name}
-                onChange={updateField('name')}
-                required
-                autoComplete="given-name"
-              />
+          <>
+            <div className={styles.row2}>
+              <div className={styles.field}>
+                <label htmlFor="auth-firstname" className={styles.label}>Prénom</label>
+                <div className={styles.inputWrapper}>
+                  <User size={16} className={styles.inputIcon} />
+                  <input
+                    id="auth-firstname"
+                    type="text"
+                    className={styles.input}
+                    placeholder="Ton prénom"
+                    value={fields.firstName}
+                    onChange={updateField('firstName')}
+                    required
+                    autoComplete="given-name"
+                  />
+                </div>
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="auth-lastname" className={styles.label}>Nom</label>
+                <div className={styles.inputWrapper}>
+                  <User size={16} className={styles.inputIcon} />
+                  <input
+                    id="auth-lastname"
+                    type="text"
+                    className={styles.input}
+                    placeholder="Ton nom"
+                    value={fields.lastName}
+                    onChange={updateField('lastName')}
+                    required
+                    autoComplete="family-name"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
+            <div className={styles.field}>
+              <label htmlFor="auth-age" className={styles.label}>Âge</label>
+              <div className={styles.inputWrapper}>
+                <Calendar size={16} className={styles.inputIcon} />
+                <input
+                  id="auth-age"
+                  type="number"
+                  min={13}
+                  max={120}
+                  className={styles.input}
+                  placeholder="Ex. 22"
+                  value={fields.age}
+                  onChange={updateField('age')}
+                  required
+                />
+              </div>
+            </div>
+          </>
         )}
 
         {/* Email */}

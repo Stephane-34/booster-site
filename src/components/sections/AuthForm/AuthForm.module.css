@@ -36,6 +36,17 @@
   gap: var(--space-4);
 }
 
+/* Ligne à deux colonnes (prénom + nom) — empile en mobile */
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+@media (max-width: 480px) {
+  .row2 { grid-template-columns: 1fr; }
+}
+
 .field {
   display: flex;
   flex-direction: column;

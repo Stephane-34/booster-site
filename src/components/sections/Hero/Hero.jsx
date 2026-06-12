@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { ArrowRight, Star, TrendingUp, Shield, Zap } from 'lucide-react';
+import { ArrowRight, Star, TrendingUp, Zap } from 'lucide-react';
 import Button from '../../ui/Button/Button';
 import Badge from '../../ui/Badge/Badge';
 import styles from './Hero.module.css';
@@ -12,12 +12,11 @@ const PHONE_STATS = [
 
 /* Points de réassurance en bas du hero */
 const REASSURANCE = [
-  { icon: Shield, text: '0% de frais d\'entrée' },
-  { icon: TrendingUp, text: 'Dès 50 €/mois' },
   { icon: Zap, text: 'Ouverture en ligne simplifiée avec un expert' },
+  { icon: TrendingUp, text: 'Dès 50 €/mois' },
 ];
 
-export default function Hero({ onCTAClick }) {
+export default function Hero({ onCTAClick, firstName }) {
   const blobRef = useRef(null);
 
   /* Animation parallax légère des blobs au mouvement souris */
@@ -49,7 +48,7 @@ export default function Hero({ onCTAClick }) {
         <div className={styles.content}>
           <Badge variant="primary" className={styles.badge}>
             <Star size={10} />
-            Nouveau · Plateforme en version bêta
+            {firstName ? `Bonjour ${firstName} 👋` : 'Nouveau · Plateforme en version bêta'}
           </Badge>
 
           <h1 className={styles.title}>

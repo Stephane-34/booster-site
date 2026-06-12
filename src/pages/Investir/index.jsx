@@ -22,8 +22,8 @@ export default function Investir() {
   const [authModal, setAuthModal] = useState(false);
   return (
     <div className={styles.page}>
-      <HeroAV onCTAClick={() => setAuthModal(true)} />
       <OfferTabs onCTAClick={() => setAuthModal(true)} />
+      <HeroAV onCTAClick={() => setAuthModal(true)} />
       <CompareSimulator />
       <ProjectTabs onCTAClick={() => setAuthModal(true)} />
       <BookingCTA />
@@ -136,13 +136,21 @@ const COMPARE_HORIZONS = [5, 10, 15, 20, 30];
 function CompareSimulator() {
   const [monthly, setMonthly] = useState(150);
   const [horizon, setHorizon] = useState(10);
+  /* Rentabilité souhaitée — slider 0 à 30 %/an, demandé dans le brief client */
+  const [rate, setRate]       = useState(5);
 
   const result = useMemo(() => {
-    const months  = horizon * 12;
-    const booster = computeFutureValue(monthly, RATE_BOOSTER, months);
-    const livret  = computeFutureValue(monthly, RATE_LIVRET_A, months);
-    return { booster, livret, diff: booster - livret };
-  }, [monthly, horizon]);
+    const months   = horizon * 12;
+    const targeted = computeFutureValue(monthly, rate / 100, months);
+    const livret   = computeFutureValue(monthly, RATE_LIVRET_A, months);
+    return { targeted, livret, diff: targeted - livret };
+  }, [monthly, horizon, rate]);
+
+  /* On normalise la barre Livret A par rapport au max des deux résultats pour
+     éviter une largeur > 100 % quand la rentabilité descend sous le Livret A. */
+  const maxVal      = Math.max(result.targeted, result.livret) || 1;
+  const livretRatio = (result.livret / maxVal) * 100;
+  const targetRatio = (result.targeted / maxVal) * 100;
 
   return (
     <section className={styles.compareSection}>
@@ -155,7 +163,7 @@ function CompareSimulator() {
           </h2>
           <p className={styles.sectionDesc}>
             Même versement, même durée — mais pas le même résultat.
-            Voici ce que font 1,5 % vs 5 % sur la durée.
+            Choisis la rentabilité que tu vises et compare-la au Livret A.
           </p>
         </div>
 
@@ -170,7 +178,15 @@ function CompareSimulator() {
                 onChange={(e) => setMonthly(Number(e.target.value))} className={styles.slider} />
             </div>
             <div className={styles.sliderGroup}>
-              <label>Horizon</label>
+              <div className={styles.sliderRow}>
+                <label>Rentabilité souhaitée</label>
+                <span className={styles.sliderVal}>{rate.toFixed(1)} %/an</span>
+              </div>
+              <input type="range" min={0} max={30} step={0.5} value={rate}
+                onChange={(e) => setRate(Number(e.target.value))} className={styles.slider} />
+            </div>
+            <div className={styles.sliderGroup}>
+              <label>Durée</label>
               <div className={styles.pills}>
                 {COMPARE_HORIZONS.map((h) => (
                   <button key={h}
@@ -190,28 +206,29 @@ function CompareSimulator() {
                 <span className={styles.compareBarValue}>{formatCurrency(result.livret)}</span>
               </div>
               <div className={styles.compareBarTrack}>
-                <div className={styles.compareBarFillLow}
-                  style={{ width: `${(result.livret / result.booster) * 100}%` }} />
+                <div className={styles.compareBarFillLow} style={{ width: `${livretRatio}%` }} />
               </div>
             </div>
             <div className={styles.compareBar}>
               <div className={styles.compareBarMeta}>
-                <span className={styles.compareBarName}>Rendement boosté — 5 %</span>
+                <span className={styles.compareBarName}>Rentabilité visée — {rate.toFixed(1)} %</span>
                 <span className={clsx(styles.compareBarValue, styles.compareBarValueHigh)}>
-                  {formatCurrency(result.booster)}
+                  {formatCurrency(result.targeted)}
                 </span>
               </div>
               <div className={styles.compareBarTrack}>
-                <div className={styles.compareBarFillHigh} style={{ width: '100%' }} />
+                <div className={styles.compareBarFillHigh} style={{ width: `${targetRatio}%` }} />
               </div>
             </div>
-            <div className={styles.compareDiff}>
-              <TrendingUp size={14} />
-              +{formatCurrency(result.diff)} de plus avec Booster sur {horizon} ans
-            </div>
+            {result.diff > 0 && (
+              <div className={styles.compareDiff}>
+                <TrendingUp size={14} />
+                +{formatCurrency(result.diff)} de plus que le Livret A sur {horizon} ans
+              </div>
+            )}
             <p className={styles.compareNote}>
               <Info size={11} />
-              Simulation indicative à 1,5 % et 5 % brut/an. Ne constitue pas un conseil en investissement.
+              Simulation indicative à 1,5 % et {rate.toFixed(1)} % brut/an. Ne constitue pas un conseil en investissement.
             </p>
           </div>
         </div>

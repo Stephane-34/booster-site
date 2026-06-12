@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
+import RequireAuth from './components/RequireAuth';
 import Header from './components/layout/Header/Header';
 import Footer from './components/layout/Footer/Footer';
 import Home from './pages/Home';
@@ -30,8 +31,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/investir" element={<Investir />} />
-            <Route path="/academie" element={<Academy />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/academie" element={<RequireAuth><Academy /></RequireAuth>} />
+            <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             {/* Redirige les anciens liens /ton-projet vers /investir — à conserver tant que des partages externes peuvent pointer cette URL */}
             <Route path="/ton-projet" element={<TonProjet />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />

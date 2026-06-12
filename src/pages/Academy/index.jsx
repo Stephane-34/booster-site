@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import {
-  ChevronRight, Trophy, Star, Zap, CheckCircle, XCircle, Lock
+  ChevronRight, Trophy, Star, Zap, CheckCircle, XCircle, Lock, Swords, Gift, Crown
 } from 'lucide-react';
 import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
 import { ACADEMY_THEMES } from '../../data/themes';
 import { useQuiz } from '../../hooks/useQuiz';
+import { useAuth } from '../../contexts/AuthContext';
+import { CURRENT_BATTLE, SEASON_LEADERBOARD, SEASON_META } from '../../data/battle';
 import styles from './Academy.module.css';
 
 /* Questions codées en dur pour la démo. La prochaine étape est de les charger
@@ -58,6 +60,7 @@ const QUESTIONS = [
 ];
 
 export default function Academy() {
+  const { firstName } = useAuth();
   const [selectedTheme, setSelectedTheme] = useState(null);
   const {
     currentQuestion: q,
@@ -112,6 +115,9 @@ export default function Academy() {
       </section>
 
       <div className={`container ${styles.content}`}>
+        {/* Battle de la semaine */}
+        <BattleSection firstName={firstName} />
+
         {/* Grille thèmes */}
         <section className={styles.themesSection}>
           <h2 className={styles.sectionTitle}>Tes parcours</h2>
@@ -202,8 +208,129 @@ export default function Academy() {
             <QuizResults score={score} total={QUESTIONS.length} onReset={resetQuiz} />
           )}
         </section>
+
+        {/* Classement de la saison */}
+        <LeaderboardSection />
       </div>
     </div>
+  );
+}
+
+/* ─── Battle de la semaine ────────────────────────────────── */
+function BattleSection({ firstName }) {
+  const { weekLabel, challenge, questionCount, endsIn, you, opponent } = CURRENT_BATTLE;
+  const me = { ...you, firstName: firstName || you.firstName };
+  /* Pourcentage de progression normalisé sur le total de questions */
+  const youPct      = Math.min(100, (me.score / questionCount) * 100);
+  const opponentPct = Math.min(100, (opponent.score / questionCount) * 100);
+
+  return (
+    <section className={styles.battleSection}>
+      <div className={styles.battleCard}>
+        <div className={styles.battleHeader}>
+          <div>
+            <Badge variant="primary">
+              <Swords size={12} />
+              {weekLabel}
+            </Badge>
+            <h2 className={styles.battleTitle}>{challenge}</h2>
+            <p className={styles.battleSubtitle}>
+              {questionCount} questions · le plus de points l'emporte
+            </p>
+          </div>
+          <span className={styles.battleCountdown}>Fin dans {endsIn}</span>
+        </div>
+
+        <div className={styles.battleArena}>
+          <div className={clsx(styles.battlePlayer, styles.battlePlayerYou)}>
+            <span className={styles.battleAvatar}>{me.avatar}</span>
+            <span className={styles.battlePlayerName}>{me.firstName}</span>
+            <span className={styles.battlePlayerScore}>{me.score}</span>
+            <span className={styles.battlePlayerMeta}>pts</span>
+          </div>
+
+          <div className={styles.battleVs}>VS</div>
+
+          <div className={styles.battlePlayer}>
+            <span className={styles.battleAvatar}>{opponent.avatar}</span>
+            <span className={styles.battlePlayerName}>{opponent.firstName}, {opponent.age} ans</span>
+            <span className={styles.battlePlayerScore}>{opponent.score}</span>
+            <span className={styles.battlePlayerMeta}>pts · série de {opponent.streak} 🔥</span>
+          </div>
+        </div>
+
+        <div className={styles.battleProgress}>
+          <div className={styles.battleProgressLabel}>
+            <span>{me.firstName} — {me.score}/{questionCount}</span>
+            <span>{opponent.firstName} — {opponent.score}/{questionCount}</span>
+          </div>
+          <div className={styles.battleProgressBar}>
+            <div className={styles.battleProgressYou} style={{ width: `${youPct}%` }} />
+          </div>
+          <div className={styles.battleProgressBar}>
+            <div className={styles.battleProgressYou} style={{ width: `${opponentPct}%`, opacity: 0.55 }} />
+          </div>
+        </div>
+
+        <div className={styles.battleActions}>
+          <Button variant="primary" size="md">
+            <Zap size={16} />
+            Reprendre le défi
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Classement de la saison ─────────────────────────────── */
+function LeaderboardSection() {
+  return (
+    <section className={styles.leaderboardSection}>
+      <div className={styles.leaderboardHead}>
+        <div>
+          <Badge variant="accent">
+            <Crown size={12} />
+            Classement saison {SEASON_META.number}
+          </Badge>
+          <h2 className={styles.sectionTitle}>Top 10 récompensé</h2>
+        </div>
+        <span className={styles.leaderboardReward}>
+          <Gift size={12} />
+          {SEASON_META.rewardText} · fin dans {SEASON_META.endsIn}
+        </span>
+      </div>
+
+      <div className={styles.leaderboardList}>
+        {SEASON_LEADERBOARD.map((row) => (
+          <div
+            key={row.rank}
+            className={clsx(
+              styles.leaderboardRow,
+              row.isMe && styles.leaderboardRowMe,
+              row.rank <= 3 && styles.leaderboardRowPodium,
+            )}
+          >
+            <span className={clsx(
+              styles.leaderboardRank,
+              row.rank <= 3 && styles.leaderboardRankPodium,
+            )}>
+              {row.badge || `#${row.rank}`}
+            </span>
+            <span className={styles.leaderboardName}>
+              {row.firstName}
+              {row.isMe && <span className={styles.leaderboardMeBadge}>Toi</span>}
+            </span>
+            <span className={styles.leaderboardPoints}>
+              {row.points.toLocaleString('fr-FR')} pts
+            </span>
+          </div>
+        ))}
+        <div className={styles.leaderboardFooter}>
+          <Gift size={12} /> Les 10 premiers reçoivent un cadeau Booster en fin de saison.
+        </div>
+      </div>
+    </section>
   );
 }
 

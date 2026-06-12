@@ -1,35 +1,62 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../services/supabase';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { supabase, getProfile, signOut as supaSignOut } from '../services/supabase';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser]       = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    /* Récupère la session existante au montage.
-       Le catch garantit que loading ne reste pas bloqué à true si Supabase est inaccessible. */
-    supabase.auth.getSession()
-      .then(({ data }) => {
-        setUser(data?.session?.user ?? null);
-      })
-      .catch(() => {
-        setUser(null);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+  /* Récupère la ligne `profiles` correspondant à l'utilisateur courant. */
+  const loadProfile = useCallback(async (currentUser) => {
+    if (!currentUser) { setProfile(null); return; }
+    try {
+      const data = await getProfile(currentUser.id);
+      setProfile(data);
+    } catch {
+      setProfile(null);
+    }
+  }, []);
 
-    /* Écoute les changements d'état d'auth (login / logout / refresh token) */
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+  useEffect(() => {
+    /* Session au montage. Le catch garantit qu'on ne bloque pas loading=true si Supabase est down. */
+    supabase.auth.getSession()
+      .then(async ({ data }) => {
+        const u = data?.session?.user ?? null;
+        setUser(u);
+        await loadProfile(u);
+      })
+      .catch(() => { setUser(null); setProfile(null); })
+      .finally(() => setLoading(false));
+
+    /* Login / logout / refresh token */
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const u = session?.user ?? null;
+      setUser(u);
+      await loadProfile(u);
     });
 
     return () => subscription.unsubscribe();
+  }, [loadProfile]);
+
+  const signOut = useCallback(async () => {
+    await supaSignOut();
+    setUser(null);
+    setProfile(null);
   }, []);
 
-  const value = { user, loading, isAuthenticated: !!user };
+  /* Fallback : si la requête profile a échoué (RLS, latence), on prend le metadata Supabase. */
+  const firstName = profile?.first_name ?? user?.user_metadata?.first_name ?? '';
+
+  const value = {
+    user,
+    profile,
+    firstName,
+    loading,
+    isAuthenticated: !!user,
+    signOut,
+  };
 
   return (
     <AuthContext.Provider value={value}>

@@ -8,15 +8,20 @@ import Modal from '../../components/ui/Modal/Modal';
 import AuthForm from '../../components/sections/AuthForm/AuthForm';
 import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
+import { useAuth } from '../../contexts/AuthContext';
 import { ACADEMY_THEMES } from '../../data/themes';
 import styles from './Home.module.css';
 
 export default function Home() {
   const [authModal, setAuthModal] = useState(false);
+  const { firstName, isAuthenticated } = useAuth();
 
   return (
     <>
-      <Hero onCTAClick={() => setAuthModal(true)} />
+      <Hero
+        onCTAClick={() => setAuthModal(true)}
+        firstName={isAuthenticated ? firstName : ''}
+      />
       <WhoWeAre />
       <Offers />
       <Testimonials />
@@ -41,7 +46,7 @@ const WHO_FEATURES = [
     icon: Shield,
     title: 'Investissez avec sérénité',
     subtitle: 'L\'accès au terrain.',
-    text: 'Profitez d\'une sélection rigoureuse de produits d\'investissement adaptés à votre profil de jeune actif. Nous sélectionnons les meilleurs partenaires et nos experts vous accompagnent lors de chaque souscription pour sécuriser vos choix.',
+    text: 'Profitez d\'une sélection rigoureuse de produits d\'investissement adaptés à votre profil. Nous sélectionnons les meilleurs partenaires et nos experts vous accompagnent lors de chaque souscription pour sécuriser vos choix. Tu crées ton compte, tu définis ton projet puis tu prends RDV avec un expert pour valider et optimiser ton contrat.',
   },
   {
     icon: Brain,
@@ -51,7 +56,14 @@ const WHO_FEATURES = [
   },
 ];
 
-const EXPERTISE = ['Expérience Banque', 'Gestion de Patrimoine', 'Expertise Immobilière'];
+const EXPERTISE = [
+  'Bancaire',
+  'Fiscalité',
+  'Retraite',
+  'Immobilier',
+  'Placement',
+  'Financement de projet',
+];
 
 function WhoWeAre() {
   return (

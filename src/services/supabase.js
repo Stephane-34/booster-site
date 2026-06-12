@@ -23,13 +23,33 @@ export async function signIn(email, password) {
   return data;
 }
 
-export async function signUp(email, password, name) {
+export async function signUp(email, password, { firstName, lastName, age }) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: name } },
+    options: {
+      data: {
+        first_name: firstName,
+        last_name:  lastName,
+        age:        age ? String(age) : null,
+        /* full_name conservé pour compat ascendante du trigger handle_new_user */
+        full_name:  [firstName, lastName].filter(Boolean).join(' '),
+      },
+    },
   });
   if (error) throw error;
+  return data;
+}
+
+/* Charge le profil étendu (first_name, last_name, age, plan) — appelé une fois la session active. */
+export async function getProfile(userId) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('first_name, last_name, age, full_name, plan')
+    .eq('id', userId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
   return data;
 }
 

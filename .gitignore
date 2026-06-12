@@ -32,3 +32,9 @@ dist-ssr
 cdc.pages
 cdc_extracted/
 .vercel
+
+# Briefs / docs internes non versionnés
+contexte/
+
+# Cache CLI Supabase
+supabase/.temp/

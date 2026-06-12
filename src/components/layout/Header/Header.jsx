@@ -1,20 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Lock, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 import Button from '../../ui/Button/Button';
 import Modal from '../../ui/Modal/Modal';
 import AuthForm from '../../sections/AuthForm/AuthForm';
+import { useAuth } from '../../../contexts/AuthContext';
 import styles from './Header.module.css';
 
-/* cta: true → pill vert (même style pour Investir et Académie) */
+/* cta: true → texte vert (Investir, Académie)
+   protected: true → onglet verrouillé tant que l'utilisateur n'est pas connecté */
 const NAV_LINKS = [
-  { label: 'Accueil',  to: '/',         cta: false },
-  { label: 'Investir', to: '/investir', cta: true  },
-  { label: 'Académie', to: '/academie', cta: true },
+  { label: 'Accueil',  to: '/',         cta: false, protected: false },
+  { label: 'Investir', to: '/investir', cta: true,  protected: false },
+  { label: 'Académie', to: '/academie', cta: true,  protected: true  },
 ];
 
 export default function Header() {
+  const { isAuthenticated, firstName, signOut } = useAuth();
+
   const [scrolled, setScrolled]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
   const [authModal, setAuthModal] = useState(false);
@@ -26,12 +30,27 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  /* Event global : permet à RequireAuth (ou n'importe quel composant) d'ouvrir le modal de connexion. */
+  useEffect(() => {
+    const handler = (e) => {
+      setAuthTab(e?.detail?.tab === 'signup' ? 'signup' : 'login');
+      setAuthModal(true);
+    };
+    window.addEventListener('open-auth-modal', handler);
+    return () => window.removeEventListener('open-auth-modal', handler);
+  }, []);
+
   const closeMenu = () => setMenuOpen(false);
 
   const openLogin = () => {
     setAuthTab('login');
     setAuthModal(true);
     setMenuOpen(false);
+  };
+
+  const handleLockedClick = (e) => {
+    e.preventDefault();
+    openLogin();
   };
 
   return (
@@ -46,27 +65,59 @@ export default function Header() {
 
           {/* Navigation desktop */}
           <nav className={styles.nav} aria-label="Navigation principale">
-            {NAV_LINKS.map(({ label, to, cta }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === '/'}
-                className={({ isActive }) =>
-                  cta
-                    ? clsx(styles.navLinkInvest, isActive && styles.navLinkInvestActive)
-                    : clsx(styles.navLink, isActive && styles.navLinkActive)
-                }
-              >
-                {label}
-              </NavLink>
-            ))}
+            {NAV_LINKS.map(({ label, to, cta, protected: isProtected }) => {
+              const locked = isProtected && !isAuthenticated;
+
+              if (locked) {
+                /* Rendu comme un bouton qui ouvre le modal — pas une NavLink, pour éviter la navigation */
+                return (
+                  <button
+                    key={to}
+                    type="button"
+                    className={clsx(styles.navLinkInvest, styles.navLinkLocked)}
+                    onClick={handleLockedClick}
+                    aria-label={`${label} — connexion requise`}
+                  >
+                    {label}
+                    <Lock size={12} className={styles.lockIcon} />
+                  </button>
+                );
+              }
+
+              return (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={to === '/'}
+                  className={({ isActive }) =>
+                    cta
+                      ? clsx(styles.navLinkInvest, isActive && styles.navLinkInvestActive)
+                      : clsx(styles.navLink, isActive && styles.navLinkActive)
+                  }
+                >
+                  {label}
+                </NavLink>
+              );
+            })}
           </nav>
 
-          {/* Actions — connexion uniquement */}
+          {/* Actions — état connecté ou non */}
           <div className={styles.actions}>
-            <Button variant="ghost" size="sm" onClick={openLogin}>
-              Connexion
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <span className={styles.greeting}>
+                  Bonjour <span className={styles.greetingName}>{firstName || 'toi'}</span>
+                </span>
+                <Button variant="ghost" size="sm" onClick={signOut}>
+                  <LogOut size={14} />
+                  Déconnexion
+                </Button>
+              </>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={openLogin}>
+                Connexion
+              </Button>
+            )}
           </div>
 
           {/* Burger mobile */}
@@ -84,25 +135,55 @@ export default function Header() {
         {menuOpen && (
           <div className={styles.mobileMenu}>
             <nav>
-              {NAV_LINKS.map(({ label, to, cta }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={to === '/'}
-                  className={clsx(
-                    styles.mobileNavLink,
-                    cta && styles.mobileNavLinkInvest,
-                  )}
-                  onClick={closeMenu}
-                >
-                  {label}
-                </NavLink>
-              ))}
+              {NAV_LINKS.map(({ label, to, cta, protected: isProtected }) => {
+                const locked = isProtected && !isAuthenticated;
+
+                if (locked) {
+                  return (
+                    <button
+                      key={to}
+                      type="button"
+                      className={clsx(styles.mobileNavLink, styles.mobileNavLinkInvest, styles.navLinkLocked)}
+                      onClick={handleLockedClick}
+                    >
+                      {label}
+                      <Lock size={14} className={styles.lockIcon} />
+                    </button>
+                  );
+                }
+
+                return (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    end={to === '/'}
+                    className={clsx(
+                      styles.mobileNavLink,
+                      cta && styles.mobileNavLinkInvest,
+                    )}
+                    onClick={closeMenu}
+                  >
+                    {label}
+                  </NavLink>
+                );
+              })}
             </nav>
             <div className={styles.mobileActions}>
-              <Button variant="outline" size="md" onClick={openLogin} className={styles.mobileBtn}>
-                Connexion
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <span className={styles.greeting}>
+                    Bonjour <span className={styles.greetingName}>{firstName || 'toi'}</span>
+                  </span>
+                  <Button variant="outline" size="md" onClick={signOut} className={styles.mobileBtn}>
+                    <LogOut size={16} />
+                    Déconnexion
+                  </Button>
+                </>
+              ) : (
+                <Button variant="outline" size="md" onClick={openLogin} className={styles.mobileBtn}>
+                  Connexion
+                </Button>
+              )}
             </div>
           </div>
         )}
@@ -111,7 +192,7 @@ export default function Header() {
       <Modal
         isOpen={authModal}
         onClose={() => setAuthModal(false)}
-        title="Connexion"
+        title={authTab === 'signup' ? 'Créer mon compte gratuit' : 'Connexion'}
       >
         <AuthForm
           defaultTab={authTab}
