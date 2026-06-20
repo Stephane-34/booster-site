@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Lock, Shield, Brain } from 'lucide-react';
 import clsx from 'clsx';
 import Hero from '../../components/sections/Hero/Hero';
@@ -15,11 +15,19 @@ import styles from './Home.module.css';
 export default function Home() {
   const [authModal, setAuthModal] = useState(false);
   const { firstName, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  /* Si l'user est déjà connecté, le CTA du Hero l'envoie vers son espace.
+     Sinon il ouvre le modal d'inscription. */
+  const handleHeroCTA = () => {
+    if (isAuthenticated) navigate('/academie');
+    else                 setAuthModal(true);
+  };
 
   return (
     <>
       <Hero
-        onCTAClick={() => setAuthModal(true)}
+        onCTAClick={handleHeroCTA}
         firstName={isAuthenticated ? firstName : ''}
       />
       <WhoWeAre />

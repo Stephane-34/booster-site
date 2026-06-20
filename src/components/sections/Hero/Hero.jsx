@@ -65,7 +65,7 @@ export default function Hero({ onCTAClick, firstName }) {
 
           <div className={styles.ctaGroup}>
             <Button variant="primary" size="lg" onClick={onCTAClick}>
-              Créer mon compte
+              {firstName ? 'Accéder à mon espace' : 'Créer mon compte'}
               <ArrowRight size={18} />
             </Button>
           </div>

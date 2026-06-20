@@ -7,6 +7,7 @@ import Modal from '../../components/ui/Modal/Modal';
 import AuthForm from '../../components/sections/AuthForm/AuthForm';
 import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
+import { useAuth } from '../../contexts/AuthContext';
 import { computeFutureValue, computeRequiredMonthly, computeMonthsToGoal } from '../../utils/calculators';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './Investir.module.css';
@@ -20,12 +21,24 @@ const RATE_LIVRET_A = 0.015;
 /* ─── Page principale ─────────────────────────────────────── */
 export default function Investir() {
   const [authModal, setAuthModal] = useState(false);
+  const { isAuthenticated } = useAuth();
+
+  /* Pour les utilisateurs connectés, les CTA "Créer mon compte" / "Commencer maintenant"
+     n'ont plus de sens — on les redirige vers la section prise de RDV. */
+  const handleCTA = () => {
+    if (isAuthenticated) {
+      document.getElementById('rdv')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      setAuthModal(true);
+    }
+  };
+
   return (
     <div className={styles.page}>
-      <OfferTabs onCTAClick={() => setAuthModal(true)} />
-      <HeroAV onCTAClick={() => setAuthModal(true)} />
+      <OfferTabs onCTAClick={handleCTA} />
+      <HeroAV onCTAClick={handleCTA} />
       <CompareSimulator />
-      <ProjectTabs onCTAClick={() => setAuthModal(true)} />
+      <ProjectTabs onCTAClick={handleCTA} />
       <BookingCTA />
       <Modal isOpen={authModal} onClose={() => setAuthModal(false)} title="Créer mon compte gratuit">
         <AuthForm defaultTab="signup" onSuccess={() => setAuthModal(false)} />

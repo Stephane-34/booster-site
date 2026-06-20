@@ -9,6 +9,7 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState('');
   const [resetSent, setResetSent]   = useState(false);
+  const [signupPending, setSignupPending] = useState(false); // signup OK mais email à confirmer
   const [showPassword, setShowPassword] = useState(false);
   const [fields, setFields]         = useState({
     firstName: '',
@@ -22,6 +23,7 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
     setTab(t);
     setError('');
     setResetSent(false);
+    setSignupPending(false);
     onTabChange?.(t);
   };
 
@@ -49,12 +51,19 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
           setError('Renseigne un âge valide (entre 13 et 120 ans).');
           return;
         }
-        await signUp(fields.email, fields.password, {
+        const result = await signUp(fields.email, fields.password, {
           firstName: fields.firstName.trim(),
           lastName:  fields.lastName.trim(),
           age:       ageNum,
         });
-        onSuccess?.();
+        /* Si Supabase a posé une session (Confirm email = OFF), on ferme le modal — l'AuthContext
+           va capter la session et l'utilisateur est immédiatement connecté.
+           Sinon (Confirm email = ON), on affiche l'écran "vérifie ton email" et on ne ferme rien. */
+        if (result?.session) {
+          onSuccess?.();
+        } else {
+          setSignupPending(true);
+        }
       } else if (tab === 'forgot') {
         await resetPassword(fields.email);
         setResetSent(true);
@@ -69,6 +78,29 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
       setLoading(false);
     }
   };
+
+  /* ─── Vue post-inscription : email à confirmer ───────── */
+  if (signupPending) {
+    return (
+      <div className={styles.wrapper}>
+        <div className={styles.successBox}>
+          <CheckCircle size={32} className={styles.successIcon} />
+          <p className={styles.successTitle}>Compte créé !</p>
+          <p className={styles.successDesc}>
+            On t'a envoyé un email à <strong>{fields.email}</strong>.
+            Clique sur le lien pour valider ton compte, puis reviens te connecter ici.
+          </p>
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => { setSignupPending(false); switchTab('login'); }}
+          >
+            Aller à la connexion
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   /* ─── Vue mot de passe oublié ─────────────────────────── */
   if (tab === 'forgot') {
