@@ -105,9 +105,9 @@ export default function Header() {
           <div className={styles.actions}>
             {isAuthenticated ? (
               <>
-                <span className={styles.greeting}>
+                <Link to="/profil" className={styles.greeting} onClick={closeMenu}>
                   Bonjour <span className={styles.greetingName}>{firstName || 'toi'}</span>
-                </span>
+                </Link>
                 <Button variant="ghost" size="sm" onClick={signOut}>
                   <LogOut size={14} />
                   Déconnexion

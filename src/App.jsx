@@ -14,6 +14,7 @@ import CGU from './pages/Legal/CGU';
 import Confidentialite from './pages/Legal/Confidentialite';
 import EmailConfirmed from './pages/EmailConfirmed';
 import ResetPassword from './pages/ResetPassword';
+import Profile from './pages/Profile';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/investir" element={<Investir />} />
             <Route path="/academie" element={<RequireAuth><Academy /></RequireAuth>} />
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+            <Route path="/profil" element={<RequireAuth><Profile /></RequireAuth>} />
             {/* Redirige les anciens liens /ton-projet vers /investir — à conserver tant que des partages externes peuvent pointer cette URL */}
             <Route path="/ton-projet" element={<TonProjet />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />

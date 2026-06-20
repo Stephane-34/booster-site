@@ -20,21 +20,28 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    /* Session au montage. Le catch garantit qu'on ne bloque pas loading=true si Supabase est down. */
+    /* Session au montage. On débloque l'UI dès qu'on connaît l'utilisateur ;
+       le fetch du profil étendu se fait en parallèle pour ne pas retarder l'affichage
+       (3-5 s observés en prod si on attendait). Le user_metadata Supabase contient déjà
+       first_name / last_name / age, donc on a une valeur affichable immédiate. */
     supabase.auth.getSession()
-      .then(async ({ data }) => {
+      .then(({ data }) => {
         const u = data?.session?.user ?? null;
         setUser(u);
-        await loadProfile(u);
+        setLoading(false);
+        loadProfile(u);
       })
-      .catch(() => { setUser(null); setProfile(null); })
-      .finally(() => setLoading(false));
+      .catch(() => {
+        setUser(null);
+        setProfile(null);
+        setLoading(false);
+      });
 
     /* Login / logout / refresh token */
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const u = session?.user ?? null;
       setUser(u);
-      await loadProfile(u);
+      loadProfile(u);
     });
 
     return () => subscription.unsubscribe();
@@ -46,6 +53,12 @@ export function AuthProvider({ children }) {
     setProfile(null);
   }, []);
 
+  /* Force le rechargement du profil étendu — appelé après modification depuis la page Profil. */
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    await loadProfile(user);
+  }, [user, loadProfile]);
+
   /* Fallback : si la requête profile a échoué (RLS, latence), on prend le metadata Supabase. */
   const firstName = profile?.first_name ?? user?.user_metadata?.first_name ?? '';
 
@@ -56,6 +69,7 @@ export function AuthProvider({ children }) {
     loading,
     isAuthenticated: !!user,
     signOut,
+    refreshProfile,
   };
 
   return (

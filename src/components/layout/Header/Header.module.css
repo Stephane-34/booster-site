@@ -109,12 +109,20 @@
   flex-shrink: 0;
 }
 
-/* Salutation utilisateur connecté */
+/* Salutation utilisateur connecté — cliquable pour aller à /profil */
 .greeting {
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   color: var(--color-text);
   white-space: nowrap;
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.greeting:hover {
+  background: var(--color-surface);
 }
 
 .greetingName {

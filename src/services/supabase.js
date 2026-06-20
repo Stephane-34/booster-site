@@ -53,6 +53,46 @@ export async function getProfile(userId) {
   return data;
 }
 
+/* Met à jour le profil de l'utilisateur connecté (prénom, nom, âge).
+   Synchronise aussi le user_metadata Supabase pour que firstName soit dispo
+   immédiatement après login sans attendre le fetch profile. */
+export async function updateProfile(userId, { firstName, lastName, age }) {
+  const fullName = [firstName, lastName].filter(Boolean).join(' ');
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .update({
+      first_name: firstName,
+      last_name:  lastName,
+      age:        age ?? null,
+      full_name:  fullName,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', userId);
+  if (profileError) throw profileError;
+
+  const { error: userError } = await supabase.auth.updateUser({
+    data: {
+      first_name: firstName,
+      last_name:  lastName,
+      age:        age ? String(age) : null,
+      full_name:  fullName,
+    },
+  });
+  if (userError) throw userError;
+}
+
+/* Met à jour l'email — Supabase renvoie un mail de confirmation au nouvel email. */
+export async function updateEmail(newEmail) {
+  const { error } = await supabase.auth.updateUser({ email: newEmail });
+  if (error) throw error;
+}
+
+/* Met à jour le mot de passe — l'utilisateur doit être actuellement connecté. */
+export async function updatePassword(newPassword) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw error;
+}
+
 export async function resetPassword(email) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${window.location.origin}/reset-password`,
