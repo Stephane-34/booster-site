@@ -1,15 +1,12 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Lock, Shield, Brain } from 'lucide-react';
-import clsx from 'clsx';
+import { useNavigate } from 'react-router-dom';
+import { Shield, Brain } from 'lucide-react';
 import Hero from '../../components/sections/Hero/Hero';
 import Testimonials from '../../components/sections/Testimonials/Testimonials';
 import Modal from '../../components/ui/Modal/Modal';
 import AuthForm from '../../components/sections/AuthForm/AuthForm';
 import Badge from '../../components/ui/Badge/Badge';
-import Button from '../../components/ui/Button/Button';
 import { useAuth } from '../../contexts/AuthContext';
-import { ACADEMY_THEMES } from '../../data/themes';
 import styles from './Home.module.css';
 
 export default function Home() {
@@ -31,7 +28,6 @@ export default function Home() {
         firstName={isAuthenticated ? firstName : ''}
       />
       <WhoWeAre />
-      <Offers />
       <Testimonials />
 
       <Modal
@@ -93,6 +89,11 @@ function WhoWeAre() {
           </p>
         </div>
 
+        <h3 className={styles.whoFeaturesTitle}>
+          Deux façons de{' '}
+          <span className="gradient-text">construire ton avenir</span>
+        </h3>
+
         <div className={styles.whoFeatures}>
           {WHO_FEATURES.map(({ icon: Icon, title, subtitle, text }) => (
             <div key={title} className={styles.whoCard}>
@@ -123,81 +124,3 @@ function WhoWeAre() {
   );
 }
 
-/* ─── Section Nos offres ─────────────────────────────────── */
-function Offers() {
-  return (
-    <section className={styles.offersSection}>
-      <div className="container">
-        <div className={styles.offersHeader}>
-          <Badge variant="primary">Nos offres</Badge>
-          <h2 className={styles.offersTitle}>
-            Deux façons de{' '}
-            <span className="gradient-text">construire ton avenir</span>
-          </h2>
-        </div>
-
-        <div className={styles.offersGrid}>
-          {/* Carte Investir */}
-          <div className={clsx(styles.offerCard, styles.offerCardInvest)}>
-            <div className={styles.offerCardInner}>
-              <div className={styles.offerCardHead}>
-                <span className={styles.offerEmoji}>📈</span>
-                <h3 className={styles.offerTitle}>Investir</h3>
-              </div>
-              <p className={styles.offerText}>
-                Accède à une sélection rigoureuse de produits d'investissement
-                luxembourgeois adaptés aux jeunes actifs. Dès 50 €/mois, place ton
-                argent dans des solutions à 0 % de frais d'entrée et fais-le travailler
-                pour toi, accompagné d'un expert à chaque étape.
-              </p>
-              <ul className={styles.offerPerks}>
-                <li>0 % de frais d'entrée</li>
-                <li>Dès 50 € / mois</li>
-                <li>Accompagnement par un expert</li>
-              </ul>
-              <Button variant="accent" size="md" as={Link} to="/investir" className={styles.offerBtn}>
-                Découvrir l'offre
-                <ArrowRight size={16} />
-              </Button>
-            </div>
-          </div>
-
-          {/* Carte Académie */}
-          <div className={clsx(styles.offerCard, styles.offerCardAcademy)}>
-            <div className={styles.offerCardInner}>
-              <div className={styles.offerCardHead}>
-                <span className={styles.offerEmoji}>🎓</span>
-                <h3 className={styles.offerTitle}>Académie</h3>
-              </div>
-              <p className={styles.offerText}>
-                Forme-toi à la finance personnelle module par module, gratuitement.
-                Des quiz hebdomadaires, des vidéos et une bibliothèque complète pour
-                apprendre à ton rythme — et ne plus jamais subir les décisions
-                financières que tu ne comprends pas.
-              </p>
-              <div className={styles.offerModules}>
-                {ACADEMY_THEMES.map((theme) => {
-                  const Icon = theme.icon;
-                  return (
-                    <div
-                      key={theme.id}
-                      className={clsx(styles.offerModule, theme.locked && styles.offerModuleLocked)}
-                    >
-                      <Icon size={13} />
-                      <span>{theme.name}</span>
-                      {theme.locked && <Lock size={10} className={styles.offerModuleLock} />}
-                    </div>
-                  );
-                })}
-              </div>
-              <Button variant="accent" size="md" as={Link} to="/academie" className={styles.offerBtn}>
-                Explorer l'Académie
-                <ArrowRight size={16} />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}

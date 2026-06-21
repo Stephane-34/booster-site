@@ -1010,110 +1010,12 @@
   margin: 0;
 }
 
-/* ─── Profils de risque ───────────────────────────────────── */
+/* ─── Profils de risque (label conservé pour TabImmobilier) ── */
 .profilesLabel {
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
   margin: 0 0 var(--space-4);
-}
-
-.profiles {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
-  margin-bottom: var(--space-3);
-}
-
-.profileCard {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-5);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  transition: border-color var(--transition-fast);
-}
-
-.profileCard:hover {
-  border-color: var(--color-border-active);
-}
-
-.profileHead {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.profileEmoji {
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-.profileLabel {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  color: var(--color-text);
-}
-
-.profileAllocation {
-  font-size: var(--text-xs);
-  color: var(--color-primary-light);
-  font-weight: var(--weight-semibold);
-}
-
-.profileBar {
-  display: flex;
-  height: 8px;
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  background: var(--color-border);
-}
-
-.profileBarEuro {
-  background: var(--color-primary);
-  height: 100%;
-  transition: width 0.4s ease;
-}
-
-.profileBarUC {
-  background: var(--color-accent);
-  height: 100%;
-  transition: width 0.4s ease;
-}
-
-.profileDesc {
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.profileLegend {
-  display: flex;
-  gap: var(--space-5);
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
-}
-
-.legendDotEuro,
-.legendDotUC {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: var(--space-1);
-  vertical-align: middle;
-}
-
-.legendDotEuro { background: var(--color-primary); }
-.legendDotUC   { background: var(--color-accent); }
-
-@media (max-width: 640px) {
-  .profiles {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ─── Animation + responsive ──────────────────────────────── */

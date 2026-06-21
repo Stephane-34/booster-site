@@ -1,8 +1,6 @@
 import { useState, useMemo } from 'react';
 import { CheckCircle, TrendingUp, Info, ArrowRight, Landmark, BarChart2, Percent, Shield, Rocket } from 'lucide-react';
 import clsx from 'clsx';
-import OfferTabs from '../../components/sections/OfferTabs/OfferTabs';
-import BookingCTA from '../../components/sections/BookingCTA/BookingCTA';
 import Modal from '../../components/ui/Modal/Modal';
 import AuthForm from '../../components/sections/AuthForm/AuthForm';
 import Badge from '../../components/ui/Badge/Badge';
@@ -23,23 +21,17 @@ export default function Investir() {
   const [authModal, setAuthModal] = useState(false);
   const { isAuthenticated } = useAuth();
 
-  /* Pour les utilisateurs connectés, les CTA "Créer mon compte" / "Commencer maintenant"
-     n'ont plus de sens — on les redirige vers la section prise de RDV. */
+  /* Pour les utilisateurs déjà connectés, le CTA "Créer mon compte" n'a plus
+     de sens — on n'ouvre pas le modal d'inscription. */
   const handleCTA = () => {
-    if (isAuthenticated) {
-      document.getElementById('rdv')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      setAuthModal(true);
-    }
+    if (!isAuthenticated) setAuthModal(true);
   };
 
   return (
     <div className={styles.page}>
-      <OfferTabs onCTAClick={handleCTA} />
       <HeroAV onCTAClick={handleCTA} />
       <CompareSimulator />
       <ProjectTabs onCTAClick={handleCTA} />
-      <BookingCTA />
       <Modal isOpen={authModal} onClose={() => setAuthModal(false)} title="Créer mon compte gratuit">
         <AuthForm defaultTab="signup" onSuccess={() => setAuthModal(false)} />
       </Modal>
@@ -313,41 +305,7 @@ function ProjectTabs({ onCTAClick }) {
    ══════════════════════════════════════════════════════════ */
 
 /* ── 1. Épargner et fructifier ────────────────────────────── */
-const RISK_PROFILES = [
-  {
-    label: 'Profil Sécuritaire',
-    emoji: '🛡️',
-    allocation: '100 % Fonds Euro',
-    desc: "Ton capital est garanti à 100 %, il ne peut pas baisser. Tu gagnes un peu moins, mais tu dors sur tes deux oreilles.",
-    barEuro: 100,
-    barUC: 0,
-  },
-  {
-    label: 'Profil Équilibré',
-    emoji: '⚖️',
-    allocation: '70 % Fonds Euro / 30 % Actions & ETF',
-    desc: "Une base solide qui ne bouge pas, boostée par une dose de marchés financiers pour aller chercher plus de performance.",
-    barEuro: 70,
-    barUC: 30,
-  },
-  {
-    label: 'Profil Dynamique',
-    emoji: '🚀',
-    allocation: '30 % Fonds Euro / 70 % Actions & ETF',
-    desc: "Le temps est ton meilleur allié. Ton capital fluctue, mais tu maximises tes chances de forte croissance sur le long terme.",
-    barEuro: 30,
-    barUC: 70,
-  },
-];
-
 function TabEpargner() {
-  const [monthly, setMonthly] = useState(100);
-  const result = useMemo(() => {
-    const now    = computeFutureValue(monthly, RATE_BOOSTER, 30 * 12);
-    const delay5 = computeFutureValue(monthly, RATE_BOOSTER, 25 * 12);
-    return { now, delay5, loss: now - delay5 };
-  }, [monthly]);
-
   return (
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
@@ -374,57 +332,6 @@ function TabEpargner() {
             la magie des intérêts composés continuer d'opérer.
           </p>
         </div>
-
-        {/* Profils de risque */}
-        <div>
-          <p className={styles.profilesLabel}>Choisis ton camp — Les profils de risque</p>
-          <div className={styles.profiles}>
-            {RISK_PROFILES.map(({ label, emoji, allocation, desc, barEuro, barUC }) => (
-              <div key={label} className={styles.profileCard}>
-                <div className={styles.profileHead}>
-                  <span className={styles.profileEmoji}>{emoji}</span>
-                  <span className={styles.profileLabel}>{label}</span>
-                </div>
-                <span className={styles.profileAllocation}>{allocation}</span>
-                <div className={styles.profileBar}>
-                  {barEuro > 0 && (
-                    <div className={styles.profileBarEuro} style={{ width: `${barEuro}%` }} title={`Fonds Euro ${barEuro}%`} />
-                  )}
-                  {barUC > 0 && (
-                    <div className={styles.profileBarUC} style={{ width: `${barUC}%` }} title={`Actions & ETF ${barUC}%`} />
-                  )}
-                </div>
-                <p className={styles.profileDesc}>{desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className={styles.profileLegend}>
-            <span><span className={styles.legendDotEuro} />Fonds Euro</span>
-            <span><span className={styles.legendDotUC} />Actions & ETF</span>
-          </div>
-        </div>
-
-        {/* Simulateur */}
-        <SimCard title="L'effet du temps sur votre capital">
-          <div className={styles.simControls}>
-            <SliderGroup label="Versement mensuel" value={formatCurrency(monthly)}>
-              <input type="range" min={50} max={1000} step={50} value={monthly}
-                onChange={(e) => setMonthly(Number(e.target.value))} className={styles.simSlider} />
-            </SliderGroup>
-          </div>
-          <div className={styles.simResult}>
-            <div className={styles.simCompRow}>
-              <span>Commencer <strong>maintenant</strong> (30 ans)</span>
-              <span className={styles.simValueHigh}>{formatCurrency(result.now)}</span>
-            </div>
-            <div className={styles.simCompRow}>
-              <span>Commencer <strong>dans 5 ans</strong> (25 ans)</span>
-              <span className={styles.simValueLow}>{formatCurrency(result.delay5)}</span>
-            </div>
-            <div className={styles.simDiff}>-{formatCurrency(result.loss)} perdus en attendant 5 ans</div>
-            <p className={styles.simNote}>Simulation sur 30 ans à {(RATE_BOOSTER * 100).toFixed(0)} % annuel.</p>
-          </div>
-        </SimCard>
       </div>
     </div>
   );
