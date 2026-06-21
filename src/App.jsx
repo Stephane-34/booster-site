@@ -15,6 +15,7 @@ import Confidentialite from './pages/Legal/Confidentialite';
 import EmailConfirmed from './pages/EmailConfirmed';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
+import Exemple from './pages/Exemple';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="/confidentialite" element={<Confidentialite />} />
             <Route path="/email-confirmed" element={<EmailConfirmed />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/exemple" element={<Exemple />} />
           </Routes>
         </main>
         <Footer />

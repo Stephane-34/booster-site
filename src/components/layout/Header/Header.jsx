@@ -9,11 +9,15 @@ import { useAuth } from '../../../contexts/AuthContext';
 import styles from './Header.module.css';
 
 /* cta: true → texte vert (Investir, Académie)
-   protected: true → onglet verrouillé tant que l'utilisateur n'est pas connecté */
+   protected: true → onglet verrouillé tant que l'utilisateur n'est pas connecté
+   guestOnly: true → onglet visible uniquement aux visiteurs non connectés
+                     (utilisé pour la page de test /exemple — à retirer
+                     une fois la nouvelle Académie validée) */
 const NAV_LINKS = [
   { label: 'Accueil',  to: '/',         cta: false, protected: false },
   { label: 'Investir', to: '/investir', cta: true,  protected: false },
   { label: 'Académie', to: '/academie', cta: true,  protected: true  },
+  { label: 'EXEMPLE',  to: '/exemple',  cta: false, protected: false, guestOnly: true },
 ];
 
 export default function Header() {
@@ -42,6 +46,10 @@ export default function Header() {
 
   const closeMenu = () => setMenuOpen(false);
 
+  /* Onglets effectivement affichés : on retire les entrées guestOnly
+     dès que l'utilisateur est connecté. */
+  const visibleNavLinks = NAV_LINKS.filter((link) => !(link.guestOnly && isAuthenticated));
+
   const openLogin = () => {
     setAuthTab('login');
     setAuthModal(true);
@@ -65,7 +73,7 @@ export default function Header() {
 
           {/* Navigation desktop */}
           <nav className={styles.nav} aria-label="Navigation principale">
-            {NAV_LINKS.map(({ label, to, cta, protected: isProtected }) => {
+            {visibleNavLinks.map(({ label, to, cta, protected: isProtected }) => {
               const locked = isProtected && !isAuthenticated;
 
               if (locked) {
@@ -135,7 +143,7 @@ export default function Header() {
         {menuOpen && (
           <div className={styles.mobileMenu}>
             <nav>
-              {NAV_LINKS.map(({ label, to, cta, protected: isProtected }) => {
+              {visibleNavLinks.map(({ label, to, cta, protected: isProtected }) => {
                 const locked = isProtected && !isAuthenticated;
 
                 if (locked) {
