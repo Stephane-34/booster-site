@@ -20,15 +20,16 @@
    En prod, `userStart` viendra du profil (created_at Supabase). Ici on utilise
    Date.now() au premier rendu + un bouton "+24h" pour tester la mécanique. */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
-  BookOpen, ChevronRight, CheckCircle, Lock, Unlock, Clock, RotateCcw,
+  BookOpen, ChevronRight, ChevronLeft, CheckCircle, Lock, Unlock, Clock, RotateCcw,
   Trophy, TrendingUp, Calendar, Target, Gift, Library, PlayCircle, FileText,
   HelpCircle, Sparkles, Route, GraduationCap, LineChart,
+  Check, X, CheckSquare, Layers, RotateCw, Shuffle,
 } from 'lucide-react';
 import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
-import { PROGRAM_52, MOCK_PLAYERS, WEEK_1 } from './data';
+import { PROGRAM_52, MOCK_PLAYERS, WEEK_1, FLASHCARDS, KEY_PRINCIPLES } from './data';
 import styles from './Exemple.module.css';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -335,11 +336,14 @@ function ProgramSection({ completedCount, globalScore }) {
 
 /* ─── Section "Ma semaine en cours" ───────────────────────── */
 function DashboardSection({ userStart, simulated, completed, setCompleted, daysPassed, simulateDay, resetDemo }) {
-  const [activeQuizId, setActiveQuiz] = useState(null);
-  const [qIndex, setQIndex] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [view, setView] = useState('dashboard'); // dashboard | quiz | summary | leaderboard
-  const [summary, setSummary] = useState(null);
+  const [activeModuleId, setActiveModule] = useState(null);
+  /* Sous-onglets à l'intérieur d'un module ouvert :
+     - quiz : les questions du jour (style Grand Livret) + récap après complétion
+     - flashcards : les fiches mémo du corpus global
+     - guide : synthèse pédagogique (résumé + principes + glossaire)
+     Voir choix "C" du brief : quiz spécifique par module, fiches/guide partagés. */
+  const [moduleTab, setModuleTab] = useState('quiz');
+  const [view, setView] = useState('dashboard'); // dashboard | module | leaderboard
 
   const movingAvg = useMemo(() => {
     const ninetyDaysMs = 90 * DAY_MS;
@@ -363,32 +367,23 @@ function DashboardSection({ userStart, simulated, completed, setCompleted, daysP
     return 'locked';
   };
 
-  const startQuiz = (id) => {
-    setActiveQuiz(id);
-    setQIndex(0);
-    setAnswers({});
-    setView('quiz');
+  const openModule = (id) => {
+    setActiveModule(id);
+    setModuleTab('quiz');
+    setView('module');
   };
 
-  const handleAnswer = (idx) => setAnswers((a) => ({ ...a, [qIndex]: idx }));
-
-  const nextQuestion = () => {
-    const day = WEEK_1.find((d) => d.id === activeQuizId);
-    if (qIndex < day.questions.length - 1) {
-      setQIndex((i) => i + 1);
-    } else {
-      finishQuiz(day);
-    }
-  };
-
-  const finishQuiz = (day) => {
+  /* Enregistrement du résultat d'un quiz — on garde la même forme dans
+     `completed` (title/theme/details/score) pour que la Bibliothèque et
+     le récap continuent de fonctionner sans changement. */
+  const saveQuizResult = (day, results) => {
     let score = 0;
     const details = day.questions.map((q, i) => {
-      const ok = answers[i] === q.correct;
+      const ok = results[i] === q.correct;
       if (ok) score++;
       return {
         question: q.q,
-        userAnswer: q.options[answers[i]],
+        userAnswer: q.options[results[i]],
         correctAnswer: q.options[q.correct],
         isCorrect: ok,
         rationale: q.rationale,
@@ -406,98 +401,61 @@ function DashboardSection({ userStart, simulated, completed, setCompleted, daysP
         theme: day.theme,
       },
     }));
-    setView('dashboard');
   };
 
-  const viewSummary = (id) => {
-    const day = WEEK_1.find((d) => d.id === id);
-    setSummary({ day, record: completed[id] });
-    setView('summary');
-  };
-
-  /* ── Sous-vues ── */
-  if (view === 'quiz') {
-    const day = WEEK_1.find((d) => d.id === activeQuizId);
-    const q = day.questions[qIndex];
-    const answered = answers[qIndex] !== undefined;
+  /* ── Vue module (ouverte au clic sur un module de la semaine) ── */
+  if (view === 'module') {
+    const day = WEEK_1.find((d) => d.id === activeModuleId);
+    const existingRecord = completed[day.id]; // récap si déjà complété
+    const moduleTabs = [
+      { id: 'quiz',       label: 'Quiz du jour',  icon: CheckSquare },
+      { id: 'flashcards', label: 'Fiches mémo',   icon: Layers },
+      { id: 'guide',      label: 'Guide',         icon: BookOpen },
+    ];
     return (
       <div className={styles.dashWrap}>
-        <div className={styles.quizHeader}>
-          <button onClick={() => setView('dashboard')} className={styles.linkBtn}>← Quitter</button>
-          <div className={styles.quizProgress}>
-            {day.questions.map((_, i) => (
-              <span key={i} className={`${styles.quizTick} ${i <= qIndex ? styles.quizTickDone : ''}`} />
-            ))}
+        <div className={styles.moduleTopbar}>
+          <button onClick={() => setView('dashboard')} className={styles.linkBtn}>
+            <ChevronLeft size={16} /> Retour à ma semaine
+          </button>
+          <div className={styles.moduleTopbarMeta}>
+            <span className={styles.moduleTopbarDay}>{day.dayName}</span>
+            <span className={styles.moduleTopbarTheme}>{day.theme}</span>
           </div>
         </div>
-        <div className={styles.quizCard}>
-          <p className={styles.quizTheme}>{day.theme}</p>
-          <h3 className={styles.quizQuestion}>{q.q}</h3>
-          <div className={styles.quizOptions}>
-            {q.options.map((opt, idx) => (
+
+        <div className={styles.livretRoot}>
+          <header className={styles.livretHeader}>
+            <div className={styles.livretPlate}><BookOpen size={22} /></div>
+            <div>
+              <p className={styles.livretBrand}>{day.title}</p>
+              <p className={styles.livretSub}>Module {day.dayName.toLowerCase()} · {day.theme}</p>
+            </div>
+          </header>
+
+          <div className={styles.livretTabs}>
+            {moduleTabs.map(({ id, label, icon: Icon }) => (
               <button
-                key={idx}
-                onClick={() => handleAnswer(idx)}
-                className={`${styles.quizOption} ${answers[qIndex] === idx ? styles.quizOptionActive : ''}`}
+                key={id}
+                onClick={() => setModuleTab(id)}
+                className={`${styles.livretTab} ${moduleTab === id ? styles.livretTabActive : ''}`}
               >
-                <span className={styles.quizOptionDot} />
-                <span>{opt}</span>
+                <Icon size={16} /> {label}
               </button>
             ))}
           </div>
-          <div className={styles.quizFooter}>
-            <Button variant="primary" size="md" onClick={nextQuestion} disabled={!answered}>
-              {qIndex < day.questions.length - 1 ? 'Question suivante' : 'Valider & voir le score'}
-              <ChevronRight size={16} />
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
-  if (view === 'summary' && summary) {
-    const { day, record } = summary;
-    const pct = Math.round((record.score / record.total) * 100);
-    return (
-      <div className={styles.dashWrap}>
-        <button onClick={() => setView('dashboard')} className={styles.linkBtn}>← Retour au programme</button>
-        <div className={styles.summaryHeader}>
-          <div>
-            <p className={styles.summaryDate}><Calendar size={14} /> Validé le {record.completedAt}</p>
-            <h2 className={styles.summaryTitle}>Fiche mémoire — {day.title}</h2>
-            <p className={styles.summarySub}>{day.theme}</p>
+          <div className={styles.livretBody}>
+            {moduleTab === 'quiz' && (
+              <ModuleQuizView
+                day={day}
+                existingRecord={existingRecord}
+                onSubmit={(results) => saveQuizResult(day, results)}
+              />
+            )}
+            {moduleTab === 'flashcards' && <ModuleFlashcardsView />}
+            {moduleTab === 'guide'      && <ModuleGuideView theme={day.theme} title={day.title} />}
           </div>
-          <div className={styles.summaryScore}>
-            <Target size={20} />
-            <span className={styles.summaryScoreLabel}>Précision</span>
-            <span className={`${styles.summaryScoreValue} ${pct >= 80 ? styles.scoreGood : pct >= 50 ? styles.scoreMid : styles.scoreLow}`}>
-              {pct}%
-            </span>
-          </div>
-        </div>
-        <div className={styles.summaryItems}>
-          {record.details.map((it, idx) => (
-            <div key={idx} className={styles.summaryItem}>
-              <h4 className={styles.summaryItemTitle}><span className={styles.summaryItemNum}>{idx + 1}.</span> {it.question}</h4>
-              <div className={styles.summaryAnswers}>
-                <div className={`${styles.summaryAnswer} ${it.isCorrect ? styles.answerGood : styles.answerBad}`}>
-                  <span className={styles.answerLabel}>Votre réponse</span>
-                  <span>{it.userAnswer}</span>
-                </div>
-                {!it.isCorrect && (
-                  <div className={`${styles.summaryAnswer} ${styles.answerGood}`}>
-                    <span className={styles.answerLabel}>La bonne réponse</span>
-                    <span>{it.correctAnswer}</span>
-                  </div>
-                )}
-              </div>
-              <div className={styles.summaryRationale}>
-                <span className={styles.rationaleLabel}><BookOpen size={14} /> L'explication Booster</span>
-                <p>{it.rationale}</p>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     );
@@ -602,12 +560,12 @@ function DashboardSection({ userStart, simulated, completed, setCompleted, daysP
                 <p className={styles.moduleLockedHint}><Clock size={14} /> Débloqué jour {i + 1}</p>
               )}
               {status === 'unlocked' && (
-                <Button variant="primary" size="md" onClick={() => startQuiz(day.id)} className={styles.moduleBtn}>
+                <Button variant="primary" size="md" onClick={() => openModule(day.id)} className={styles.moduleBtn}>
                   Démarrer le module <ChevronRight size={16} />
                 </Button>
               )}
               {status === 'completed' && (
-                <Button variant="ghost" size="md" onClick={() => viewSummary(day.id)} className={styles.moduleBtn}>
+                <Button variant="ghost" size="md" onClick={() => openModule(day.id)} className={styles.moduleBtn}>
                   <BookOpen size={14} /> Consulter la fiche
                 </Button>
               )}
@@ -739,6 +697,367 @@ function BibliothequeSection({ completed, onGoToWeek }) {
                 <p className={styles.libraryDocMeta}>{d.type} · {d.pages} page{d.pages > 1 ? 's' : ''}</p>
               </div>
               <ChevronRight size={16} className={styles.libraryDocArrow} />
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Vue module — 3 sous-onglets (Quiz / Fiches mémo / Guide).
+   Style "Le Grand Livret" (thème éditorial papier + violet).
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Tampon "VALIDÉ / À REVOIR" apposé après une réponse. */
+function StampSeal({ ok }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={`${styles.livretStamp} ${ok ? styles.stampOK : styles.stampKO}`}
+    >
+      <div className={styles.stampInner}>{ok ? 'VALIDÉ' : 'À REVOIR'}</div>
+    </div>
+  );
+}
+
+/* ── Sous-onglet Quiz du module ──────────────────────────── */
+function ModuleQuizView({ day, existingRecord, onSubmit }) {
+  const [idx, setIdx]           = useState(0);
+  const [answers, setAnswers]   = useState({});
+  const [showResults, setShow]  = useState(!!existingRecord);
+
+  /* Si on ré-ouvre un module déjà complété, on affiche direct le récap. */
+  useEffect(() => {
+    if (existingRecord) setShow(true);
+  }, [existingRecord]);
+
+  const total = day.questions.length;
+  const current = day.questions[idx];
+  const answered = idx in answers;
+
+  const restart = () => {
+    setIdx(0);
+    setAnswers({});
+    setShow(false);
+  };
+
+  const select = (optIdx) => {
+    if (idx in answers) return;
+    setAnswers((a) => ({ ...a, [idx]: optIdx }));
+  };
+
+  const next = () => {
+    if (idx < total - 1) {
+      setIdx(idx + 1);
+      return;
+    }
+    onSubmit(answers);
+    setShow(true);
+  };
+
+  /* ── Récap (vue post-quiz ou consultation d'une fiche déjà complétée) ── */
+  if (showResults) {
+    const record = existingRecord || {
+      score: day.questions.filter((q, i) => answers[i] === q.correct).length,
+      total,
+      details: day.questions.map((q, i) => ({
+        question: q.q,
+        userAnswer: q.options[answers[i]],
+        correctAnswer: q.options[q.correct],
+        isCorrect: answers[i] === q.correct,
+        rationale: q.rationale,
+      })),
+    };
+    const pct = Math.round((record.score / record.total) * 100);
+    return (
+      <div className={styles.livretResults}>
+        <div className={styles.livretResultsCard}>
+          <p className={styles.livretMono}>Relevé de fin de session</p>
+          <h2 className={styles.livretResultsTitle}>Ta fiche mémoire</h2>
+          <div className={styles.livretScore}>{record.score}<span>/ {record.total}</span></div>
+          <p className={styles.livretResultsMsg}>
+            {pct >= 80 ? 'Excellent ! Concept maîtrisé.'
+              : pct >= 50 ? 'Bien, mais quelques concepts à revoir.'
+              : 'Prends le temps de revoir la fiche mémo et le guide avant de refaire ce module.'}
+          </p>
+          <div className={styles.livretResultsActions}>
+            <Button variant="primary" size="md" onClick={restart}>
+              <RotateCw size={16} /> Refaire le quiz
+            </Button>
+          </div>
+        </div>
+        <div className={styles.livretReview}>
+          {record.details.map((it, i) => (
+            <div key={i} className={`${styles.livretReviewItem} ${it.isCorrect ? styles.livretReviewOK : styles.livretReviewKO}`}>
+              <p className={styles.livretMono}>Entrée n°{String(i + 1).padStart(2, '0')}</p>
+              <p className={styles.livretReviewQ}>{it.question}</p>
+              <p className={styles.livretReviewLine}><strong>Ta réponse :</strong> {it.userAnswer ?? 'Aucune'}</p>
+              {!it.isCorrect && (
+                <p className={styles.livretReviewLine}><strong>Bonne réponse :</strong> {it.correctAnswer}</p>
+              )}
+              <div className={styles.livretReviewRationale}>
+                <strong>Explication</strong>
+                <p>{it.rationale}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Question courante ── */
+  return (
+    <div className={styles.livretQuiz}>
+      <div className={styles.livretQuizHead}>
+        <span className={styles.livretMono}>Entrée {idx + 1} / {total}</span>
+        <div className={styles.livretTicks}>
+          {day.questions.map((_, i) => (
+            <span
+              key={i}
+              className={`${styles.livretTick} ${i === idx ? styles.livretTickCurrent : (i in answers ? styles.livretTickDone : '')}`}
+            />
+          ))}
+        </div>
+      </div>
+      <h2 className={styles.livretQuestion}>{current.q}</h2>
+      <div className={styles.livretOptions} role="radiogroup">
+        {current.options.map((opt, optIdx) => {
+          const selected = answers[idx] === optIdx;
+          const isCorrect = optIdx === current.correct;
+          let state = '';
+          if (answered) {
+            if (isCorrect) state = styles.optionCorrect;
+            else if (selected) state = styles.optionIncorrect;
+            else state = styles.optionMuted;
+          } else if (selected) {
+            state = styles.optionSelected;
+          }
+          return (
+            <button
+              key={optIdx}
+              role="radio"
+              aria-checked={selected}
+              disabled={answered}
+              onClick={() => select(optIdx)}
+              className={`${styles.livretOption} ${state}`}
+            >
+              <span className={styles.livretOptionMark}>
+                {answered && isCorrect && <Check size={13} strokeWidth={3} />}
+                {answered && !isCorrect && selected && <X size={13} strokeWidth={3} />}
+              </span>
+              <span>{opt}</span>
+            </button>
+          );
+        })}
+      </div>
+      {answered && (
+        <div className={styles.livretRationale}>
+          <StampSeal ok={answers[idx] === current.correct} />
+          <div>
+            <strong>Explication</strong>
+            <p>{current.rationale}</p>
+          </div>
+        </div>
+      )}
+      <div className={styles.livretFooter}>
+        <button
+          onClick={() => setIdx((i) => Math.max(0, i - 1))}
+          disabled={idx === 0}
+          className={styles.linkBtn}
+        >
+          <ChevronLeft size={16} /> Précédent
+        </button>
+        <Button variant="primary" size="md" onClick={next} disabled={!answered}>
+          {idx === total - 1 ? 'Valider mon score' : 'Suivant'} <ChevronRight size={16} />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Sous-onglet Fiches mémo (corpus global partagé) ─────── */
+/* Le brief (choix C) : réutiliser le corpus FLASHCARDS pour tous les
+   modules dans la démo — chaque module aura son propre corpus en prod. */
+const shuffleFlashcards = (list) => {
+  const c = [...list];
+  for (let i = c.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [c[i], c[j]] = [c[j], c[i]];
+  }
+  return c;
+};
+
+function ModuleFlashcardsView() {
+  const [order, setOrder]     = useState(() => FLASHCARDS.map((c) => c.id));
+  const [filter, setFilter]   = useState('all');
+  const [mastery, setMastery] = useState({});
+  const [index, setIndex]     = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const sceneRef = useRef(null);
+
+  const cardsById = useMemo(() => Object.fromEntries(FLASHCARDS.map((c) => [c.id, c])), []);
+
+  const visible = useMemo(() => {
+    if (filter === 'all') return order;
+    return order.filter((id) => (mastery[id] || 'review') === filter);
+  }, [order, filter, mastery]);
+
+  useEffect(() => { setIndex(0); setFlipped(false); }, [filter]);
+  useEffect(() => {
+    if (index >= visible.length && visible.length > 0) setIndex(visible.length - 1);
+  }, [visible, index]);
+
+  const known      = FLASHCARDS.filter((c) => mastery[c.id] === 'known').length;
+  const reviewN    = FLASHCARDS.length - known;
+  const pctKnown   = Math.round((known / FLASHCARDS.length) * 100);
+  const current    = visible.length > 0 ? cardsById[visible[index]] : null;
+
+  const goNext = useCallback(() => {
+    setFlipped(false);
+    setIndex((i) => (visible.length ? (i + 1) % visible.length : 0));
+  }, [visible.length]);
+
+  const goPrev = useCallback(() => {
+    setFlipped(false);
+    setIndex((i) => (visible.length ? (i - 1 + visible.length) % visible.length : 0));
+  }, [visible.length]);
+
+  const onShuffle = () => {
+    setOrder(shuffleFlashcards(order));
+    setIndex(0);
+    setFlipped(false);
+  };
+
+  const mark = (status) => {
+    if (!current) return;
+    setMastery((m) => ({ ...m, [current.id]: status }));
+    setTimeout(goNext, 120);
+  };
+
+  const onKey = (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); goNext(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); }
+    else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setFlipped((f) => !f); }
+  };
+
+  const filters = [
+    { id: 'all',    label: `Toutes (${FLASHCARDS.length})` },
+    { id: 'review', label: `À revoir (${reviewN})` },
+    { id: 'known',  label: `Connues (${known})` },
+  ];
+
+  return (
+    <div className={styles.flashWrap}>
+      <div className={styles.flashProgress}>
+        <div className={styles.flashProgressMeta}><span>Maîtrisées</span><span>{pctKnown}%</span></div>
+        <div className={styles.flashProgressBar}>
+          <div className={styles.flashProgressFill} style={{ width: `${pctKnown}%` }} />
+        </div>
+      </div>
+
+      <div className={styles.flashFilters}>
+        {filters.map((f) => (
+          <button
+            key={f.id}
+            onClick={() => setFilter(f.id)}
+            className={`${styles.flashFilter} ${filter === f.id ? styles.flashFilterActive : ''}`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {!current ? (
+        <div className={styles.flashEmpty}>
+          <p className={styles.flashEmptyTitle}>Rien à afficher ici</p>
+          <p>{filter === 'review' ? 'Bravo, toutes les fiches sont marquées comme connues !' : 'Aucune fiche dans cette catégorie.'}</p>
+        </div>
+      ) : (
+        <>
+          <div className={styles.flashCount}>Fiche {index + 1} / {visible.length}</div>
+          <div
+            ref={sceneRef}
+            tabIndex={0}
+            role="button"
+            aria-label={`Carte mémo : ${flipped ? 'définition' : 'terme'}. Entrée pour retourner.`}
+            onKeyDown={onKey}
+            onClick={() => setFlipped((f) => !f)}
+            className={styles.flipScene}
+          >
+            <div className={`${styles.flipCard} ${flipped ? styles.flipCardFlipped : ''}`}>
+              <div className={`${styles.flipFace} ${styles.flipFront}`}>
+                <RotateCw size={16} className={styles.flipHint} />
+                <p className={styles.livretMono}>Terme</p>
+                <h3 className={styles.flipText}>{current.front}</h3>
+                <p className={styles.flipFooter}>Cliquez ou appuyez sur Entrée pour voir la définition</p>
+              </div>
+              <div className={`${styles.flipFace} ${styles.flipBack}`}>
+                <p className={styles.livretMono}>Définition</p>
+                <p className={styles.flipBackText}>{current.back}</p>
+              </div>
+            </div>
+          </div>
+          <div className={styles.flashActions}>
+            <Button variant="ghost" size="sm" onClick={() => mark('review')}>
+              <RotateCw size={14} /> À revoir
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => mark('known')}>
+              <Check size={14} /> Je connais
+            </Button>
+          </div>
+          <div className={styles.flashNav}>
+            <button onClick={goPrev} className={styles.flashNavBtn} aria-label="Précédente"><ChevronLeft size={18} /></button>
+            <button onClick={onShuffle} className={styles.flashNavBtn} aria-label="Mélanger"><Shuffle size={18} /></button>
+            <button onClick={goNext} className={styles.flashNavBtn} aria-label="Suivante"><ChevronRight size={18} /></button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ── Sous-onglet Guide (corpus global partagé) ───────────── */
+function ModuleGuideView({ theme, title }) {
+  return (
+    <div className={styles.guideWrap}>
+      <header className={styles.guideHeader}>
+        <p className={styles.livretMono}>Cahier d'étude · {theme}</p>
+        <h2 className={styles.guideTitle}>{title}</h2>
+        <p className={styles.guideSub}>Synthèse pédagogique du corpus Booster</p>
+      </header>
+      <section>
+        <h3 className={styles.guideSectionTitle}><Layers size={18} /> Résumé</h3>
+        <p className={styles.guideText}>
+          Ce guide synthétise les concepts essentiels de finances personnelles : mécanismes de la
+          croissance du capital, stratégies de protection contre les imprévus et l'inflation, et
+          principes pour construire un portefeuille équilibré entre risque et rendement.
+        </p>
+      </section>
+      <section>
+        <h3 className={styles.guideSectionTitle}>Principes clés</h3>
+        <div className={styles.guidePrinciples}>
+          {KEY_PRINCIPLES.map((p, i) => (
+            <div key={p.title} className={styles.guidePrinciple}>
+              <span className={styles.guidePrincipleNum}>{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <p className={styles.guidePrincipleTitle}>{p.title}</p>
+                <p className={styles.guidePrincipleBody}>{p.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      <section>
+        <h3 className={styles.guideSectionTitle}>Glossaire</h3>
+        <div className={styles.guideGlossary}>
+          {FLASHCARDS.map((c) => (
+            <div key={c.id} className={styles.guideTerm}>
+              <span className={styles.guideTermFront}>{c.front}</span>
+              <span className={styles.guideTermBack}>{c.back}</span>
             </div>
           ))}
         </div>
