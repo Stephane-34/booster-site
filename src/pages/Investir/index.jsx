@@ -16,22 +16,33 @@ import styles from './Investir.module.css';
 const RATE_BOOSTER  = 0.05;
 const RATE_LIVRET_A = 0.015;
 
+/* Lien de prise de RDV — dupliqué depuis BookingCTA pour rester indépendant.
+   À centraliser dans une config si un troisième endroit apparaît. */
+const HUBSPOT_CALENDAR_URL = 'https://meetings.hubspot.com/booster';
+
 /* ─── Page principale ─────────────────────────────────────── */
 export default function Investir() {
   const [authModal, setAuthModal] = useState(false);
   const { isAuthenticated } = useAuth();
 
-  /* Pour les utilisateurs déjà connectés, le CTA "Créer mon compte" n'a plus
-     de sens — on n'ouvre pas le modal d'inscription. */
+  /* Le CTA change de rôle selon l'état de connexion :
+     - Visiteur → ouvre le modal d'inscription ("Créer mon compte")
+     - Connecté → ouvre HubSpot dans un nouvel onglet ("Prendre RDV") */
   const handleCTA = () => {
-    if (!isAuthenticated) setAuthModal(true);
+    if (isAuthenticated) {
+      window.open(HUBSPOT_CALENDAR_URL, '_blank', 'noopener,noreferrer');
+    } else {
+      setAuthModal(true);
+    }
   };
+
+  const ctaLabel = isAuthenticated ? 'Prendre RDV' : 'Créer mon compte';
 
   return (
     <div className={styles.page}>
-      <HeroAV onCTAClick={handleCTA} />
+      <HeroAV onCTAClick={handleCTA} ctaLabel={ctaLabel} />
       <CompareSimulator />
-      <ProjectTabs onCTAClick={handleCTA} />
+      <ProjectTabs onCTAClick={handleCTA} ctaLabel={ctaLabel} />
       <Modal isOpen={authModal} onClose={() => setAuthModal(false)} title="Créer mon compte gratuit">
         <AuthForm defaultTab="signup" onSuccess={() => setAuthModal(false)} />
       </Modal>
@@ -65,7 +76,7 @@ const AV_GLASS_SECTIONS = [
   },
 ];
 
-function HeroAV({ onCTAClick }) {
+function HeroAV({ onCTAClick, ctaLabel }) {
   return (
     <section className={styles.heroAV}>
       <div className="container">
@@ -81,7 +92,7 @@ function HeroAV({ onCTAClick }) {
             L'outil le plus puissant pour transformer tes économies d'aujourd'hui en gros projets demain.
           </p>
           <Button variant="accent" size="lg" onClick={onCTAClick}>
-            Créer mon compte
+            {ctaLabel}
             <ArrowRight size={18} />
           </Button>
         </div>
@@ -250,7 +261,7 @@ const PROJECT_TABS = [
   { id: 'retraite',   label: 'Préparer sa retraite' },
 ];
 
-function ProjectTabs({ onCTAClick }) {
+function ProjectTabs({ onCTAClick, ctaLabel }) {
   const [active, setActive] = useState('epargner');
 
   return (
@@ -292,7 +303,7 @@ function ProjectTabs({ onCTAClick }) {
           </p>
           <Button variant="accent" size="lg" onClick={onCTAClick}>
             <CheckCircle size={18} />
-            Créer mon compte
+            {ctaLabel}
           </Button>
         </div>
       </div>

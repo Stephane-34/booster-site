@@ -114,7 +114,7 @@ export default function Header() {
             {isAuthenticated ? (
               <>
                 <Link to="/profil" className={styles.greeting} onClick={closeMenu}>
-                  Bonjour <span className={styles.greetingName}>{firstName || 'toi'}</span>
+                  Bonjour{' '}<span className={styles.greetingName}>{firstName || 'toi'}</span>
                 </Link>
                 <Button variant="ghost" size="sm" onClick={signOut}>
                   <LogOut size={14} />
@@ -180,7 +180,7 @@ export default function Header() {
               {isAuthenticated ? (
                 <>
                   <span className={styles.greeting}>
-                    Bonjour <span className={styles.greetingName}>{firstName || 'toi'}</span>
+                    Bonjour{' '}<span className={styles.greetingName}>{firstName || 'toi'}</span>
                   </span>
                   <Button variant="outline" size="md" onClick={signOut} className={styles.mobileBtn}>
                     <LogOut size={16} />
