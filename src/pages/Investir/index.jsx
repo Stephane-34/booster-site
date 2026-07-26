@@ -595,7 +595,6 @@ function TabImmobilier() {
         {/* La Stratégie Booster — 3 leviers propres à l'immobilier via l'AV */}
         <div className={styles.strategyCard}>
           <div className={styles.strategyHead}>
-            <span className={styles.strategyEmoji}>🇮🇹</span>
             <h4 className={styles.strategyTitle}>La Stratégie Booster</h4>
           </div>
           <ul className={styles.strategyList}>

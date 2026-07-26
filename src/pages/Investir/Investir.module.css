@@ -1224,11 +1224,6 @@
   margin-bottom: var(--space-5);
 }
 
-.strategyEmoji {
-  font-size: 1.75rem;
-  line-height: 1;
-}
-
 .strategyTitle {
   margin: 0;
   font-size: var(--text-xl);
