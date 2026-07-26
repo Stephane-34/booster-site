@@ -1042,3 +1042,481 @@
 @media (max-width: 480px) {
   .projectGrid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ─── Profils de risque en flip-cards ─────────────────────── */
+.flipGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.flipCardScene {
+  perspective: 1200px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  height: 220px;
+  width: 100%;
+  outline: none;
+  font-family: inherit;
+}
+
+.flipCardScene:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+  border-radius: var(--radius-xl);
+}
+
+.flipCardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.4, 0.18, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flipCardInner.flipped {
+  transform: rotateY(180deg);
+}
+
+.flipCardFace {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-3);
+}
+
+.flipCardFront {
+  background: linear-gradient(160deg, rgba(168, 85, 247, 0.14), rgba(168, 85, 247, 0.04));
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: var(--color-text);
+}
+
+.flipCardBack {
+  transform: rotateY(180deg);
+  background: linear-gradient(160deg, rgba(74, 222, 128, 0.14), rgba(168, 85, 247, 0.08));
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  color: var(--color-text);
+  padding: var(--space-5);
+}
+
+.flipCardIcon {
+  color: var(--color-primary-light);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  padding: var(--space-3);
+  width: 56px;
+  height: 56px;
+}
+
+.flipCardTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.flipCardHint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.flipCardAllocation {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-accent-light);
+  font-weight: var(--weight-bold);
+  padding: var(--space-2) var(--space-4);
+  background: rgba(74, 222, 128, 0.15);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  border-radius: var(--radius-full);
+}
+
+.flipCardDetail {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+  .flipGrid { grid-template-columns: 1fr; }
+  .flipCardScene { height: 190px; }
+}
+
+/* ─── Résultat simulateur profil de risque ────────────────── */
+.profileResult {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-4);
+}
+
+.profileResultMain,
+.profileResultProjection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.profileResultLabel {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-bold);
+}
+
+.profileResultValue {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: -0.01em;
+}
+
+.profile_securitaire { color: var(--color-primary-light); }
+.profile_equilibre   { color: var(--color-warning); }
+.profile_dynamique   { color: var(--color-accent-light); }
+
+.profileResultProjectionValue {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+  .profileResult { grid-template-columns: 1fr; }
+}
+
+/* ─── Stratégie Booster (immobilier) ──────────────────────── */
+.strategyCard {
+  background: linear-gradient(150deg, rgba(168, 85, 247, 0.14), rgba(76, 29, 149, 0.15));
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+}
+
+.strategyHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.strategyEmoji {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.strategyTitle {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.strategyList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.strategyItem {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.strategyCheck {
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Titre bien contrasté sur fond violet — corrige le bug remonté par le client */
+.strategyItemTitle {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  letter-spacing: -0.005em;
+}
+
+.strategyItemText {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.6;
+}
+
+/* ─── Bloc pédagogique retraite ───────────────────────────── */
+.pedagoBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.pedagoHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pedagoTitle {
+  margin: 0;
+  font-size: clamp(var(--text-lg), 2vw, var(--text-2xl));
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.pedagoIntro {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+  font-size: var(--text-sm);
+}
+
+.pedagoSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pedagoSectionTitle {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+}
+
+.pedagoText {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+  font-size: var(--text-sm);
+}
+
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.pillar {
+  position: relative;
+  padding: var(--space-5);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pillarIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: rgba(168, 85, 247, 0.14);
+  color: var(--color-primary-light);
+}
+
+.pillarNum {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--weight-bold);
+}
+
+.pillarTitle {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+}
+
+.pillarBody {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.solutions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.solution {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.solutionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: rgba(74, 222, 128, 0.14);
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.solutionTitle {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+}
+
+.solutionBody {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .pillars   { grid-template-columns: 1fr; }
+  .solutions { grid-template-columns: 1fr; }
+}
+
+/* ─── Bloc calendrier de RDV en bas d'onglet ──────────────── */
+.bookingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  background: linear-gradient(160deg, rgba(74, 222, 128, 0.08), rgba(168, 85, 247, 0.06));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.bookingHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.bookingTitle {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.bookingDesc {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.bookingSlot {
+  min-height: 480px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.bookingIframe {
+  width: 100%;
+  height: 620px;
+  border: 0;
+  display: block;
+}
+
+.bookingLock {
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  min-height: 480px;
+  justify-content: center;
+}
+
+.bookingLockIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.14);
+  color: var(--color-primary-light);
+  margin-bottom: var(--space-2);
+}
+
+.bookingLockTitle {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+}
+
+.bookingLockDesc {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-secondary);
+  max-width: 420px;
+  line-height: 1.6;
+  font-size: var(--text-sm);
+}
+
+.bookingLockActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}

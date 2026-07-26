@@ -1,9 +1,9 @@
-# Spécification — page `/exemple`
+# Spécification — page `/academie`
 
-> **Statut :** terrain de test, non-prod. Accessible uniquement aux visiteurs
-> non-connectés via l'entrée `EXEMPLE` du menu (flag `guestOnly` dans
-> `Header.jsx`). Objectif : arbitrer avec le client l'UX de la future Académie
-> avant intégration à `/academie`.
+> **Statut :** en prod. Route protégée par `RequireAuth` (membres uniquement).
+> Anciennement `/exemple` (terrain de test), promue en `/academie` après
+> validation UX client. L'ancienne page `/academie` (grille de thèmes + quiz
+> en 3 questions) a été remplacée par ce contenu.
 
 ## 1. Contexte produit
 

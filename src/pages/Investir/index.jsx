@@ -1,5 +1,8 @@
 import { useState, useMemo } from 'react';
-import { CheckCircle, TrendingUp, Info, ArrowRight, Landmark, BarChart2, Percent, Shield, Rocket } from 'lucide-react';
+import {
+  CheckCircle, TrendingUp, Info, ArrowRight, Landmark, BarChart2, Percent, Shield, Rocket,
+  Calendar, Lock, RotateCw, Wallet, Banknote, Sparkles, Clock, Hourglass, PiggyBank,
+} from 'lucide-react';
 import clsx from 'clsx';
 import Modal from '../../components/ui/Modal/Modal';
 import AuthForm from '../../components/sections/AuthForm/AuthForm';
@@ -316,7 +319,59 @@ function ProjectTabs({ onCTAClick, ctaLabel }) {
    ══════════════════════════════════════════════════════════ */
 
 /* ── 1. Épargner et fructifier ────────────────────────────── */
+/* Profils de risque affichés en flip-cards indépendantes.
+   Recto = présentation courte, verso = allocation détaillée + description. */
+const RISK_PROFILES = [
+  {
+    id: 'securitaire',
+    icon: Shield,
+    label: 'Profil Sécuritaire',
+    allocation: '100 % Fonds Euro',
+    detail: "Ton capital est garanti à 100 %, il ne peut pas baisser. Tu gagnes un peu moins, mais tu dors sur tes deux oreilles.",
+  },
+  {
+    id: 'equilibre',
+    icon: BarChart2,
+    label: 'Profil Équilibré',
+    allocation: '70 % Fonds Euro / 30 % Actions & ETF',
+    detail: "Une base solide qui ne bouge pas, boostée par une dose de marchés financiers pour aller chercher plus de performance.",
+  },
+  {
+    id: 'dynamique',
+    icon: Rocket,
+    label: 'Profil Dynamique',
+    allocation: '30 % Fonds Euro / 70 % Actions & ETF',
+    detail: "Le temps est ton meilleur allié. Ton capital fluctue, mais tu maximises tes chances de forte croissance sur le long terme.",
+  },
+];
+
+/* Détermine le profil selon le rendement souhaité — règle produit :
+   1-5 % : Sécuritaire · 5-10 % : Équilibré · 10 %+ : Dynamique. */
+function profileForRate(rate) {
+  if (rate < 5)  return { key: 'securitaire', label: 'Sécuritaire', color: 'securitaire' };
+  if (rate < 10) return { key: 'equilibre',   label: 'Équilibré',   color: 'equilibre' };
+  return             { key: 'dynamique',   label: 'Dynamique',   color: 'dynamique' };
+}
+
 function TabEpargner() {
+  const [flipped, setFlipped] = useState({}); // { profileId: true }
+  const toggleFlip = (id) => setFlipped((f) => ({ ...f, [id]: !f[id] }));
+
+  /* Simulateur profil de risque */
+  const [capital, setCapital]   = useState(2000);
+  const [monthly, setMonthly]   = useState(150);
+  const [rate, setRate]         = useState(7);
+  const detectedProfile = profileForRate(rate);
+
+  /* Projection à 10 ans pour donner un ordre de grandeur — pas un conseil.
+     Formule capitalisation + versements : C₀·(1+t)^n + m·((1+t/12)^(n·12)−1)/(t/12). */
+  const projection = useMemo(() => {
+    const years = 10;
+    const monthlyValue = computeFutureValue(monthly, rate / 100, years * 12);
+    const capitalValue = capital * Math.pow(1 + rate / 100, years);
+    return Math.round(capitalValue + monthlyValue);
+  }, [capital, monthly, rate]);
+
   return (
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
@@ -343,6 +398,75 @@ function TabEpargner() {
             la magie des intérêts composés continuer d'opérer.
           </p>
         </div>
+
+        {/* Profils de risque en flip-cards */}
+        <div>
+          <p className={styles.profilesLabel}>Choisis ton camp — Les profils de risque</p>
+          <div className={styles.flipGrid}>
+            {RISK_PROFILES.map(({ id, icon: Icon, label, allocation, detail }) => {
+              const isFlipped = !!flipped[id];
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => toggleFlip(id)}
+                  aria-pressed={isFlipped}
+                  className={styles.flipCardScene}
+                >
+                  <div className={clsx(styles.flipCardInner, isFlipped && styles.flipped)}>
+                    <div className={clsx(styles.flipCardFace, styles.flipCardFront)}>
+                      <Icon size={28} className={styles.flipCardIcon} />
+                      <span className={styles.flipCardTitle}>{label}</span>
+                      <span className={styles.flipCardHint}>
+                        <RotateCw size={12} /> Cliquer pour retourner
+                      </span>
+                    </div>
+                    <div className={clsx(styles.flipCardFace, styles.flipCardBack)}>
+                      <span className={styles.flipCardAllocation}>{allocation}</span>
+                      <p className={styles.flipCardDetail}>{detail}</p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Simulateur de profil de risque */}
+        <SimCard title="Simulateur de profil de risque">
+          <div className={styles.simControls}>
+            <SliderGroup label="Capital initialement investi" value={formatCurrency(capital)}>
+              <input type="range" min={0} max={50000} step={500} value={capital}
+                onChange={(e) => setCapital(Number(e.target.value))} className={styles.simSlider} />
+            </SliderGroup>
+            <SliderGroup label="Versement mensuel souhaité" value={formatCurrency(monthly)}>
+              <input type="range" min={0} max={2000} step={50} value={monthly}
+                onChange={(e) => setMonthly(Number(e.target.value))} className={styles.simSlider} />
+            </SliderGroup>
+            <SliderGroup label="Rendement souhaité" value={`${rate.toFixed(1)} %/an`}>
+              <input type="range" min={0} max={30} step={0.5} value={rate}
+                onChange={(e) => setRate(Number(e.target.value))} className={styles.simSlider} />
+            </SliderGroup>
+          </div>
+          <div className={styles.profileResult}>
+            <div className={styles.profileResultMain}>
+              <span className={styles.profileResultLabel}>Ton profil détecté</span>
+              <span className={clsx(styles.profileResultValue, styles[`profile_${detectedProfile.color}`])}>
+                {detectedProfile.label}
+              </span>
+            </div>
+            <div className={styles.profileResultProjection}>
+              <span className={styles.profileResultLabel}>Projection à 10 ans</span>
+              <span className={styles.profileResultProjectionValue}>{formatCurrency(projection)}</span>
+            </div>
+          </div>
+          <p className={styles.simNote}>
+            <Info size={11} />
+            Simulation indicative — 1-5 % : Sécuritaire · 5-10 % : Équilibré · 10 %+ : Dynamique. Ne constitue pas un conseil en investissement.
+          </p>
+        </SimCard>
+
+        <InlineBookingCTA />
       </div>
     </div>
   );
@@ -467,6 +591,46 @@ function TabImmobilier() {
             )}
           </div>
         </SimCard>
+
+        {/* La Stratégie Booster — 3 leviers propres à l'immobilier via l'AV */}
+        <div className={styles.strategyCard}>
+          <div className={styles.strategyHead}>
+            <span className={styles.strategyEmoji}>🇮🇹</span>
+            <h4 className={styles.strategyTitle}>La Stratégie Booster</h4>
+          </div>
+          <ul className={styles.strategyList}>
+            <li className={styles.strategyItem}>
+              <CheckCircle size={18} className={styles.strategyCheck} />
+              <div>
+                <p className={styles.strategyItemTitle}>Apport progressif</p>
+                <p className={styles.strategyItemText}>
+                  On automatise ton épargne mensuelle pour lisser l'effort et arriver prêt le jour J face au banquier.
+                </p>
+              </div>
+            </li>
+            <li className={styles.strategyItem}>
+              <CheckCircle size={18} className={styles.strategyCheck} />
+              <div>
+                <p className={styles.strategyItemTitle}>Argent disponible pour le séquestre</p>
+                <p className={styles.strategyItemText}>
+                  L'enveloppe reste liquide. Tu as besoin de virer tes fonds pour le notaire ? C'est disponible à tout moment.
+                </p>
+              </div>
+            </li>
+            <li className={styles.strategyItem}>
+              <CheckCircle size={18} className={styles.strategyCheck} />
+              <div>
+                <p className={styles.strategyItemTitle}>Fiscalité optimisée</p>
+                <p className={styles.strategyItemText}>
+                  Tu ne touches que l'apport dont tu as besoin. Le reste continue de profiter du cadre fiscal
+                  avantageux de l'assurance-vie pour la suite de tes projets.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <InlineBookingCTA />
       </div>
     </div>
   );
@@ -561,12 +725,46 @@ function TabPersonnel() {
             )}
           </div>
         </SimCard>
+
+        <InlineBookingCTA />
       </div>
     </div>
   );
 }
 
 /* ── 4. Préparer sa retraite ──────────────────────────────── */
+const RETRAITE_PILLARS = [
+  {
+    icon: Sparkles,
+    title: "L'âge — le point de départ",
+    body: "Plus tôt tu commences, plus l'effort d'épargne est doux. Commencer à 25, 35 ou 45 ans ne demande pas du tout la même implication financière. Le temps est ton meilleur allié pour lisser l'effort.",
+  },
+  {
+    icon: Hourglass,
+    title: 'Le temps — le pouvoir de la durée',
+    body: "Grâce au mécanisme des intérêts composés, l'argent que tu mets de côté travaille pour toi au fil des années. Plus la période de capitalisation est longue, plus le rendement potentiel est important sans forcer ton budget mensuel.",
+  },
+  {
+    icon: PiggyBank,
+    title: "La capacité d'épargne — la régularité",
+    body: "Il ne s'agit pas de te priver aujourd'hui, mais d'apprendre à mettre de côté une fraction, même modeste, de tes revenus de manière régulière. C'est la constance qui fait la différence, pas les gros montants occasionnels.",
+  },
+];
+
+const RETRAITE_SOLUTIONS = [
+  {
+    icon: Wallet,
+    title: 'Se constituer un capital à ton rythme',
+    body: "Des solutions d'épargne souples te permettent de verser mensuellement ce que tu veux, quand tu veux — sans engagement de durée ni pénalité de sortie anticipée.",
+  },
+  {
+    icon: Banknote,
+    title: 'Défiscaliser tout en préparant ton avenir',
+    body: "Des dispositifs performants (comme le PER) te permettent de réduire ton impôt aujourd'hui en préparant ta retraite. Chaque euro placé travaille deux fois : pour ton avenir et contre ta fiscalité actuelle.",
+  },
+];
+
+
 const RETRAITE_POINTS = [
   "Assurance vie + PER (Plan Épargne Retraite) : deux enveloppes complémentaires",
   "PER : vos versements sont déductibles de votre revenu imposable",
@@ -649,6 +847,69 @@ function TabRetraite() {
           </p>
         </SimCard>
 
+        {/* Bloc pédagogique — Anticiper sa retraite */}
+        <div className={styles.pedagoBlock}>
+          <div className={styles.pedagoHeader}>
+            <Badge variant="accent">Éducatif</Badge>
+            <h4 className={styles.pedagoTitle}>
+              Anticiper sa retraite :{' '}
+              <span className="gradient-text">pourquoi il ne faut jamais s'y prendre trop tard</span>
+            </h4>
+            <p className={styles.pedagoIntro}>
+              On a tous tendance à repousser ce sujet à « plus tard ». Entre les projets du moment,
+              les factures et le quotidien, la retraite semble souvent être une lointaine préoccupation.
+              Pourtant, c'est l'un des investissements les plus cruciaux de ta vie.
+            </p>
+            <p className={styles.pedagoIntro}>
+              Préparer sa retraite, ce n'est pas seulement penser à arrêter de travailler : c'est
+              s'offrir la liberté de profiter de cette nouvelle étape sans contrainte financière,
+              maintenir son niveau de vie et réaliser les projets qui te tiennent à cœur.
+            </p>
+          </div>
+
+          <div className={styles.pedagoSection}>
+            <h5 className={styles.pedagoSectionTitle}>
+              Les 3 piliers incontournables pour réussir sa préparation
+            </h5>
+            <p className={styles.pedagoText}>
+              Pour construire une retraite sereine, inutile d'attendre d'avoir des revenus astronomiques.
+              Tout repose sur une équation simple, fondée sur trois piliers fondamentaux :
+            </p>
+            <div className={styles.pillars}>
+              {RETRAITE_PILLARS.map(({ icon: Icon, title, body }, i) => (
+                <div key={title} className={styles.pillar}>
+                  <div className={styles.pillarIcon}><Icon size={20} /></div>
+                  <span className={styles.pillarNum}>{String(i + 1).padStart(2, '0')}</span>
+                  <p className={styles.pillarTitle}>{title}</p>
+                  <p className={styles.pillarBody}>{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.pedagoSection}>
+            <h5 className={styles.pedagoSectionTitle}>
+              Des solutions concrètes, adaptées à chaque profil
+            </h5>
+            <p className={styles.pedagoText}>
+              Parce que chaque parcours de vie est unique, il n'existe pas de stratégie unique, mais
+              <em> ta </em>stratégie. Que tu sois en début de carrière avec une petite capacité d'épargne,
+              ou au sommet de ton activité avec des revenus à optimiser, il existe des leviers adaptés :
+            </p>
+            <div className={styles.solutions}>
+              {RETRAITE_SOLUTIONS.map(({ icon: Icon, title, body }) => (
+                <div key={title} className={styles.solution}>
+                  <div className={styles.solutionIcon}><Icon size={18} /></div>
+                  <div>
+                    <p className={styles.solutionTitle}>{title}</p>
+                    <p className={styles.solutionBody}>{body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Simulateur capital retraite */}
         <SimCard title="Mon capital à la retraite">
           <div className={styles.simControls}>
@@ -685,6 +946,8 @@ function TabRetraite() {
             </p>
           </div>
         </SimCard>
+
+        <InlineBookingCTA />
       </div>
     </div>
   );
@@ -711,6 +974,59 @@ function SliderGroup({ label, value, children }) {
         <span className={styles.simSliderVal}>{value}</span>
       </div>
       {children}
+    </div>
+  );
+}
+
+/* Bloc de prise de RDV compact — répété en bas de chaque onglet de projet.
+   Réservé aux utilisateurs connectés (iframe HubSpot) ; les visiteurs voient
+   un overlay les incitant à créer un compte, qui utilise l'event global
+   `open-auth-modal` écouté par le Header. */
+function InlineBookingCTA() {
+  const { isAuthenticated } = useAuth();
+
+  const openAuth = (tab = 'signup') =>
+    window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: { tab } }));
+
+  return (
+    <div className={styles.bookingBlock}>
+      <div className={styles.bookingHeader}>
+        <Badge variant="primary">
+          <Calendar size={12} />
+          Prise de RDV
+        </Badge>
+        <h4 className={styles.bookingTitle}>Prends rendez-vous avec un conseiller</h4>
+        <p className={styles.bookingDesc}>
+          30 minutes, sans engagement — pour valider ta stratégie et optimiser ton contrat.
+        </p>
+      </div>
+      <div className={styles.bookingSlot}>
+        {isAuthenticated ? (
+          <iframe
+            src={HUBSPOT_CALENDAR_URL}
+            title="Prendre rendez-vous avec un conseiller Booster"
+            className={styles.bookingIframe}
+            loading="lazy"
+          />
+        ) : (
+          <div className={styles.bookingLock}>
+            <div className={styles.bookingLockIcon}><Lock size={22} /></div>
+            <p className={styles.bookingLockTitle}>Crée ton compte pour réserver</p>
+            <p className={styles.bookingLockDesc}>
+              La prise de rendez-vous est réservée aux membres Booster.
+              Crée ton compte gratuit en 30 secondes pour accéder à l'agenda.
+            </p>
+            <div className={styles.bookingLockActions}>
+              <Button variant="primary" size="sm" onClick={() => openAuth('signup')}>
+                Créer mon compte
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => openAuth('login')}>
+                J'ai déjà un compte
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
