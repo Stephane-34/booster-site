@@ -23,50 +23,49 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
-  BookOpen, ChevronRight, ChevronLeft, CheckCircle, Lock, Unlock, Clock, RotateCcw,
+  BookOpen, ChevronRight, ChevronLeft, CheckCircle, Lock, Unlock, Clock,
   Trophy, TrendingUp, Calendar, Target, Gift, Library, PlayCircle, FileText,
   HelpCircle, Sparkles, Route, GraduationCap, LineChart,
   Check, X, CheckSquare, Layers, RotateCw, Shuffle,
 } from 'lucide-react';
 import Button from '../../components/ui/Button/Button';
+import { useAcademyProgress } from '../../hooks/useAcademyProgress';
 import { PROGRAM_52, MOCK_PLAYERS, WEEK_1, FLASHCARDS, KEY_PRINCIPLES } from './data';
 import styles from './Academy.module.css';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/* Mode test — passe à false pour restaurer les cadenas normaux (déblocage
-   jour par jour + seuils progressifs sur les phases). Laissé à true pour
-   permettre au client de parcourir librement toutes les semaines et phases
-   pendant la phase de recette. */
-const TEST_MODE_UNLOCK_ALL = true;
+/* Mode test — bypass complet du cadenas côté UI. Laissé en place au cas où,
+   mais ne devrait plus être nécessaire : on décale désormais artificiellement
+   la date de début (profiles.academy_start_date) au niveau BDD pour les
+   comptes "admin/testeur" — plus propre car par-utilisateur. */
+const TEST_MODE_UNLOCK_ALL = false;
 
 export default function Academy() {
   const [section, setSection] = useState('week');
 
-  /* State partagé entre onglets : la progression de l'utilisateur (démo)
-     conditionne à la fois l'affichage du dashboard, le déblocage des phases
-     du programme, et le contenu de la bibliothèque. */
-  const [userStart, setUserStart] = useState(() => Date.now());
+  /* Source de vérité : la table academy_quiz_results + auth.users.created_at
+     (via useAcademyProgress). `simulated` reste local pour le mode démo — il
+     permet de faire avancer artificiellement le calendrier en dev via le
+     bouton "Tester le semainier". En prod, `simulated` reste égal à
+     Date.now() puisque le bouton n'est plus affiché (cf. IS_DEV plus bas). */
+  const { userStart, completed, loading: progressLoading, saveResult } = useAcademyProgress();
   const [simulated, setSimulated] = useState(() => Date.now());
-  const [completed, setCompleted] = useState({});
+
+  /* Aligne `simulated` sur `userStart` dès qu'on connaît la vraie date
+     d'inscription (auth.users.created_at). Sinon, un premier daysPassed
+     énorme apparaîtrait puisque `simulated` = maintenant et
+     userStart = fallback initial. */
+  useEffect(() => {
+    setSimulated((s) => Math.max(s, Date.now()));
+  }, [userStart]);
 
   const daysPassed = Math.floor((simulated - userStart) / DAY_MS);
   const simulateDay = () => setSimulated((s) => s + DAY_MS);
-  const resetDemo = () => {
-    const now = Date.now();
-    setUserStart(now);
-    setSimulated(now);
-    setCompleted({});
-  };
 
-  const completedCount = Object.keys(completed).length;
-  const globalScore = useMemo(() => {
-    const vals = Object.values(completed);
-    if (vals.length === 0) return 0;
-    const sum = vals.reduce((acc, q) => acc + q.score, 0);
-    const max = vals.reduce((acc, q) => acc + q.total, 0);
-    return max === 0 ? 0 : Math.round((sum / max) * 100);
-  }, [completed]);
+  /* Semaine de formation atteinte : 6 modules/semaine, plafonné à 52.
+     Utilisée par le déblocage des phases du Programme. */
+  const currentWeek = Math.min(52, Math.max(1, Math.floor(daysPassed / 6) + 1));
 
   const sections = [
     { id: 'week',    label: 'Ma semaine en cours',    icon: Trophy },
@@ -107,13 +106,16 @@ export default function Academy() {
         <div className={styles.content}>
           {section === 'week' && (
             <DashboardSection
-              userStart={userStart} simulated={simulated} completed={completed}
-              setCompleted={setCompleted} daysPassed={daysPassed}
-              simulateDay={simulateDay} resetDemo={resetDemo}
+              simulated={simulated}
+              completed={completed}
+              daysPassed={daysPassed}
+              simulateDay={simulateDay}
+              saveResult={saveResult}
+              loading={progressLoading}
             />
           )}
           {section === 'program' && (
-            <ProgramSection completedCount={completedCount} globalScore={globalScore} />
+            <ProgramSection currentWeek={currentWeek} />
           )}
           {section === 'library' && (
             <BibliothequeSection completed={completed} onGoToWeek={() => setSection('week')} />
@@ -245,31 +247,36 @@ function HelpSection({ goTo }) {
 }
 
 /* ─── Programme 52 semaines (avec cadenas conditionnels) ──── */
-/* Seuils de déblocage — pensés pour être atteignables dans la démo :
-   la Semaine 1 compte 6 modules, on débloque au fur et à mesure.
-   Bypass complet en mode test (voir TEST_MODE_UNLOCK_ALL). */
+/* Déblocage temporel des phases : basé sur la semaine courante (dérivée de
+   profiles.academy_start_date). Chaque phase couvre 13 semaines, on débloque
+   la suivante quand l'utilisateur y arrive dans son calendrier personnel.
+     - Fondations   → semaines 1-13
+     - Structuration → 14-26
+     - Optimisation → 27-39
+     - Expertise    → 40-52
+   Bypass possible en mode test (voir TEST_MODE_UNLOCK_ALL). */
+const PHASE_UNLOCK_WEEK = { p1: 1, p2: 14, p3: 27, p4: 40 };
+
 const PHASE_UNLOCK_RULES = {
   p1: () => ({ unlocked: true }),
-  p2: ({ completedCount }) => ({
-    unlocked: TEST_MODE_UNLOCK_ALL || completedCount >= 3,
-    requirement: `Valide ${Math.max(3 - completedCount, 0)} module${completedCount >= 2 ? '' : 's'} supplémentaire${completedCount >= 2 ? '' : 's'} de ta semaine (${completedCount}/3 fait).`,
+  p2: ({ currentWeek }) => ({
+    unlocked: TEST_MODE_UNLOCK_ALL || currentWeek >= PHASE_UNLOCK_WEEK.p2,
+    requirement: `Cette phase se débloque à partir de la semaine ${PHASE_UNLOCK_WEEK.p2} (tu es en semaine ${currentWeek}).`,
   }),
-  p3: ({ completedCount }) => ({
-    unlocked: TEST_MODE_UNLOCK_ALL || completedCount >= 6,
-    requirement: `Termine ta première semaine complète (${completedCount}/6 modules validés).`,
+  p3: ({ currentWeek }) => ({
+    unlocked: TEST_MODE_UNLOCK_ALL || currentWeek >= PHASE_UNLOCK_WEEK.p3,
+    requirement: `Cette phase se débloque à partir de la semaine ${PHASE_UNLOCK_WEEK.p3} (tu es en semaine ${currentWeek}).`,
   }),
-  p4: ({ completedCount, globalScore }) => ({
-    unlocked: TEST_MODE_UNLOCK_ALL || (completedCount >= 6 && globalScore >= 80),
-    requirement: completedCount < 6
-      ? `Termine d'abord la Semaine 1 (${completedCount}/6 modules).`
-      : `Atteins 80 % de score global (actuellement ${globalScore} %).`,
+  p4: ({ currentWeek }) => ({
+    unlocked: TEST_MODE_UNLOCK_ALL || currentWeek >= PHASE_UNLOCK_WEEK.p4,
+    requirement: `Cette phase se débloque à partir de la semaine ${PHASE_UNLOCK_WEEK.p4} (tu es en semaine ${currentWeek}).`,
   }),
 };
 
-function ProgramSection({ completedCount, globalScore }) {
+function ProgramSection({ currentWeek }) {
   const phasesWithState = PROGRAM_52.map((p) => ({
     ...p,
-    ...PHASE_UNLOCK_RULES[p.id]({ completedCount, globalScore }),
+    ...PHASE_UNLOCK_RULES[p.id]({ currentWeek }),
   }));
 
   /* Par défaut on ouvre la première phase débloquée. */
@@ -341,7 +348,7 @@ function ProgramSection({ completedCount, globalScore }) {
 }
 
 /* ─── Section "Ma semaine en cours" ───────────────────────── */
-function DashboardSection({ userStart, simulated, completed, setCompleted, daysPassed, simulateDay, resetDemo }) {
+function DashboardSection({ simulated, completed, daysPassed, simulateDay, saveResult, loading }) {
   const [activeModuleId, setActiveModule] = useState(null);
   /* Sous-onglets à l'intérieur d'un module ouvert :
      - quiz : les questions du jour (style Grand Livret) + récap après complétion
@@ -380,35 +387,9 @@ function DashboardSection({ userStart, simulated, completed, setCompleted, daysP
     setView('module');
   };
 
-  /* Enregistrement du résultat d'un quiz — on garde la même forme dans
-     `completed` (title/theme/details/score) pour que la Bibliothèque et
-     le récap continuent de fonctionner sans changement. */
-  const saveQuizResult = (day, results) => {
-    let score = 0;
-    const details = day.questions.map((q, i) => {
-      const ok = results[i] === q.correct;
-      if (ok) score++;
-      return {
-        question: q.q,
-        userAnswer: q.options[results[i]],
-        correctAnswer: q.options[q.correct],
-        isCorrect: ok,
-        rationale: q.rationale,
-      };
-    });
-    setCompleted((c) => ({
-      ...c,
-      [day.id]: {
-        score,
-        total: day.questions.length,
-        details,
-        timestamp: simulated,
-        completedAt: new Date(simulated).toLocaleDateString('fr-FR'),
-        title: day.title,
-        theme: day.theme,
-      },
-    }));
-  };
+  /* Enregistrement du résultat via le hook — délégué à Supabase.
+     Le hook fait l'optimistic update + le upsert en base. */
+  const saveQuizResult = (day, results) => saveResult(day, results);
 
   /* ── Vue module (ouverte au clic sur un module de la semaine) ── */
   if (view === 'module') {
@@ -506,9 +487,9 @@ function DashboardSection({ userStart, simulated, completed, setCompleted, daysP
     );
   }
 
-  /* Semaine du programme atteinte : 6 modules par semaine (Lun→Sam),
-     donc floor(daysPassed / 6) + 1 = numéro de la semaine en cours. */
-  const currentWeek = Math.floor(daysPassed / 6) + 1;
+  /* Semaine du programme atteinte : 6 modules par semaine (Lun→Sam).
+     Plafonné à 52 pour éviter "Semaine 314" sur un compte très ancien. */
+  const currentWeek = Math.min(52, Math.max(1, Math.floor(daysPassed / 6) + 1));
 
   return (
     <div className={styles.dashWrap}>
@@ -523,12 +504,6 @@ function DashboardSection({ userStart, simulated, completed, setCompleted, daysP
             tu démarres au début et tu avances à ton rythme. Un nouveau module se débloque
             chaque jour à minuit, même si tu n'as pas fini celui de la veille.
           </p>
-          <div className={styles.simBlock}>
-            <Button variant="ghost" size="sm" onClick={simulateDay}>
-              <Clock size={14} />
-              Tester le semainier
-            </Button>
-          </div>
         </div>
         <div className={styles.dashStat}>
           <TrendingUp size={22} />
@@ -540,11 +515,20 @@ function DashboardSection({ userStart, simulated, completed, setCompleted, daysP
         </div>
       </div>
 
-      <div className={styles.dashActions}>
-        <Button variant="ghost" size="sm" onClick={resetDemo}>
-          <RotateCcw size={14} /> Reset démo
-        </Button>
-      </div>
+      {/* Bouton "Tester le semainier" uniquement en dev — permet de simuler
+          l'avancement du calendrier sans attendre 24h. Retiré en prod car le
+          user réel avance automatiquement de +1 jour à minuit. */}
+      {import.meta.env.DEV && (
+        <div className={styles.dashActions}>
+          <Button variant="ghost" size="sm" onClick={simulateDay}>
+            <Clock size={14} /> Tester le semainier (dev)
+          </Button>
+        </div>
+      )}
+
+      {loading && (
+        <p className={styles.dashLoading}>Chargement de ta progression…</p>
+      )}
 
       <div className={styles.modulesGrid}>
         {WEEK_1.map((day, i) => {

@@ -41,11 +41,14 @@ export async function signUp(email, password, { firstName, lastName, age }) {
   return data;
 }
 
-/* Charge le profil étendu (first_name, last_name, age, plan) — appelé une fois la session active. */
+/* Charge le profil étendu (first_name, last_name, age, plan, academy_start_date)
+   — appelé une fois la session active.
+   `academy_start_date` est la date de début d'Académie (distincte de
+   auth.users.created_at) : c'est elle qui pilote tout le déblocage. */
 export async function getProfile(userId) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('first_name, last_name, age, full_name, plan')
+    .select('first_name, last_name, age, full_name, plan, academy_start_date')
     .eq('id', userId)
     .single();
 
@@ -142,5 +145,45 @@ export async function getUserProgress(userId) {
     .single();
 
   if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}
+
+/* ─── Académie 52 semaines — résultats de quiz ─────────────
+   Table `academy_quiz_results` (cf. migration 20260802000001) : un enregistrement
+   par (user × module). L'UPSERT sur la contrainte unique permet à l'utilisateur
+   de refaire un quiz — l'ancien score est remplacé. */
+
+export async function fetchAcademyResults(userId) {
+  const { data, error } = await supabase
+    .from('academy_quiz_results')
+    .select('module_id, score, total, details, title, theme, completed_at')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function upsertAcademyResult(userId, {
+  moduleId, score, total, details, title, theme,
+}) {
+  const { data, error } = await supabase
+    .from('academy_quiz_results')
+    .upsert(
+      {
+        user_id:    userId,
+        module_id:  moduleId,
+        score,
+        total,
+        details,
+        title,
+        theme,
+        completed_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,module_id' },
+    )
+    .select()
+    .single();
+
+  if (error) throw error;
   return data;
 }
