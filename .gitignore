@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Le projet utilise npm — un pnpm-lock.yaml qui traînerait ferait basculer
+# Vercel sur pnpm et ferait planter le build (mismatch avec package.json).
+pnpm-lock.yaml
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
