@@ -28,12 +28,17 @@ import {
   HelpCircle, Sparkles, Route, GraduationCap, LineChart,
   Check, X, CheckSquare, Layers, RotateCw, Shuffle,
 } from 'lucide-react';
-import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
 import { PROGRAM_52, MOCK_PLAYERS, WEEK_1, FLASHCARDS, KEY_PRINCIPLES } from './data';
 import styles from './Academy.module.css';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+/* Mode test — passe à false pour restaurer les cadenas normaux (déblocage
+   jour par jour + seuils progressifs sur les phases). Laissé à true pour
+   permettre au client de parcourir librement toutes les semaines et phases
+   pendant la phase de recette. */
+const TEST_MODE_UNLOCK_ALL = true;
 
 export default function Academy() {
   const [section, setSection] = useState('week');
@@ -74,10 +79,6 @@ export default function Academy() {
     <div className={styles.page}>
       <div className="container">
         <header className={styles.pageHeader}>
-          <Badge variant="accent">
-            <Trophy size={12} />
-            Académie Booster
-          </Badge>
           <h1 className={styles.pageTitle}>
             Forme-toi à la finance{' '}
             <span className="gradient-text">module par module</span>
@@ -245,19 +246,20 @@ function HelpSection({ goTo }) {
 
 /* ─── Programme 52 semaines (avec cadenas conditionnels) ──── */
 /* Seuils de déblocage — pensés pour être atteignables dans la démo :
-   la Semaine 1 compte 6 modules, on débloque au fur et à mesure. */
+   la Semaine 1 compte 6 modules, on débloque au fur et à mesure.
+   Bypass complet en mode test (voir TEST_MODE_UNLOCK_ALL). */
 const PHASE_UNLOCK_RULES = {
   p1: () => ({ unlocked: true }),
   p2: ({ completedCount }) => ({
-    unlocked: completedCount >= 3,
+    unlocked: TEST_MODE_UNLOCK_ALL || completedCount >= 3,
     requirement: `Valide ${Math.max(3 - completedCount, 0)} module${completedCount >= 2 ? '' : 's'} supplémentaire${completedCount >= 2 ? '' : 's'} de ta semaine (${completedCount}/3 fait).`,
   }),
   p3: ({ completedCount }) => ({
-    unlocked: completedCount >= 6,
+    unlocked: TEST_MODE_UNLOCK_ALL || completedCount >= 6,
     requirement: `Termine ta première semaine complète (${completedCount}/6 modules validés).`,
   }),
   p4: ({ completedCount, globalScore }) => ({
-    unlocked: completedCount >= 6 && globalScore >= 80,
+    unlocked: TEST_MODE_UNLOCK_ALL || (completedCount >= 6 && globalScore >= 80),
     requirement: completedCount < 6
       ? `Termine d'abord la Semaine 1 (${completedCount}/6 modules).`
       : `Atteins 80 % de score global (actuellement ${globalScore} %).`,
@@ -364,10 +366,11 @@ function DashboardSection({ userStart, simulated, completed, setCompleted, daysP
   /* Statut d'un module de la semaine — la seule chose qui compte pour
      débloquer, c'est le nombre de jours écoulés depuis l'inscription. On ne
      regarde JAMAIS si le module de la veille a été complété : cf. règle
-     produit "un nouveau quizz débloqué chaque jour à 00h, quoi qu'il arrive". */
+     produit "un nouveau quizz débloqué chaque jour à 00h, quoi qu'il arrive".
+     Bypass complet en mode test (voir TEST_MODE_UNLOCK_ALL). */
   const dayStatus = (i, id) => {
     if (completed[id]) return 'completed';
-    if (i <= daysPassed) return 'unlocked';
+    if (TEST_MODE_UNLOCK_ALL || i <= daysPassed) return 'unlocked';
     return 'locked';
   };
 
