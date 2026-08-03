@@ -2209,3 +2209,312 @@
   .livretQuiz { padding: var(--space-5); }
   .livretFooter { flex-direction: column; gap: var(--space-3); align-items: stretch; }
 }
+
+/* ─── Section "Ma progression" ────────────────────────────── */
+.progressionWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.progressGlobal {
+  padding: var(--space-6);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.10), rgba(74, 222, 128, 0.08));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.progressGlobalHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-3);
+}
+
+.progressGlobalLabel {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+}
+
+.progressGlobalPct {
+  font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
+  font-weight: var(--weight-extrabold);
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.progressGlobalBar {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressGlobalFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--radius-full);
+}
+
+.progressGlobalMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  flex-wrap: wrap;
+}
+
+.progressGlobalMeta strong {
+  color: var(--color-text);
+  font-weight: var(--weight-bold);
+}
+
+/* Légende des statuts */
+.progressLegend {
+  display: flex;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.progressLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--weight-medium);
+}
+
+.statusDot {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+.statusValidated { background: var(--color-accent); }
+.statusReview    { background: var(--color-warning); }
+.statusTodo      { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); }
+.statusLocked    { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); }
+
+/* Timeline par phase — 4 phases côte à côte pour tenir sur un écran. */
+.progressionPhases {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.progressionPhase {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  min-width: 0; /* évite l'overflow de la grille */
+}
+
+/* Header phase compact — colonnes étroites : les 3 infos empilées. */
+.progressionPhaseHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.progressionPhaseNum {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  color: var(--color-primary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.progressionPhaseTitle {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.progressionPhaseRange {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+.progressionGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Grille de 7 colonnes : 1 label semaine + 6 modules de 20×20 px fixes.
+   Gap réduit pour tenir dans une colonne de phase étroite. */
+.progressionDaysHeader,
+.progressionWeekRow {
+  display: grid;
+  grid-template-columns: 28px repeat(6, 20px);
+  align-items: center;
+  gap: 4px;
+}
+
+.progressionDaysHeader {
+  margin-bottom: var(--space-2);
+}
+
+.progressionDayLabel {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: var(--weight-bold);
+}
+
+.progressionWeekLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-bold);
+  text-align: left;
+}
+
+.progressionCell {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-bg);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  padding: 0;
+  font-family: inherit;
+}
+
+.progressionCell:not(:disabled):hover {
+  transform: scale(1.15);
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.progressionCell:disabled {
+  cursor: not-allowed;
+}
+
+.cellStatus_validated {
+  background: var(--color-accent);
+  color: white;
+}
+
+.cellStatus_review {
+  background: var(--color-warning);
+  color: var(--color-bg);
+}
+
+.cellStatus_todo {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.cellStatus_locked {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 1024px) {
+  /* Écrans étroits : 4 phases ne tiennent plus côte à côte, on passe en 2×2. */
+  .progressionPhases { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  /* Mobile : 1 phase par ligne, retour à la présentation empilée. */
+  .progressionPhases { grid-template-columns: 1fr; }
+  .progressLegend { justify-content: flex-start; }
+}
+
+/* Modal "Contenu à venir" */
+.comingSoonOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-6);
+  animation: fadeIn 0.2s ease;
+}
+
+.comingSoonModal {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.comingSoonIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.14);
+  color: var(--color-primary-light);
+}
+
+.comingSoonTitle {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text);
+}
+
+.comingSoonText {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  font-size: var(--text-sm);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}

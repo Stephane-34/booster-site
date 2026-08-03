@@ -44,6 +44,21 @@ const TEST_MODE_UNLOCK_ALL = false;
 export default function Academy() {
   const [section, setSection] = useState('week');
 
+  /* Ouverture d'un module — remonté au niveau parent pour être accessible
+     depuis n'importe quel onglet (dashboard "Ma semaine" mais aussi
+     "Ma progression"). Quand `activeModuleId` est set, la vue module
+     s'affiche dans DashboardSection quel que soit l'onglet d'origine. */
+  const [activeModuleId, setActiveModule] = useState(null);
+  const [moduleTab, setModuleTab] = useState('quiz');
+
+  /* Ouvre le module `id` avec le sous-onglet demandé (quiz par défaut) et
+     bascule sur l'onglet "Ma semaine" qui héberge la vue module. */
+  const openModule = (id, tab = 'quiz') => {
+    setActiveModule(id);
+    setModuleTab(tab);
+    setSection('week');
+  };
+
   /* Source de vérité : la table academy_quiz_results + auth.users.created_at
      (via useAcademyProgress). `simulated` reste local pour le mode démo — il
      permet de faire avancer artificiellement le calendrier en dev via le
@@ -68,10 +83,11 @@ export default function Academy() {
   const currentWeek = Math.min(52, Math.max(1, Math.floor(daysPassed / 6) + 1));
 
   const sections = [
-    { id: 'week',    label: 'Ma semaine en cours',    icon: Trophy },
-    { id: 'program', label: 'Programme 52 semaines',  icon: Calendar },
-    { id: 'library', label: 'Bibliothèque',           icon: Library },
-    { id: 'help',    label: 'Aide',                   icon: HelpCircle },
+    { id: 'week',        label: 'Ma semaine en cours',   icon: Trophy },
+    { id: 'progression', label: 'Ma progression',        icon: LineChart },
+    { id: 'program',     label: 'Programme 52 semaines', icon: Calendar },
+    { id: 'library',     label: 'Bibliothèque',          icon: Library },
+    { id: 'help',        label: 'Aide',                  icon: HelpCircle },
   ];
 
   return (
@@ -112,6 +128,17 @@ export default function Academy() {
               simulateDay={simulateDay}
               saveResult={saveResult}
               loading={progressLoading}
+              activeModuleId={activeModuleId}
+              setActiveModule={setActiveModule}
+              moduleTab={moduleTab}
+              setModuleTab={setModuleTab}
+            />
+          )}
+          {section === 'progression' && (
+            <ProgressionSection
+              currentWeek={currentWeek}
+              completed={completed}
+              onOpenModule={openModule}
             />
           )}
           {section === 'program' && (
@@ -347,16 +374,178 @@ function ProgramSection({ currentWeek }) {
   );
 }
 
+/* ─── Section "Ma progression" ────────────────────────────── */
+/* Timeline 52 semaines × 6 modules (312 carrés) groupée par les 4 phases.
+   Chaque carré affiche le statut du module correspondant :
+     - validated : score ≥ 80 %
+     - review    : quiz complété mais < 80 %
+     - todo      : semaine débloquée, module non commencé
+     - locked    : semaine > currentWeek
+   Seule la Semaine 1 a du contenu quiz aujourd'hui — cliquer sur un module
+   d'une semaine ≥ 2 ouvre un modal "Contenu à venir". */
+
+const VALIDATION_THRESHOLD = 80; // seuil vert ≥ 80 %
+const DAYS_HEADER = ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'];
+
+function moduleStatus(weekN, dayIdx, currentWeek, completed) {
+  if (weekN > currentWeek) return 'locked';
+  /* Seule la Semaine 1 est actuellement rattachée au corpus de quiz : on
+     regarde `completed['day-<i>']` uniquement pour elle. Les Semaines 2+
+     restent en "todo" quelle que soit la progression. */
+  if (weekN === 1) {
+    const id = WEEK_1[dayIdx]?.id;
+    const rec = id ? completed[id] : null;
+    if (rec) {
+      const pct = (rec.score / rec.total) * 100;
+      return pct >= VALIDATION_THRESHOLD ? 'validated' : 'review';
+    }
+  }
+  return 'todo';
+}
+
+function ProgressionSection({ currentWeek, completed, onOpenModule }) {
+  const [comingSoonWeek, setComingSoonWeek] = useState(null);
+
+  /* Stats globales — sur les modules effectivement validés parmi les
+     312 possibles. `completedCount` inclut les scores faibles ; `validated`
+     ne compte que les modules ≥ 80 %. */
+  const totalModules   = 52 * 6;
+  const completedList  = Object.values(completed);
+  const completedCount = completedList.length;
+  const validatedCount = completedList.filter((r) => (r.score / r.total) * 100 >= VALIDATION_THRESHOLD).length;
+  const progressPct    = Math.round((validatedCount / totalModules) * 100);
+  const avgScore = completedCount > 0
+    ? Math.round(completedList.reduce((acc, r) => acc + (r.score / r.total) * 100, 0) / completedCount)
+    : 0;
+
+  const handleClick = (weekN, dayIdx) => {
+    const status = moduleStatus(weekN, dayIdx, currentWeek, completed);
+    if (status === 'locked') return;
+    if (weekN === 1) {
+      const id = WEEK_1[dayIdx].id;
+      onOpenModule(id);
+    } else {
+      setComingSoonWeek(weekN);
+    }
+  };
+
+  return (
+    <div className={styles.progressionWrap}>
+      {/* Barre de progression globale */}
+      <div className={styles.progressGlobal}>
+        <div className={styles.progressGlobalHead}>
+          <p className={styles.progressGlobalLabel}>Progression globale</p>
+          <span className={styles.progressGlobalPct}>{progressPct} %</span>
+        </div>
+        <div className={styles.progressGlobalBar}>
+          <div
+            className={styles.progressGlobalFill}
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+        <div className={styles.progressGlobalMeta}>
+          <span><strong>{validatedCount}</strong> module{validatedCount > 1 ? 's' : ''} validé{validatedCount > 1 ? 's' : ''} sur {totalModules}</span>
+          {completedCount > 0 && <span>Score moyen <strong>{avgScore} %</strong></span>}
+        </div>
+      </div>
+
+      {/* Légende des états */}
+      <div className={styles.progressLegend}>
+        <span className={styles.progressLegendItem}>
+          <span className={`${styles.statusDot} ${styles.statusValidated}`} /> Validé (≥ 80 %)
+        </span>
+        <span className={styles.progressLegendItem}>
+          <span className={`${styles.statusDot} ${styles.statusReview}`} /> À revoir (&lt; 80 %)
+        </span>
+        <span className={styles.progressLegendItem}>
+          <span className={`${styles.statusDot} ${styles.statusTodo}`} /> À faire
+        </span>
+        <span className={styles.progressLegendItem}>
+          <span className={`${styles.statusDot} ${styles.statusLocked}`} /> Verrouillé
+        </span>
+      </div>
+
+      {/* Timeline par phase */}
+      <div className={styles.progressionPhases}>
+        {PROGRAM_52.map((phase, phaseIdx) => (
+          <section key={phase.id} className={styles.progressionPhase}>
+            <header className={styles.progressionPhaseHeader}>
+              <span className={styles.progressionPhaseNum}>Phase 0{phaseIdx + 1}</span>
+              <h3 className={styles.progressionPhaseTitle}>{phase.name}</h3>
+              <span className={styles.progressionPhaseRange}>{phase.range}</span>
+            </header>
+
+            <div className={styles.progressionGrid}>
+              <div className={styles.progressionDaysHeader}>
+                <span /> {/* colonne du numéro de semaine */}
+                {DAYS_HEADER.map((d) => (
+                  <span key={d} className={styles.progressionDayLabel}>{d}</span>
+                ))}
+              </div>
+
+              {phase.weeks.map((week) => (
+                <div key={week.n} className={styles.progressionWeekRow}>
+                  <span className={styles.progressionWeekLabel}>S{week.n}</span>
+                  {week.topics.map((topic, dayIdx) => {
+                    const status = moduleStatus(week.n, dayIdx, currentWeek, completed);
+                    const isLocked = status === 'locked';
+                    return (
+                      <button
+                        key={dayIdx}
+                        type="button"
+                        onClick={() => handleClick(week.n, dayIdx)}
+                        disabled={isLocked}
+                        aria-label={`Semaine ${week.n} · ${DAYS_HEADER[dayIdx]} · ${topic} · ${status}`}
+                        title={`S${week.n} · ${DAYS_HEADER[dayIdx]} — ${topic}`}
+                        className={`${styles.progressionCell} ${styles[`cellStatus_${status}`]}`}
+                      >
+                        {status === 'validated' && <Check size={12} strokeWidth={3} />}
+                        {status === 'review'    && <X size={12} strokeWidth={3} />}
+                        {status === 'locked'    && <Lock size={10} />}
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      {/* Modal "Contenu à venir" pour les semaines 2-52 */}
+      {comingSoonWeek !== null && (
+        <div className={styles.comingSoonOverlay} onClick={() => setComingSoonWeek(null)}>
+          <div className={styles.comingSoonModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.comingSoonIcon}>
+              <Clock size={28} />
+            </div>
+            <h3 className={styles.comingSoonTitle}>Contenu de la semaine {comingSoonWeek} à venir</h3>
+            <p className={styles.comingSoonText}>
+              Le corpus de quiz pour cette semaine est en cours de rédaction.
+              Il sera disponible prochainement — reviens la semaine prochaine !
+            </p>
+            <Button variant="ghost" size="md" onClick={() => setComingSoonWeek(null)}>
+              Fermer
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── Section "Ma semaine en cours" ───────────────────────── */
-function DashboardSection({ simulated, completed, daysPassed, simulateDay, saveResult, loading }) {
-  const [activeModuleId, setActiveModule] = useState(null);
-  /* Sous-onglets à l'intérieur d'un module ouvert :
-     - quiz : les questions du jour (style Grand Livret) + récap après complétion
-     - flashcards : les fiches mémo du corpus global
-     - guide : synthèse pédagogique (résumé + principes + glossaire)
-     Voir choix "C" du brief : quiz spécifique par module, fiches/guide partagés. */
-  const [moduleTab, setModuleTab] = useState('quiz');
-  const [view, setView] = useState('dashboard'); // dashboard | module | leaderboard
+/* `activeModuleId` / `moduleTab` viennent du parent Academy : ils sont
+   partagés avec ProgressionSection pour permettre d'ouvrir un module
+   depuis "Ma progression" (on bascule ici et on affiche direct la vue module). */
+function DashboardSection({
+  simulated, completed, daysPassed, simulateDay, saveResult, loading,
+  activeModuleId, setActiveModule, moduleTab, setModuleTab,
+}) {
+  const [view, setView] = useState('dashboard'); // dashboard | leaderboard
+  /* Sous-onglets à l'intérieur d'un module ouvert (quiz / flashcards / guide).
+     La vue module s'affiche dès que `activeModuleId` est set — indépendant
+     de `view`, qui gère seulement dashboard vs leaderboard. */
 
   const movingAvg = useMemo(() => {
     const ninetyDaysMs = 90 * DAY_MS;
@@ -381,19 +570,30 @@ function DashboardSection({ simulated, completed, daysPassed, simulateDay, saveR
     return 'locked';
   };
 
-  const openModule = (id) => {
+  /* Ouverture locale d'un module (depuis la grille de la semaine). Fonctionne
+     via les états parents pour être cohérent avec l'ouverture depuis d'autres
+     onglets (Progression). */
+  const openModuleLocal = (id) => {
     setActiveModule(id);
     setModuleTab('quiz');
-    setView('module');
   };
+
+  const closeModule = () => setActiveModule(null);
 
   /* Enregistrement du résultat via le hook — délégué à Supabase.
      Le hook fait l'optimistic update + le upsert en base. */
   const saveQuizResult = (day, results) => saveResult(day, results);
 
-  /* ── Vue module (ouverte au clic sur un module de la semaine) ── */
-  if (view === 'module') {
+  /* ── Vue module (ouverte au clic sur un module de la semaine ou depuis
+        l'onglet "Ma progression"). Prime sur la vue dashboard/leaderboard. ── */
+  if (activeModuleId) {
     const day = WEEK_1.find((d) => d.id === activeModuleId);
+    /* Sécurité : si l'id ne correspond à aucun module connu (par ex.
+       arrivée d'un id de semaine 2+ non implémenté), on ferme la vue. */
+    if (!day) {
+      closeModule();
+      return null;
+    }
     const existingRecord = completed[day.id]; // récap si déjà complété
     const moduleTabs = [
       { id: 'quiz',       label: 'Quiz du jour',  icon: CheckSquare },
@@ -403,7 +603,7 @@ function DashboardSection({ simulated, completed, daysPassed, simulateDay, saveR
     return (
       <div className={styles.dashWrap}>
         <div className={styles.moduleTopbar}>
-          <button onClick={() => setView('dashboard')} className={styles.linkBtn}>
+          <button onClick={closeModule} className={styles.linkBtn}>
             <ChevronLeft size={16} /> Retour à ma semaine
           </button>
           <div className={styles.moduleTopbarMeta}>
@@ -549,12 +749,12 @@ function DashboardSection({ simulated, completed, daysPassed, simulateDay, saveR
                 <p className={styles.moduleLockedHint}><Clock size={14} /> Débloqué jour {i + 1}</p>
               )}
               {status === 'unlocked' && (
-                <Button variant="primary" size="md" onClick={() => openModule(day.id)} className={styles.moduleBtn}>
+                <Button variant="primary" size="md" onClick={() => openModuleLocal(day.id)} className={styles.moduleBtn}>
                   Démarrer le module <ChevronRight size={16} />
                 </Button>
               )}
               {status === 'completed' && (
-                <Button variant="ghost" size="md" onClick={() => openModule(day.id)} className={styles.moduleBtn}>
+                <Button variant="ghost" size="md" onClick={() => openModuleLocal(day.id)} className={styles.moduleBtn}>
                   <BookOpen size={14} /> Consulter la fiche
                 </Button>
               )}
