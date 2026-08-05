@@ -232,3 +232,20 @@
   background: rgba(248, 113, 113, 0.1);
   color: var(--color-danger);
 }
+
+.dangerActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* Le bouton "Supprimer mon compte" est visuellement séparé pour éviter
+   le clic accidentel : rouge, aligné à droite si l'espace le permet. */
+.deleteBtn {
+  color: var(--color-danger);
+  margin-left: auto;
+}
+
+.deleteBtn:hover {
+  background: rgba(248, 113, 113, 0.1);
+}

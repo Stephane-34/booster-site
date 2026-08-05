@@ -29,38 +29,35 @@ via l'API de l'outil choisi. À décider avec le client selon l'outil retenu.
 
 Priorités décroissantes :
 
-### 1. Droit à l'oubli (obligatoire)
-Ajouter un bouton **"Supprimer mon compte"** sur `/profil` qui déclenche
-la suppression cascade (via `on delete cascade` déjà en place sur
-`profiles`, `academy_quiz_results`, etc.). L'API Supabase pour supprimer
-un utilisateur nécessite la clé `service_role` - passer par une edge
-function pour la sécurité.
+### 1. Droit à l'oubli (obligatoire) - **fait**
+Bouton "Supprimer mon compte" sur `/profil` avec modal de confirmation
+("tape SUPPRIMER"). Appelle la RPC `delete_current_user()` (migration
+`20260805000002`), qui supprime auth.users → cascade sur profiles,
+academy_quiz_results, user_progress.
 
-### 2. Âge minimum (à valider)
-Le formulaire accepte 13+. Le RGPD français impose **15 ans** ou consentement
-parental. À passer à 15 ans côté validation form + trigger PL/pgSQL, ou
-ajouter un flow de consentement parental.
+### 2. Âge minimum - **fait**
+Passé à **15 ans** (art. 8 RGPD, France). Validation client dans AuthForm
+et Profile ; contrainte SQL dans profiles via migration `20260805000001`.
 
-### 3. Bannière cookies
-À vérifier : le calendrier HubSpot (iframe embarqué sur `/investir` et
-d'ancienne version de `/academie`) dépose-t-il des cookies tiers ?
-Si oui → bannière type Axeptio / tarteaucitron / Osano.
+### 3. Bannière cookies - **fait**
+Composant `CookieBanner` en bas de page qui apparaît à la première visite,
+avec choix "Tout accepter" vs "Refuser les cookies tiers". Préférence
+stockée dans localStorage. L'iframe HubSpot (calendrier de RDV) est chargée
+uniquement si consentement `accepted` ; sinon un placeholder propose
+d'ouvrir HubSpot dans un nouvel onglet.
 
-### 4. Politique de confidentialité (à jour)
-Vérifier que `/confidentialite` liste :
-- Données collectées (identité, contact, date de naissance, opt-in newsletter,
-  résultats de quiz Académie, IP via Vercel).
-- Tiers destinataires : Supabase (hébergement BDD), Vercel (hébergement app),
-  HubSpot (RDV).
-- Durée de conservation (Booster peut choisir 3 ans après dernière activité).
-- Droits utilisateur : accès, rectification, effacement, portabilité, opposition.
+### 4. Politique de confidentialité - **fait**
+`/confidentialite` mise à jour : nouvelles données collectées (civilité,
+date de naissance, téléphone, opt-in newsletter, résultats Académie),
+âge minimum 15 ans, encadré sur les cookies tiers HubSpot, mention des
+boutons "Exporter" / "Supprimer" sur /profil.
 
-### 5. Export des données (portabilité - recommandé)
-Bouton **"Exporter mes données"** sur `/profil` qui télécharge un JSON avec
-toutes les données du compte (profile, résultats, opt-in). Simple à
-implémenter côté client via les SELECT autorisés par RLS.
+### 5. Export des données (portabilité) - **fait**
+Bouton "Exporter mes données (JSON)" sur `/profil`. Télécharge un fichier
+`booster-mes-donnees-YYYY-MM-DD.json` contenant profile + résultats
+Académie + progression. Filtré par RLS côté Supabase.
 
-### 6. Registre des traitements
+### 6. Registre des traitements (reste à faire)
 Document interne (art. 30 RGPD). Pas visible utilisateur mais obligatoire.
 À rédiger une fois pour toutes (template CNIL).
 

@@ -76,8 +76,9 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
         let age = now.getFullYear() - birth.getFullYear();
         const monthDiff = now.getMonth() - birth.getMonth();
         if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) age--;
-        if (age < 13 || age > 120) {
-          setError('Tu dois avoir entre 13 et 120 ans.');
+        /* RGPD art. 8 : consentement valide dès 15 ans en France. */
+        if (age < 15 || age > 120) {
+          setError('Tu dois avoir au moins 15 ans pour créer un compte.');
           return;
         }
 

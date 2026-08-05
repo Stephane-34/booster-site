@@ -7,7 +7,7 @@ export default function Confidentialite() {
         <header className={styles.header}>
           <span className={styles.tag}>Légal</span>
           <h1 className={styles.title}>Politique de confidentialité</h1>
-          <p className={styles.date}>Dernière mise à jour : 1er janvier 2026</p>
+          <p className={styles.date}>Dernière mise à jour : 5 août 2026</p>
         </header>
 
         <article className={styles.body}>
@@ -30,10 +30,18 @@ export default function Confidentialite() {
           <h2>2. Données collectées</h2>
           <h3>2.1 Données que vous nous fournissez</h3>
           <ul>
-            <li><strong>Compte :</strong> adresse e-mail, nom complet (facultatif).</li>
+            <li>
+              <strong>Compte & identité :</strong> civilité (M./Mme), prénom, nom,
+              date de naissance, adresse e-mail, numéro de téléphone, mot de passe (haché).
+            </li>
+            <li>
+              <strong>Préférence marketing :</strong> opt-in newsletter (facultatif,
+              non nécessaire pour utiliser le service).
+            </li>
             <li>
               <strong>Profil investisseur :</strong> situation financière, objectifs
-              d'investissement, appétit au risque (collectés lors de la prise de RDV).
+              d'investissement, appétit au risque (collectés lors de la prise de RDV
+              avec un conseiller).
             </li>
             <li>
               <strong>Communications :</strong> messages échangés avec nos conseillers.
@@ -43,16 +51,24 @@ export default function Confidentialite() {
           <ul>
             <li>
               <strong>Données de navigation :</strong> adresse IP, type de navigateur,
-              pages visitées, durée des sessions.
+              pages visitées, durée des sessions (via l'hébergeur Vercel).
             </li>
             <li>
-              <strong>Données d'utilisation :</strong> progression dans l'Académie,
-              réponses aux quiz, simulations effectuées.
+              <strong>Progression Académie :</strong> résultats de vos quiz quotidiens
+              (score, questions, date de complétion), utilisés pour afficher votre
+              progression et le classement.
             </li>
             <li>
               <strong>Cookies :</strong> voir section 7 ci-dessous.
             </li>
           </ul>
+          <h3>2.3 Âge minimum</h3>
+          <p>
+            La création d'un compte est ouverte aux utilisateurs âgés d'au moins
+            <strong> 15 ans</strong> (art. 8 du RGPD, en application en France).
+            En dessous de cet âge, le consentement d'un titulaire de l'autorité
+            parentale est requis - merci de nous contacter avant toute inscription.
+          </p>
 
           <h2>3. Finalités et bases légales</h2>
           <table>
@@ -142,30 +158,50 @@ export default function Confidentialite() {
             <li><strong>Retrait du consentement</strong> - à tout moment pour les traitements fondés sur le consentement.</li>
           </ul>
           <p>
-            Pour exercer vos droits, contactez notre DPO :{' '}
+            <strong>En pratique :</strong> depuis votre page{' '}
+            <a href="/profil">Mon profil</a>, vous pouvez à tout moment :
+          </p>
+          <ul>
+            <li>modifier vos informations personnelles (rectification) ;</li>
+            <li>
+              exporter l'intégralité de vos données au format JSON, en un clic
+              (portabilité) ;
+            </li>
+            <li>
+              supprimer définitivement votre compte et toutes les données associées
+              (droit à l'effacement).
+            </li>
+          </ul>
+          <p>
+            Pour tout autre exercice de vos droits, contactez notre DPO :{' '}
             <a href="mailto:privacy@booster.lu">privacy@booster.lu</a>. Nous répondrons
             dans un délai d'un mois. En cas de réponse insatisfaisante, vous pouvez
             introduire une réclamation auprès de la{' '}
             <strong>Commission Nationale pour la Protection des Données (CNPD)</strong>{' '}
-            au Luxembourg.
+            au Luxembourg ou de la <strong>CNIL</strong> en France.
           </p>
 
           <h2>7. Cookies</h2>
           <h3>Cookies essentiels</h3>
           <p>
-            Ces cookies sont nécessaires au fonctionnement du service (maintien de session,
-            sécurité). Ils ne peuvent pas être désactivés.
+            Ces cookies sont nécessaires au fonctionnement du service (maintien de session
+            Supabase, sécurité, mémorisation de vos choix de consentement). Ils ne peuvent
+            pas être désactivés sans dégrader le service.
           </p>
-          <h3>Cookies analytiques</h3>
+          <h3>Cookies tiers</h3>
           <p>
-            Nous utilisons des outils d'analyse (anonymisés) pour comprendre comment vous
-            utilisez le service et l'améliorer. Ces cookies ne sont déposés qu'avec
-            votre consentement.
+            Le calendrier de prise de rendez-vous, propulsé par <strong>HubSpot</strong>,
+            peut déposer des cookies tiers lorsque vous consultez la page{' '}
+            <a href="/investir">Investir</a>. Ces cookies ne sont chargés{' '}
+            <strong>qu'après votre consentement explicite</strong> via la bannière qui
+            apparaît lors de votre première visite.
           </p>
           <h3>Gestion des cookies</h3>
           <p>
-            Vous pouvez gérer vos préférences via les paramètres de votre navigateur ou
-            en nous contactant à <a href="mailto:privacy@booster.lu">privacy@booster.lu</a>.
+            Vous pouvez changer d'avis à tout moment en vidant les cookies de votre
+            navigateur pour ce site : la bannière de consentement réapparaîtra à la
+            visite suivante. Vous pouvez aussi nous contacter à{' '}
+            <a href="mailto:privacy@booster.lu">privacy@booster.lu</a>.
           </p>
 
           <h2>8. Sécurité</h2>

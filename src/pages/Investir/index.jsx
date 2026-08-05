@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   CheckCircle, TrendingUp, Info, ArrowRight, Landmark, BarChart2, Percent, Shield, Rocket,
-  Calendar, Lock, RotateCw, Wallet, Banknote, Sparkles, Clock, Hourglass, PiggyBank,
+  Calendar, Lock, RotateCw, Wallet, Banknote, Sparkles, Clock, Hourglass, PiggyBank, Cookie,
 } from 'lucide-react';
+import { getCookieConsent } from '../../components/layout/CookieBanner/CookieBanner';
 import clsx from 'clsx';
 import Modal from '../../components/ui/Modal/Modal';
 import AuthForm from '../../components/sections/AuthForm/AuthForm';
@@ -1001,9 +1002,74 @@ function SliderGroup({ label, value, children }) {
    `open-auth-modal` écouté par le Header. */
 function InlineBookingCTA() {
   const { isAuthenticated } = useAuth();
+  /* On lit le consentement cookies au montage puis on écoute les
+     changements pour ne pas obliger l'utilisateur à recharger la page
+     après avoir cliqué "Tout accepter" dans la bannière. */
+  const [cookieConsent, setCookieConsent] = useState(() => getCookieConsent());
+  useEffect(() => {
+    const onChange = (e) => setCookieConsent(e.detail);
+    window.addEventListener('cookie-consent-changed', onChange);
+    return () => window.removeEventListener('cookie-consent-changed', onChange);
+  }, []);
 
   const openAuth = (tab = 'signup') =>
     window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: { tab } }));
+
+  const openHubspot = () =>
+    window.open(HUBSPOT_CALENDAR_URL, '_blank', 'noopener,noreferrer');
+
+  /* Décide quoi afficher dans l'emplacement iframe :
+     1) Non connecté : overlay "Créer un compte" (prime sur tout le reste)
+     2) Connecté sans consentement cookies tiers : placeholder + lien direct
+        vers HubSpot (l'iframe déposerait des cookies sans accord)
+     3) Connecté + consentement : iframe HubSpot classique */
+  let slot;
+  if (!isAuthenticated) {
+    slot = (
+      <div className={styles.bookingLock}>
+        <div className={styles.bookingLockIcon}><Lock size={22} /></div>
+        <p className={styles.bookingLockTitle}>Crée ton compte pour réserver</p>
+        <p className={styles.bookingLockDesc}>
+          La prise de rendez-vous est réservée aux membres Booster.
+          Crée ton compte gratuit en 30 secondes pour accéder à l'agenda.
+        </p>
+        <div className={styles.bookingLockActions}>
+          <Button variant="primary" size="sm" onClick={() => openAuth('signup')}>
+            Créer mon compte
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => openAuth('login')}>
+            J'ai déjà un compte
+          </Button>
+        </div>
+      </div>
+    );
+  } else if (cookieConsent !== 'accepted') {
+    slot = (
+      <div className={styles.bookingLock}>
+        <div className={styles.bookingLockIcon}><Cookie size={22} /></div>
+        <p className={styles.bookingLockTitle}>Calendrier HubSpot bloqué</p>
+        <p className={styles.bookingLockDesc}>
+          Tu as refusé les cookies tiers, ce qui bloque l'affichage du
+          calendrier de RDV directement dans la page. Tu peux quand même
+          prendre rendez-vous en ouvrant HubSpot dans un nouvel onglet.
+        </p>
+        <div className={styles.bookingLockActions}>
+          <Button variant="primary" size="sm" onClick={openHubspot}>
+            Ouvrir le calendrier HubSpot
+          </Button>
+        </div>
+      </div>
+    );
+  } else {
+    slot = (
+      <iframe
+        src={HUBSPOT_CALENDAR_URL}
+        title="Prendre rendez-vous avec un conseiller Booster"
+        className={styles.bookingIframe}
+        loading="lazy"
+      />
+    );
+  }
 
   return (
     <div className={styles.bookingBlock}>
@@ -1017,33 +1083,7 @@ function InlineBookingCTA() {
           30 minutes, sans engagement - pour valider ta stratégie et optimiser ton contrat.
         </p>
       </div>
-      <div className={styles.bookingSlot}>
-        {isAuthenticated ? (
-          <iframe
-            src={HUBSPOT_CALENDAR_URL}
-            title="Prendre rendez-vous avec un conseiller Booster"
-            className={styles.bookingIframe}
-            loading="lazy"
-          />
-        ) : (
-          <div className={styles.bookingLock}>
-            <div className={styles.bookingLockIcon}><Lock size={22} /></div>
-            <p className={styles.bookingLockTitle}>Crée ton compte pour réserver</p>
-            <p className={styles.bookingLockDesc}>
-              La prise de rendez-vous est réservée aux membres Booster.
-              Crée ton compte gratuit en 30 secondes pour accéder à l'agenda.
-            </p>
-            <div className={styles.bookingLockActions}>
-              <Button variant="primary" size="sm" onClick={() => openAuth('signup')}>
-                Créer mon compte
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => openAuth('login')}>
-                J'ai déjà un compte
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
+      <div className={styles.bookingSlot}>{slot}</div>
     </div>
   );
 }

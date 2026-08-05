@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import RequireAuth from './components/RequireAuth';
 import Header from './components/layout/Header/Header';
 import Footer from './components/layout/Footer/Footer';
+import CookieBanner from './components/layout/CookieBanner/CookieBanner';
 import Home from './pages/Home';
 import Investir from './pages/Investir';
 import Academy from './pages/Academy';
@@ -45,6 +46,7 @@ export default function App() {
           </Routes>
         </main>
         <Footer />
+        <CookieBanner />
       </AuthProvider>
     </BrowserRouter>
   );

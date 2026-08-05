@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react';
-import { User, Mail, Lock, LogOut, ShieldAlert, Calendar, Phone } from 'lucide-react';
+import { User, Mail, Lock, LogOut, ShieldAlert, Calendar, Phone, Download, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
+import Modal from '../../components/ui/Modal/Modal';
 import { useAuth } from '../../contexts/AuthContext';
-import { updateProfile, updateEmail, updatePassword } from '../../services/supabase';
+import {
+  updateProfile, updateEmail, updatePassword,
+  deleteCurrentUser, exportUserData,
+} from '../../services/supabase';
 import styles from './Profile.module.css';
 
 export default function Profile() {
@@ -22,7 +27,7 @@ export default function Profile() {
           <ProfileCard user={user} profile={profile} onSaved={refreshProfile} />
           <EmailCard currentEmail={user?.email} />
           <PasswordCard />
-          <DangerCard onSignOut={signOut} />
+          <DangerCard user={user} onSignOut={signOut} />
         </div>
       </div>
     </div>
@@ -62,7 +67,7 @@ function ProfileCard({ user, profile, onSaved }) {
     if (!user) return;
     setStatus({ type: null, msg: '' });
 
-    /* Validation de la date de naissance si fournie (13-120 ans). */
+    /* Validation de la date de naissance si fournie (15-120 ans - RGPD art. 8). */
     if (birthDate) {
       const b = new Date(birthDate);
       if (Number.isNaN(b.getTime())) {
@@ -73,8 +78,8 @@ function ProfileCard({ user, profile, onSaved }) {
       let age = now.getFullYear() - b.getFullYear();
       const m = now.getMonth() - b.getMonth();
       if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age--;
-      if (age < 13 || age > 120) {
-        setStatus({ type: 'error', msg: 'Tu dois avoir entre 13 et 120 ans.' });
+      if (age < 15 || age > 120) {
+        setStatus({ type: 'error', msg: 'Tu dois avoir au moins 15 ans.' });
         return;
       }
     }
@@ -320,21 +325,134 @@ function PasswordCard() {
   );
 }
 
-/* ─── Carte 4 : zone "dangereuse" ──────────────────────────── */
-function DangerCard({ onSignOut }) {
+/* ─── Carte 4 : zone "dangereuse" (RGPD - portabilité + droit à l'oubli) ─ */
+function DangerCard({ user, onSignOut }) {
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting]     = useState(false);
+  const [exporting, setExporting]   = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const [error, setError]           = useState('');
+  const navigate = useNavigate();
+
+  /* RGPD - droit à la portabilité : télécharge toutes les données du user
+     dans un fichier JSON local. RLS filtre côté serveur. */
+  const handleExport = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      const data = await exportUserData(user.id);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = `booster-mes-donnees-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err.message || "Impossible d'exporter les données.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  /* RGPD - droit à l'oubli : appelle la RPC qui supprime auth.users
+     (cascade sur profiles, résultats, progression). Redirige vers l'accueil. */
+  const handleDelete = async () => {
+    if (confirmText !== 'SUPPRIMER') {
+      setError('Tape SUPPRIMER en majuscules pour confirmer.');
+      return;
+    }
+    setError('');
+    setDeleting(true);
+    try {
+      await deleteCurrentUser();
+      setDeleteOpen(false);
+      navigate('/', { replace: true });
+    } catch (err) {
+      setError(err.message || 'Impossible de supprimer le compte.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
-    <div className={`${styles.card} ${styles.dangerCard}`}>
-      <div className={styles.cardHeader}>
-        <div className={styles.cardIcon}><ShieldAlert size={18} /></div>
-        <div>
-          <div className={styles.cardTitle}>Session</div>
-          <div className={styles.cardDesc}>Déconnecte-toi de cet appareil.</div>
+    <>
+      <div className={`${styles.card} ${styles.dangerCard}`}>
+        <div className={styles.cardHeader}>
+          <div className={styles.cardIcon}><ShieldAlert size={18} /></div>
+          <div>
+            <div className={styles.cardTitle}>Session & données</div>
+            <div className={styles.cardDesc}>
+              Déconnexion, export de tes données (RGPD), suppression de compte.
+            </div>
+          </div>
         </div>
+
+        <div className={styles.dangerActions}>
+          <Button variant="ghost" size="md" onClick={onSignOut}>
+            <LogOut size={16} />
+            Me déconnecter
+          </Button>
+          <Button variant="ghost" size="md" onClick={handleExport} loading={exporting}>
+            <Download size={16} />
+            Exporter mes données (JSON)
+          </Button>
+          <Button
+            variant="ghost"
+            size="md"
+            onClick={() => { setError(''); setConfirmText(''); setDeleteOpen(true); }}
+            className={styles.deleteBtn}
+          >
+            <Trash2 size={16} />
+            Supprimer mon compte
+          </Button>
+        </div>
+
+        {error && !deleteOpen && (
+          <p className={`${styles.message} ${styles.error}`}>{error}</p>
+        )}
       </div>
-      <Button variant="ghost" size="md" onClick={onSignOut} className={styles.submitBtn}>
-        <LogOut size={16} />
-        Me déconnecter
-      </Button>
-    </div>
+
+      {/* Modal de confirmation de suppression */}
+      <Modal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} title="Supprimer mon compte">
+        <p style={{ marginBottom: 'var(--space-4)', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
+          Cette action est <strong>définitive</strong>. Toutes tes données seront supprimées :
+          profil, progression Académie, résultats de quiz. Aucun retour en arrière possible.
+        </p>
+        <p style={{ marginBottom: 'var(--space-3)', color: 'var(--color-text)' }}>
+          Pour confirmer, tape <strong>SUPPRIMER</strong> en majuscules :
+        </p>
+        <input
+          type="text"
+          className={styles.input}
+          value={confirmText}
+          onChange={(e) => setConfirmText(e.target.value)}
+          placeholder="SUPPRIMER"
+          autoFocus
+        />
+        {error && (
+          <p className={`${styles.message} ${styles.error}`} style={{ marginTop: 'var(--space-3)' }}>
+            {error}
+          </p>
+        )}
+        <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-4)', justifyContent: 'flex-end' }}>
+          <Button variant="ghost" size="md" onClick={() => setDeleteOpen(false)}>
+            Annuler
+          </Button>
+          <Button
+            variant="primary"
+            size="md"
+            onClick={handleDelete}
+            loading={deleting}
+            disabled={confirmText !== 'SUPPRIMER'}
+          >
+            <Trash2 size={16} />
+            Supprimer définitivement
+          </Button>
+        </div>
+      </Modal>
+    </>
   );
 }

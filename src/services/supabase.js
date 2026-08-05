@@ -140,6 +140,37 @@ export async function signOut() {
   if (error) throw error;
 }
 
+/* RGPD - droit à l'oubli. Appelle la RPC `delete_current_user` qui supprime
+   l'entrée auth.users du user courant (cascade sur profiles + résultats). */
+export async function deleteCurrentUser() {
+  const { error } = await supabase.rpc('delete_current_user');
+  if (error) throw error;
+  /* La suppression invalide la session côté serveur mais le client peut
+     encore avoir un token en mémoire - on nettoie explicitement. */
+  await supabase.auth.signOut();
+}
+
+/* RGPD - droit à la portabilité. Récupère toutes les données liées à
+   l'utilisateur courant pour export. RLS garantit qu'on ne voit que les
+   siennes. Retourne un objet JSON-sérialisable prêt à télécharger. */
+export async function exportUserData(userId) {
+  const [profileRes, quizRes, progressRes] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', userId).single(),
+    supabase.from('academy_quiz_results').select('*').eq('user_id', userId),
+    supabase.from('user_progress').select('*').eq('user_id', userId).maybeSingle(),
+  ]);
+
+  return {
+    exported_at: new Date().toISOString(),
+    user: {
+      id: userId,
+      profile: profileRes.data ?? null,
+    },
+    academy_quiz_results: quizRes.data ?? [],
+    user_progress: progressRes.data ?? null,
+  };
+}
+
 export async function getSession() {
   const { data } = await supabase.auth.getSession();
   return data.session;
