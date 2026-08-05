@@ -30,7 +30,7 @@ export default function MentionsLegales() {
           <p>
             <strong>Vercel Inc.</strong><br />
             340 Pine Street, Suite 401<br />
-            San Francisco, California 94104 — États-Unis<br />
+            San Francisco, California 94104 - États-Unis<br />
             <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">
               vercel.com
             </a>

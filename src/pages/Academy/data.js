@@ -92,8 +92,8 @@ export const PROGRAM_52 = [
   },
 ];
 
-/* ─── Semaine 1 — Dashboard quotidien ─────────────────────── */
-/* Corpus de questions de la Semaine 1 — 10 questions par jour, fourni par
+/* ─── Semaine 1 - Dashboard quotidien ─────────────────────── */
+/* Corpus de questions de la Semaine 1 - 10 questions par jour, fourni par
    le client dans update-juillet.docx. `correct` est un index 0-based
    (A=0, B=1, C=2, D=3). `rationale` reprend la formulation de la bonne
    réponse pour l'affichage post-clic. */

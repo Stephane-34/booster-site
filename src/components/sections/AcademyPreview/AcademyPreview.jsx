@@ -7,7 +7,7 @@ import Button from '../../ui/Button/Button';
 import { ACADEMY_THEMES } from '../../../data/themes';
 import styles from './AcademyPreview.module.css';
 
-/* Question de démonstration — les vraies questions viennent de Supabase */
+/* Question de démonstration - les vraies questions viennent de Supabase */
 const DEMO_QUESTION = {
   theme: 'Fiscalité',
   question: 'Quel est le taux du Prélèvement Forfaitaire Unique (PFU) appliqué sur les plus-values mobilières en France ?',
@@ -36,7 +36,7 @@ export default function AcademyPreview() {
   return (
     <section id="academie" className={styles.section}>
       <div className={`container ${styles.inner}`}>
-        {/* Colonne gauche — thèmes */}
+        {/* Colonne gauche - thèmes */}
         <div className={styles.themes}>
           <Badge variant="accent">Académie</Badge>
           <h2 className={styles.title}>
@@ -72,7 +72,7 @@ export default function AcademyPreview() {
           </Button>
         </div>
 
-        {/* Colonne droite — quiz démo */}
+        {/* Colonne droite - quiz démo */}
         <div className={styles.quizWrapper}>
           <div className={styles.quizCard}>
             {/* En-tête */}

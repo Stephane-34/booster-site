@@ -5,7 +5,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import styles from './BookingCTA.module.css';
 
 const PERKS = [
-  { icon: Clock, text: '30 minutes — sans engagement' },
+  { icon: Clock, text: '30 minutes - sans engagement' },
   { icon: User, text: 'Conseiller dédié, pas de script' },
   { icon: CheckCircle, text: '100 % gratuit, zéro pression commerciale' },
 ];

@@ -14,7 +14,7 @@ export default function Confidentialite() {
           <div className={styles.infoBox}>
             <p>
               Booster S.A. s'engage à protéger vos données personnelles conformément au
-              Règlement Général sur la Protection des Données (RGPD — Règlement UE 2016/679)
+              Règlement Général sur la Protection des Données (RGPD - Règlement UE 2016/679)
               et à la législation luxembourgeoise applicable.
             </p>
           </div>
@@ -133,13 +133,13 @@ export default function Confidentialite() {
           <h2>6. Vos droits</h2>
           <p>Conformément au RGPD, vous disposez des droits suivants :</p>
           <ul>
-            <li><strong>Droit d'accès</strong> — obtenir une copie de vos données personnelles.</li>
-            <li><strong>Droit de rectification</strong> — corriger des données inexactes.</li>
-            <li><strong>Droit à l'effacement</strong> — obtenir la suppression dans les cas prévus par le RGPD.</li>
-            <li><strong>Droit à la limitation</strong> — restreindre le traitement dans certains cas.</li>
-            <li><strong>Droit à la portabilité</strong> — recevoir vos données dans un format structuré.</li>
-            <li><strong>Droit d'opposition</strong> — vous opposer au traitement fondé sur l'intérêt légitime.</li>
-            <li><strong>Retrait du consentement</strong> — à tout moment pour les traitements fondés sur le consentement.</li>
+            <li><strong>Droit d'accès</strong> - obtenir une copie de vos données personnelles.</li>
+            <li><strong>Droit de rectification</strong> - corriger des données inexactes.</li>
+            <li><strong>Droit à l'effacement</strong> - obtenir la suppression dans les cas prévus par le RGPD.</li>
+            <li><strong>Droit à la limitation</strong> - restreindre le traitement dans certains cas.</li>
+            <li><strong>Droit à la portabilité</strong> - recevoir vos données dans un format structuré.</li>
+            <li><strong>Droit d'opposition</strong> - vous opposer au traitement fondé sur l'intérêt légitime.</li>
+            <li><strong>Retrait du consentement</strong> - à tout moment pour les traitements fondés sur le consentement.</li>
           </ul>
           <p>
             Pour exercer vos droits, contactez notre DPO :{' '}

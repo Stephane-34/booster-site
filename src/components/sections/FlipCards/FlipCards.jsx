@@ -50,7 +50,7 @@ function FlipCard({ theme, isFlipped, onToggle }) {
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onToggle()}
       aria-pressed={isFlipped}
-      aria-label={`${theme.name} — ${isFlipped ? 'Retourner' : 'Voir les détails'}`}
+      aria-label={`${theme.name} - ${isFlipped ? 'Retourner' : 'Voir les détails'}`}
     >
       <div className={clsx(styles.card, isFlipped && styles.cardFlipped)}>
         {/* Recto */}

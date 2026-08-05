@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import styles from './Modal.module.css';
 
 /**
- * Modale accessible — gère le focus trap, fermeture via Escape et clic backdrop.
+ * Modale accessible - gère le focus trap, fermeture via Escape et clic backdrop.
  */
 export default function Modal({ isOpen, onClose, title, children, size = 'md' }) {
   const modalRef = useRef(null);

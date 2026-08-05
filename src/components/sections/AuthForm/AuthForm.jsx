@@ -1,8 +1,23 @@
 import { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, CheckCircle, Calendar } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, CheckCircle, Calendar, Phone } from 'lucide-react';
 import Button from '../../ui/Button/Button';
 import { signIn, signUp, resetPassword } from '../../../services/supabase';
 import styles from './AuthForm.module.css';
+
+/* Champs de l'inscription (voir migration 20260804000001_profile_signup_fields) :
+   civilité, nom/prénom, date de naissance, téléphone, email, mot de passe,
+   opt-in newsletter (non obligatoire). L'âge n'est plus saisi manuellement ;
+   il est dérivé de birth_date côté trigger Supabase. */
+const INITIAL_FIELDS = {
+  gender:         '',
+  firstName:      '',
+  lastName:       '',
+  birthDate:      '',
+  phone:          '',
+  email:          '',
+  password:       '',
+  newsletterOptIn: false,
+};
 
 export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess }) {
   const [tab, setTab]               = useState(defaultTab); // 'login' | 'signup' | 'forgot'
@@ -11,13 +26,7 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
   const [resetSent, setResetSent]   = useState(false);
   const [signupPending, setSignupPending] = useState(false); // signup OK mais email à confirmer
   const [showPassword, setShowPassword] = useState(false);
-  const [fields, setFields]         = useState({
-    firstName: '',
-    lastName:  '',
-    age:       '',
-    email:     '',
-    password:  '',
-  });
+  const [fields, setFields]         = useState(INITIAL_FIELDS);
 
   const switchTab = (t) => {
     setTab(t);
@@ -28,7 +37,8 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
   };
 
   const updateField = (key) => (e) => {
-    setFields((prev) => ({ ...prev, [key]: e.target.value }));
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    setFields((prev) => ({ ...prev, [key]: value }));
     setError('');
   };
 
@@ -46,17 +56,40 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
           setError('Le mot de passe doit contenir au moins 8 caractères.');
           return;
         }
-        const ageNum = fields.age ? Number(fields.age) : null;
-        if (ageNum !== null && (Number.isNaN(ageNum) || ageNum < 13 || ageNum > 120)) {
-          setError('Renseigne un âge valide (entre 13 et 120 ans).');
+        if (!fields.gender) {
+          setError('Sélectionne ta civilité.');
           return;
         }
+        if (!fields.birthDate) {
+          setError('Renseigne ta date de naissance.');
+          return;
+        }
+        /* Cohérence de la date : entre 13 et 120 ans. On calcule en années
+           écoulées et non en années civiles pour rester juste autour d'un
+           anniversaire pas encore atteint. */
+        const birth = new Date(fields.birthDate);
+        if (Number.isNaN(birth.getTime())) {
+          setError('Date de naissance invalide.');
+          return;
+        }
+        const now = new Date();
+        let age = now.getFullYear() - birth.getFullYear();
+        const monthDiff = now.getMonth() - birth.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) age--;
+        if (age < 13 || age > 120) {
+          setError('Tu dois avoir entre 13 et 120 ans.');
+          return;
+        }
+
         const result = await signUp(fields.email, fields.password, {
-          firstName: fields.firstName.trim(),
-          lastName:  fields.lastName.trim(),
-          age:       ageNum,
+          firstName:       fields.firstName.trim(),
+          lastName:        fields.lastName.trim(),
+          gender:          fields.gender,
+          birthDate:       fields.birthDate,
+          phone:           fields.phone.trim() || null,
+          newsletterOptIn: fields.newsletterOptIn,
         });
-        /* Si Supabase a posé une session (Confirm email = OFF), on ferme le modal — l'AuthContext
+        /* Si Supabase a posé une session (Confirm email = OFF), on ferme le modal - l'AuthContext
            va capter la session et l'utilisateur est immédiatement connecté.
            Sinon (Confirm email = ON), on affiche l'écran "vérifie ton email" et on ne ferme rien. */
         if (result?.session) {
@@ -185,23 +218,35 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
         {/* Identité (inscription seulement) */}
         {tab === 'signup' && (
           <>
-            <div className={styles.row2}>
-              <div className={styles.field}>
-                <label htmlFor="auth-firstname" className={styles.label}>Prénom</label>
-                <div className={styles.inputWrapper}>
-                  <User size={16} className={styles.inputIcon} />
+            {/* Civilité - deux radios en pilules */}
+            <fieldset className={styles.field}>
+              <legend className={styles.label}>Civilité</legend>
+              <div className={styles.genderChoice}>
+                <label className={`${styles.genderPill} ${fields.gender === 'monsieur' ? styles.genderPillActive : ''}`}>
                   <input
-                    id="auth-firstname"
-                    type="text"
-                    className={styles.input}
-                    placeholder="Ton prénom"
-                    value={fields.firstName}
-                    onChange={updateField('firstName')}
+                    type="radio"
+                    name="gender"
+                    value="monsieur"
+                    checked={fields.gender === 'monsieur'}
+                    onChange={updateField('gender')}
                     required
-                    autoComplete="given-name"
                   />
-                </div>
+                  Monsieur
+                </label>
+                <label className={`${styles.genderPill} ${fields.gender === 'madame' ? styles.genderPillActive : ''}`}>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="madame"
+                    checked={fields.gender === 'madame'}
+                    onChange={updateField('gender')}
+                  />
+                  Madame
+                </label>
               </div>
+            </fieldset>
+
+            <div className={styles.row2}>
               <div className={styles.field}>
                 <label htmlFor="auth-lastname" className={styles.label}>Nom</label>
                 <div className={styles.inputWrapper}>
@@ -218,22 +263,55 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
                   />
                 </div>
               </div>
+              <div className={styles.field}>
+                <label htmlFor="auth-firstname" className={styles.label}>Prénom</label>
+                <div className={styles.inputWrapper}>
+                  <User size={16} className={styles.inputIcon} />
+                  <input
+                    id="auth-firstname"
+                    type="text"
+                    className={styles.input}
+                    placeholder="Ton prénom"
+                    value={fields.firstName}
+                    onChange={updateField('firstName')}
+                    required
+                    autoComplete="given-name"
+                  />
+                </div>
+              </div>
             </div>
-            <div className={styles.field}>
-              <label htmlFor="auth-age" className={styles.label}>Âge</label>
-              <div className={styles.inputWrapper}>
-                <Calendar size={16} className={styles.inputIcon} />
-                <input
-                  id="auth-age"
-                  type="number"
-                  min={13}
-                  max={120}
-                  className={styles.input}
-                  placeholder="Ex. 22"
-                  value={fields.age}
-                  onChange={updateField('age')}
-                  required
-                />
+
+            <div className={styles.row2}>
+              <div className={styles.field}>
+                <label htmlFor="auth-birthdate" className={styles.label}>Date de naissance</label>
+                <div className={styles.inputWrapper}>
+                  <Calendar size={16} className={styles.inputIcon} />
+                  <input
+                    id="auth-birthdate"
+                    type="date"
+                    className={styles.input}
+                    value={fields.birthDate}
+                    onChange={updateField('birthDate')}
+                    required
+                    autoComplete="bday"
+                  />
+                </div>
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="auth-phone" className={styles.label}>Téléphone</label>
+                <div className={styles.inputWrapper}>
+                  <Phone size={16} className={styles.inputIcon} />
+                  <input
+                    id="auth-phone"
+                    type="tel"
+                    className={styles.input}
+                    placeholder="06 12 34 56 78"
+                    value={fields.phone}
+                    onChange={updateField('phone')}
+                    required
+                    autoComplete="tel"
+                  />
+                </div>
               </div>
             </div>
           </>
@@ -298,6 +376,18 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
             </button>
           </div>
         </div>
+
+        {/* Opt-in newsletter - inscription uniquement, non obligatoire */}
+        {tab === 'signup' && (
+          <label className={styles.checkboxRow}>
+            <input
+              type="checkbox"
+              checked={fields.newsletterOptIn}
+              onChange={updateField('newsletterOptIn')}
+            />
+            <span>Je souhaite m'abonner à la newsletter Booster (facultatif)</span>
+          </label>
+        )}
 
         {error && <p className={styles.error} role="alert">{error}</p>}
 

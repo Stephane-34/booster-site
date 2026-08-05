@@ -1,4 +1,4 @@
-/* Page Académie — parcours d'apprentissage financier sur 52 semaines.
+/* Page Académie - parcours d'apprentissage financier sur 52 semaines.
    Anciennement /exemple, promue en /academie après validation UX client.
    4 onglets :
    - Ma semaine en cours : dashboard quotidien avec déblocage jour par jour.
@@ -35,16 +35,16 @@ import styles from './Academy.module.css';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/* Mode test — bypass complet du cadenas côté UI. Laissé en place au cas où,
+/* Mode test - bypass complet du cadenas côté UI. Laissé en place au cas où,
    mais ne devrait plus être nécessaire : on décale désormais artificiellement
    la date de début (profiles.academy_start_date) au niveau BDD pour les
-   comptes "admin/testeur" — plus propre car par-utilisateur. */
+   comptes "admin/testeur" - plus propre car par-utilisateur. */
 const TEST_MODE_UNLOCK_ALL = false;
 
 export default function Academy() {
   const [section, setSection] = useState('week');
 
-  /* Ouverture d'un module — remonté au niveau parent pour être accessible
+  /* Ouverture d'un module - remonté au niveau parent pour être accessible
      depuis n'importe quel onglet (dashboard "Ma semaine" mais aussi
      "Ma progression"). Quand `activeModuleId` est set, la vue module
      s'affiche dans DashboardSection quel que soit l'onglet d'origine. */
@@ -60,7 +60,7 @@ export default function Academy() {
   };
 
   /* Source de vérité : la table academy_quiz_results + auth.users.created_at
-     (via useAcademyProgress). `simulated` reste local pour le mode démo — il
+     (via useAcademyProgress). `simulated` reste local pour le mode démo - il
      permet de faire avancer artificiellement le calendrier en dev via le
      bouton "Tester le semainier". En prod, `simulated` reste égal à
      Date.now() puisque le bouton n'est plus affiché (cf. IS_DEV plus bas). */
@@ -172,7 +172,7 @@ function HelpSection({ goTo }) {
     {
       icon: Route,
       title: "2 · Tu démarres au jour 1, quelle que soit ta date d'inscription",
-      body: "Personne ne rate le début : que tu t'inscrives le 10 janvier ou le 30 avril, tu commences par la Semaine 1 · Lundi. Ton calendrier est personnel — il ne dépend pas d'un rythme calendaire commun à tous les utilisateurs.",
+      body: "Personne ne rate le début : que tu t'inscrives le 10 janvier ou le 30 avril, tu commences par la Semaine 1 · Lundi. Ton calendrier est personnel - il ne dépend pas d'un rythme calendaire commun à tous les utilisateurs.",
     },
     {
       icon: Clock,
@@ -194,14 +194,14 @@ function HelpSection({ goTo }) {
     {
       icon: LineChart,
       title: '6 · Classement et moyenne mobile 3 mois',
-      body: "Ta performance est calculée sur les 90 derniers jours (moyenne mobile) — un mauvais début n'écrase donc pas ta progression sur la durée. Les 10 premiers du classement hebdomadaire reçoivent une récompense exclusive.",
+      body: "Ta performance est calculée sur les 90 derniers jours (moyenne mobile) - un mauvais début n'écrase donc pas ta progression sur la durée. Les 10 premiers du classement hebdomadaire reçoivent une récompense exclusive.",
     },
   ];
 
   const faqs = [
     {
       q: "Que se passe-t-il si je rate plusieurs jours d'affilée ?",
-      a: "Rien de grave — les modules manqués restent accessibles. Tu peux les rattraper à ton rythme, en parallèle du module du jour qui, lui, continue à se débloquer à minuit.",
+      a: "Rien de grave - les modules manqués restent accessibles. Tu peux les rattraper à ton rythme, en parallèle du module du jour qui, lui, continue à se débloquer à minuit.",
     },
     {
       q: "Est-ce que je peux avancer plus vite que le calendrier ?",
@@ -209,11 +209,11 @@ function HelpSection({ goTo }) {
     },
     {
       q: "Que devient mon score si je refais un quiz ?",
-      a: "Ton meilleur score sur les 90 derniers jours est conservé. Refaire un module que tu as raté est encouragé — c'est même la meilleure manière de sécuriser un concept.",
+      a: "Ton meilleur score sur les 90 derniers jours est conservé. Refaire un module que tu as raté est encouragé - c'est même la meilleure manière de sécuriser un concept.",
     },
     {
       q: "Puis-je consulter les futurs modules à l'avance ?",
-      a: "Non pour les quiz (verrouillés jour par jour), oui pour la carte globale du programme — tu peux la parcourir à tout moment depuis l'onglet « Programme 52 semaines » pour savoir ce qui t'attend.",
+      a: "Non pour les quiz (verrouillés jour par jour), oui pour la carte globale du programme - tu peux la parcourir à tout moment depuis l'onglet « Programme 52 semaines » pour savoir ce qui t'attend.",
     },
   ];
 
@@ -225,7 +225,7 @@ function HelpSection({ goTo }) {
           <h2 className={styles.helpTitle}>Comment fonctionne l'Académie ?</h2>
           <p className={styles.helpSub}>
             Six principes à connaître pour tirer le meilleur de tes 52 semaines
-            d'apprentissage — avec, en bas, les questions les plus courantes.
+            d'apprentissage - avec, en bas, les questions les plus courantes.
           </p>
         </div>
       </div>
@@ -381,7 +381,7 @@ function ProgramSection({ currentWeek }) {
      - review    : quiz complété mais < 80 %
      - todo      : semaine débloquée, module non commencé
      - locked    : semaine > currentWeek
-   Seule la Semaine 1 a du contenu quiz aujourd'hui — cliquer sur un module
+   Seule la Semaine 1 a du contenu quiz aujourd'hui - cliquer sur un module
    d'une semaine ≥ 2 ouvre un modal "Contenu à venir". */
 
 const VALIDATION_THRESHOLD = 80; // seuil vert ≥ 80 %
@@ -406,7 +406,7 @@ function moduleStatus(weekN, dayIdx, currentWeek, completed) {
 function ProgressionSection({ currentWeek, completed, onOpenModule }) {
   const [comingSoonWeek, setComingSoonWeek] = useState(null);
 
-  /* Stats globales — sur les modules effectivement validés parmi les
+  /* Stats globales - sur les modules effectivement validés parmi les
      312 possibles. `completedCount` inclut les scores faibles ; `validated`
      ne compte que les modules ≥ 80 %. */
   const totalModules   = 52 * 6;
@@ -496,7 +496,7 @@ function ProgressionSection({ currentWeek, completed, onOpenModule }) {
                         onClick={() => handleClick(week.n, dayIdx)}
                         disabled={isLocked}
                         aria-label={`Semaine ${week.n} · ${DAYS_HEADER[dayIdx]} · ${topic} · ${status}`}
-                        title={`S${week.n} · ${DAYS_HEADER[dayIdx]} — ${topic}`}
+                        title={`S${week.n} · ${DAYS_HEADER[dayIdx]} - ${topic}`}
                         className={`${styles.progressionCell} ${styles[`cellStatus_${status}`]}`}
                       >
                         {status === 'validated' && <Check size={12} strokeWidth={3} />}
@@ -522,7 +522,7 @@ function ProgressionSection({ currentWeek, completed, onOpenModule }) {
             <h3 className={styles.comingSoonTitle}>Contenu de la semaine {comingSoonWeek} à venir</h3>
             <p className={styles.comingSoonText}>
               Le corpus de quiz pour cette semaine est en cours de rédaction.
-              Il sera disponible prochainement — reviens la semaine prochaine !
+              Il sera disponible prochainement - reviens la semaine prochaine !
             </p>
             <Button variant="ghost" size="md" onClick={() => setComingSoonWeek(null)}>
               Fermer
@@ -544,7 +544,7 @@ function DashboardSection({
 }) {
   const [view, setView] = useState('dashboard'); // dashboard | leaderboard
   /* Sous-onglets à l'intérieur d'un module ouvert (quiz / flashcards / guide).
-     La vue module s'affiche dès que `activeModuleId` est set — indépendant
+     La vue module s'affiche dès que `activeModuleId` est set - indépendant
      de `view`, qui gère seulement dashboard vs leaderboard. */
 
   const movingAvg = useMemo(() => {
@@ -559,7 +559,7 @@ function DashboardSection({
     return max === 0 ? 0 : Math.round((sum / max) * 100);
   }, [completed, simulated]);
 
-  /* Statut d'un module de la semaine — la seule chose qui compte pour
+  /* Statut d'un module de la semaine - la seule chose qui compte pour
      débloquer, c'est le nombre de jours écoulés depuis l'inscription. On ne
      regarde JAMAIS si le module de la veille a été complété : cf. règle
      produit "un nouveau quizz débloqué chaque jour à 00h, quoi qu'il arrive".
@@ -580,7 +580,7 @@ function DashboardSection({
 
   const closeModule = () => setActiveModule(null);
 
-  /* Enregistrement du résultat via le hook — délégué à Supabase.
+  /* Enregistrement du résultat via le hook - délégué à Supabase.
      Le hook fait l'optimistic update + le upsert en base. */
   const saveQuizResult = (day, results) => saveResult(day, results);
 
@@ -700,7 +700,7 @@ function DashboardSection({
             Jour <span className={styles.dashHeroBig}>{daysPassed + 1}</span> de ta formation
           </h2>
           <p className={styles.dashHeroSub}>
-            Tu es en <strong>Semaine {currentWeek}</strong> — quel que soit ton jour d'inscription,
+            Tu es en <strong>Semaine {currentWeek}</strong> - quel que soit ton jour d'inscription,
             tu démarres au début et tu avances à ton rythme. Un nouveau module se débloque
             chaque jour à minuit, même si tu n'as pas fini celui de la veille.
           </p>
@@ -715,7 +715,7 @@ function DashboardSection({
         </div>
       </div>
 
-      {/* Bouton "Tester le semainier" uniquement en dev — permet de simuler
+      {/* Bouton "Tester le semainier" uniquement en dev - permet de simuler
           l'avancement du calendrier sans attendre 24h. Retiré en prod car le
           user réel avance automatiquement de +1 jour à minuit. */}
       {import.meta.env.DEV && (
@@ -801,7 +801,7 @@ function BibliothequeSection({ completed, onGoToWeek }) {
               <BookOpen size={20} /> Mes fiches mémoire acquises
             </h2>
             <p className={styles.librarySectionSub}>
-              {fiches.length} fiche{fiches.length > 1 ? 's' : ''} validée{fiches.length > 1 ? 's' : ''} —
+              {fiches.length} fiche{fiches.length > 1 ? 's' : ''} validée{fiches.length > 1 ? 's' : ''} -
               se remplit à mesure que tu complètes tes modules quotidiens.
             </p>
           </div>
@@ -896,7 +896,7 @@ function BibliothequeSection({ completed, onGoToWeek }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Vue module — 3 sous-onglets (Quiz / Fiches mémo / Guide).
+   Vue module - 3 sous-onglets (Quiz / Fiches mémo / Guide).
    Style "Le Grand Livret" (thème éditorial papier + violet).
    ═══════════════════════════════════════════════════════════════ */
 
@@ -1071,7 +1071,7 @@ function ModuleQuizView({ day, existingRecord, onSubmit }) {
 
 /* ── Sous-onglet Fiches mémo (corpus global partagé) ─────── */
 /* Le brief (choix C) : réutiliser le corpus FLASHCARDS pour tous les
-   modules dans la démo — chaque module aura son propre corpus en prod. */
+   modules dans la démo - chaque module aura son propre corpus en prod. */
 const shuffleFlashcards = (list) => {
   const c = [...list];
   for (let i = c.length - 1; i > 0; i--) {

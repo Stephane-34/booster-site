@@ -3,7 +3,7 @@ import Badge from '../../ui/Badge/Badge';
 import Button from '../../ui/Button/Button';
 import styles from './OfferTabs.module.css';
 
-/* Contenu "Comment ça marche" — objectif unique : déclencher la prise de RDV */
+/* Contenu "Comment ça marche" - objectif unique : déclencher la prise de RDV */
 const STEPS = [
   {
     number: '01',

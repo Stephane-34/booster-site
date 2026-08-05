@@ -33,15 +33,15 @@
 }
 
 .logoImg {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-md);
   object-fit: cover;
   display: block;
 }
 
 .logoText {
-  font-size: var(--text-xl);
+  font-size: var(--text-2xl);
   font-weight: var(--weight-extrabold);
   color: var(--color-text);
   letter-spacing: -0.02em;
@@ -76,7 +76,7 @@
   background: rgba(168, 85, 247, 0.1);
 }
 
-/* Liens Investir et Académie — texte vert, sans border */
+/* Liens Investir et Académie - texte vert, sans border */
 .navLinkInvest {
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
@@ -109,7 +109,7 @@
   flex-shrink: 0;
 }
 
-/* Salutation utilisateur connecté — cliquable pour aller à /profil */
+/* Salutation utilisateur connecté - cliquable pour aller à /profil */
 .greeting {
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);

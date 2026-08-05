@@ -10,7 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './Dashboard.module.css';
 
-/* Données de démo — en prod, viennent de Supabase */
+/* Données de démo - en prod, viennent de Supabase */
 const DEMO_PORTFOLIO = {
   value: 12840,
   invested: 10200,
@@ -200,8 +200,8 @@ export default function Dashboard() {
               <div className={styles.allocationUC} style={{ width: '60%' }} />
             </div>
             <div className={styles.allocLegend}>
-              <span><span className={styles.legendDotFonds} />Fonds € — 40 %</span>
-              <span><span className={styles.legendDotUC} />UC — 60 %</span>
+              <span><span className={styles.legendDotFonds} />Fonds € - 40 %</span>
+              <span><span className={styles.legendDotUC} />UC - 60 %</span>
             </div>
           </div>
 

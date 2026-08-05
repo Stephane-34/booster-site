@@ -7,7 +7,7 @@ export const CURRENT_BATTLE = {
   challenge:    'Maîtrise des produits d\'épargne',
   questionCount: 10,
   endsIn:       '2 j 14 h',
-  /* Score "you" est passé en prop par le composant — la maquette utilise un défaut visuel */
+  /* Score "you" est passé en prop par le composant - la maquette utilise un défaut visuel */
   you: {
     firstName: 'Toi',
     avatar:    '🚀',
@@ -22,7 +22,7 @@ export const CURRENT_BATTLE = {
   },
 };
 
-/* Classement de la saison en cours — top 10 récompensé par Booster.
+/* Classement de la saison en cours - top 10 récompensé par Booster.
    Le rank du joueur courant est marqué avec isMe=true dans la maquette. */
 export const SEASON_LEADERBOARD = [
   { rank: 1,  firstName: 'Hugo',     points: 4820, badge: '🏆' },

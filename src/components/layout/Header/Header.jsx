@@ -69,14 +69,14 @@ export default function Header() {
               const locked = isProtected && !isAuthenticated;
 
               if (locked) {
-                /* Rendu comme un bouton qui ouvre le modal — pas une NavLink, pour éviter la navigation */
+                /* Rendu comme un bouton qui ouvre le modal - pas une NavLink, pour éviter la navigation */
                 return (
                   <button
                     key={to}
                     type="button"
                     className={clsx(styles.navLinkInvest, styles.navLinkLocked)}
                     onClick={handleLockedClick}
-                    aria-label={`${label} — connexion requise`}
+                    aria-label={`${label} - connexion requise`}
                   >
                     {label}
                     <Lock size={12} className={styles.lockIcon} />
@@ -101,7 +101,7 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Actions — état connecté ou non */}
+          {/* Actions - état connecté ou non */}
           <div className={styles.actions}>
             {isAuthenticated ? (
               <>

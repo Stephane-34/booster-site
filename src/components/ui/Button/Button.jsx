@@ -1,7 +1,7 @@
 import styles from './Button.module.css';
 
 /**
- * Bouton polymorphe — supporte variant, size, et rendu via `as`
+ * Bouton polymorphe - supporte variant, size, et rendu via `as`
  * (ex: <Button as="a" href="/..."> pour les liens)
  */
 export default function Button({

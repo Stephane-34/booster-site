@@ -110,7 +110,7 @@
   }
 }
 
-/* Overlay "connexion requise" — affiché à la place de l'iframe Calendly tant que l'user n'est pas connecté */
+/* Overlay "connexion requise" - affiché à la place de l'iframe Calendly tant que l'user n'est pas connecté */
 .lockOverlay {
   display: flex;
   flex-direction: column;

@@ -10,7 +10,7 @@ import styles from './Calculator.module.css';
 const HORIZONS = [5, 10, 15, 20, 30];
 const DEFAULT_MONTHLY = 100;
 const DEFAULT_HORIZON = 15;
-/* Taux annuel moyen hypothétique pour les UC — affiché en disclaimer */
+/* Taux annuel moyen hypothétique pour les UC - affiché en disclaimer */
 const DEFAULT_RATE = 5.5;
 const LIVRET_A_RATE = 0.03;
 
@@ -18,7 +18,7 @@ export default function Calculator({ onCTAClick }) {
   const [monthly, setMonthly] = useState(DEFAULT_MONTHLY);
   const [horizon, setHorizon] = useState(DEFAULT_HORIZON);
 
-  /* Tous les calculs dérivés dans un seul useMemo — une seule dépendance sur monthly/horizon */
+  /* Tous les calculs dérivés dans un seul useMemo - une seule dépendance sur monthly/horizon */
   const simulation = useMemo(() => {
     const months = horizon * 12;
     const totalInvested = monthly * 12 * horizon;
@@ -40,7 +40,7 @@ export default function Calculator({ onCTAClick }) {
             <span className="gradient-text">travailler pour toi</span>
           </h2>
           <p className={styles.desc}>
-            Combine épargne régulière et rendement composé — l'arme secrète
+            Combine épargne régulière et rendement composé - l'arme secrète
             des investisseurs. Ajuste les paramètres pour simuler ton futur capital.
           </p>
 
@@ -62,8 +62,8 @@ export default function Calculator({ onCTAClick }) {
               <div className={styles.resultBarGains} />
             </div>
             <div className={styles.barLegend}>
-              <span><span className={styles.dotInvested} />Capital versé — {formatCurrency(simulation.totalInvested)}</span>
-              <span><span className={styles.dotGains} />Gains — {formatCurrency(simulation.gains)}</span>
+              <span><span className={styles.dotInvested} />Capital versé - {formatCurrency(simulation.totalInvested)}</span>
+              <span><span className={styles.dotGains} />Gains - {formatCurrency(simulation.gains)}</span>
             </div>
           </div>
 
@@ -123,7 +123,7 @@ export default function Calculator({ onCTAClick }) {
             </div>
           </div>
 
-          {/* Comparaison avec le Livret A — valeurs issues du useMemo, aucun recalcul ici */}
+          {/* Comparaison avec le Livret A - valeurs issues du useMemo, aucun recalcul ici */}
           <div className={styles.comparison}>
             <p className={styles.comparisonLabel}>Comparé à un Livret A (3 %)</p>
             <div className={styles.comparisonRow}>

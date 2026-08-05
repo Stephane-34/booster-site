@@ -41,7 +41,7 @@ export const ACADEMY_THEMES = [
     locked: false,
     color: 'green',
     flipFront: 'Investis dans les marchés mondiaux simplement.',
-    flipBack: 'Dollar-Cost Averaging, ETF world, diversification — apprends à faire travailler ton argent de manière méthodique et sans stress.',
+    flipBack: 'Dollar-Cost Averaging, ETF world, diversification - apprends à faire travailler ton argent de manière méthodique et sans stress.',
     stat: 'Règle des 72 : doublement en ~9 ans à 8 %',
   },
   {
@@ -54,7 +54,7 @@ export const ACADEMY_THEMES = [
     locked: true,
     color: 'orange',
     flipFront: 'Optimise ce que tu gardes vraiment.',
-    flipBack: 'PFU 30 %, exonération PEA après 5 ans, abattement assurance-vie après 8 ans — maîtrise les règles du jeu fiscal pour maximiser tes gains nets.',
+    flipBack: 'PFU 30 %, exonération PEA après 5 ans, abattement assurance-vie après 8 ans - maîtrise les règles du jeu fiscal pour maximiser tes gains nets.',
     stat: 'Jusqu\'à 9 200 € d\'abattement en assurance-vie',
   },
   {
@@ -67,7 +67,7 @@ export const ACADEMY_THEMES = [
     locked: true,
     color: 'teal',
     flipFront: 'Protège tes revenus et ta famille.',
-    flipBack: 'Prévoyance, arrêt maladie, invalidité — comprends tes droits et les lacunes à combler. Souvent négligée par les jeunes, cette protection est cruciale.',
+    flipBack: 'Prévoyance, arrêt maladie, invalidité - comprends tes droits et les lacunes à combler. Souvent négligée par les jeunes, cette protection est cruciale.',
     stat: 'Risque d\'invalidité : 1 actif sur 3 avant 60 ans',
   },
   {
@@ -80,7 +80,7 @@ export const ACADEMY_THEMES = [
     locked: true,
     color: 'pink',
     flipFront: 'Transmets ton patrimoine efficacement.',
-    flipBack: 'Abattements sur donations, assurance-vie hors succession, SCI familiale — anticipe pour que tes proches ne paient pas plus que nécessaire.',
+    flipBack: 'Abattements sur donations, assurance-vie hors succession, SCI familiale - anticipe pour que tes proches ne paient pas plus que nécessaire.',
     stat: '100 000 € d\'abattement tous les 15 ans',
   },
 ];

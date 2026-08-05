@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 /**
  * Encapsule toute la logique d'état d'un quiz.
- * Complètement découplé de l'UI — facile à tester unitairement.
+ * Complètement découplé de l'UI - facile à tester unitairement.
  */
 export function useQuiz(questions) {
   const [currentIndex, setCurrentIndex] = useState(0);

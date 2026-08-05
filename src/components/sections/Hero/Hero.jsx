@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { ArrowRight, Star, TrendingUp, Zap } from 'lucide-react';
+import { ArrowRight, Star, TrendingUp, Zap, GraduationCap, Wallet } from 'lucide-react';
 import Button from '../../ui/Button/Button';
 import Badge from '../../ui/Badge/Badge';
 import styles from './Hero.module.css';
@@ -10,10 +10,14 @@ const PHONE_STATS = [
   { label: 'Dividendes reçus', value: '124 €', delta: '+3 ce mois', positive: true },
 ];
 
-/* Points de réassurance en bas du hero */
+/* Points de réassurance en bas du hero. On y ressort les arguments clés
+   qu'on a sortis du titre h1 pour l'alléger visuellement : dès 50 €/mois,
+   0 frais de versement, académie gratuite, expert accompagnant. */
 const REASSURANCE = [
-  { icon: Zap, text: 'Ouverture en ligne simplifiée avec un expert' },
-  { icon: TrendingUp, text: 'Dès 50 €/mois' },
+  { icon: TrendingUp,    text: 'Dès 50 € / mois' },
+  { icon: Wallet,        text: '0 frais de versement' },
+  { icon: GraduationCap, text: 'Académie gratuite' },
+  { icon: Zap,           text: 'Accompagné par un expert' },
 ];
 
 export default function Hero({ onCTAClick, firstName }) {
@@ -52,20 +56,22 @@ export default function Hero({ onCTAClick, firstName }) {
           </Badge>
 
           <h1 className={styles.title}>
-            La première solution{' '}
-            <span className="gradient-text">d'apprentissage</span>{' '}
-            et d'investissement{' '}
-            <span className="gradient-text">pour les jeunes</span>
+            Avec <span className="gradient-text">Booster</span>, fais travailler ton argent
+            <br />
+            avec une <span className="gradient-text">épargne programmée dès 50 €</span>
+            <br />
+            et forme-toi avec l'<span className="gradient-text">Académie</span>
           </h1>
 
           <p className={styles.subtitle}>
-            Ton argent mérite mieux qu'un livret bancaire, investis à partir de 50 euros
-            par mois et forme-toi à la finance personnelle de manière ludique.
+            Fais fructifier ton argent à ton rythme : épargne programmée dès 50 € par mois
+            sur ton assurance vie selon tes projets, zéro frais de versement, et un contrat
+            ouvert en ligne accompagné par un expert financier.
           </p>
 
           <div className={styles.ctaGroup}>
             <Button variant="primary" size="lg" onClick={onCTAClick}>
-              {firstName ? 'Accéder à mon espace' : 'Créer mon compte'}
+              {firstName ? 'Accéder à mon espace' : 'Définir mon projet et commencer à épargner'}
               <ArrowRight size={18} />
             </Button>
           </div>

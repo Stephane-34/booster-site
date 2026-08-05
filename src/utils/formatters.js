@@ -1,4 +1,4 @@
-/* Instances Intl mises en cache au niveau module — évite de les recréer à chaque appel.
+/* Instances Intl mises en cache au niveau module - évite de les recréer à chaque appel.
    Intl.NumberFormat est coûteux à instancier, pas à utiliser. */
 const currencyFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',

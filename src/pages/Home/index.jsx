@@ -61,7 +61,6 @@ const WHO_FEATURES = [
 ];
 
 const EXPERTISE = [
-  'Bancaire',
   'Fiscalité',
   'Retraite',
   'Immobilier',
@@ -76,16 +75,16 @@ function WhoWeAre() {
         <div className={styles.whoHeader}>
           <Badge variant="accent">Qui sommes-nous ?</Badge>
           <h2 className={styles.whoTitle}>
-            D'anciens étudiants,{' '}
-            <span className="gradient-text">devenus experts</span>{' '}
-            pour vous.
+            Épargner n'aura{' '}
+            <span className="gradient-text">jamais été aussi simple</span>{' '}
+            …
           </h2>
           <p className={styles.whoIntro}>
-            L'école ne nous a jamais appris à gérer nos premiers salaires, encore moins
-            à bâtir une stratégie immobilière ou à optimiser notre patrimoine. Comme vous,
-            nous avons dû apprendre par nous-mêmes comment faire fructifier nos premiers
-            revenus. Aujourd'hui, Booster vous simplifie la vie en combinant éducation
-            et action.
+            L'éducation financière et patrimoniale ne fait pas partie des cursus traditionnels.
+            C'est pourquoi nous avons fondé Booster : une plateforme conçue pour transformer
+            l'apprentissage en actions concrètes. En combinant formation rigoureuse et solutions
+            d'investissement simple et sur-mesure, nous vous accompagnons dans la structuration
+            et la valorisation de votre capital dès vos premiers revenus.
           </p>
         </div>
 

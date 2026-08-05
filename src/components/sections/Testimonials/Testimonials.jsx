@@ -49,7 +49,7 @@ const TESTIMONIALS = [
     role: 'Étudiant M2, 24 ans',
     avatar: 'AP',
     color: '#2dd4bf',
-    text: 'Interface ultra propre, app rapide, RDV pris en 2 clics. Exactement ce qu\'il fallait — pas de banque lourde, pas de paperasse inutile.',
+    text: 'Interface ultra propre, app rapide, RDV pris en 2 clics. Exactement ce qu\'il fallait - pas de banque lourde, pas de paperasse inutile.',
     stars: 5,
   },
 ];
@@ -78,7 +78,7 @@ export default function Testimonials() {
         </div>
       </div>
 
-      {/* Carrousel infini sans JS de scroll — pure CSS animation */}
+      {/* Carrousel infini sans JS de scroll - pure CSS animation */}
       <div
         className={styles.carousel}
         onMouseEnter={pause}

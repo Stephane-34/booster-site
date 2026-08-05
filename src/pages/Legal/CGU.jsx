@@ -85,7 +85,7 @@ export default function CGU() {
             </thead>
             <tbody>
               <tr>
-                <td>Académie — modules de base</td>
+                <td>Académie - modules de base</td>
                 <td>3 modules</td>
                 <td>6 thèmes complets</td>
               </tr>
@@ -106,7 +106,7 @@ export default function CGU() {
               </tr>
               <tr>
                 <td>Accès prioritaire conseillers</td>
-                <td>—</td>
+                <td>-</td>
                 <td>✓</td>
               </tr>
             </tbody>

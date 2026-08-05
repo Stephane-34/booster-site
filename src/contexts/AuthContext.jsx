@@ -53,7 +53,7 @@ export function AuthProvider({ children }) {
     setProfile(null);
   }, []);
 
-  /* Force le rechargement du profil étendu — appelé après modification depuis la page Profil. */
+  /* Force le rechargement du profil étendu - appelé après modification depuis la page Profil. */
   const refreshProfile = useCallback(async () => {
     if (!user) return;
     await loadProfile(user);

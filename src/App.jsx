@@ -35,7 +35,7 @@ export default function App() {
             <Route path="/academie" element={<RequireAuth><Academy /></RequireAuth>} />
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/profil" element={<RequireAuth><Profile /></RequireAuth>} />
-            {/* Redirige les anciens liens /ton-projet vers /investir — à conserver tant que des partages externes peuvent pointer cette URL */}
+            {/* Redirige les anciens liens /ton-projet vers /investir - à conserver tant que des partages externes peuvent pointer cette URL */}
             <Route path="/ton-projet" element={<TonProjet />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/cgu" element={<CGU />} />

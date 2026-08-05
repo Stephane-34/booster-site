@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Mail, Lock, LogOut, ShieldAlert } from 'lucide-react';
+import { User, Mail, Lock, LogOut, ShieldAlert, Calendar, Phone } from 'lucide-react';
 import Button from '../../components/ui/Button/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { updateProfile, updateEmail, updatePassword } from '../../services/supabase';
@@ -29,21 +29,31 @@ export default function Profile() {
   );
 }
 
-/* ─── Carte 1 : prénom / nom / âge ─────────────────────────── */
+/* ─── Carte 1 : identité complète (civilité, nom/prénom, date de naissance,
+       téléphone, newsletter opt-in). Reprend les champs du formulaire
+       d'inscription enrichi pour permettre aux utilisateurs existants (créés
+       avant la migration) de compléter les données manquantes. ─────────── */
 function ProfileCard({ user, profile, onSaved }) {
   const fallback = user?.user_metadata ?? {};
-  const [firstName, setFirstName] = useState('');
-  const [lastName,  setLastName]  = useState('');
-  const [age,       setAge]       = useState('');
-  const [status,    setStatus]    = useState({ type: null, msg: '' });
-  const [loading,   setLoading]   = useState(false);
+  const [gender,          setGender]          = useState('');
+  const [firstName,       setFirstName]       = useState('');
+  const [lastName,        setLastName]        = useState('');
+  const [birthDate,       setBirthDate]       = useState('');
+  const [phone,           setPhone]           = useState('');
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
+  const [status,          setStatus]          = useState({ type: null, msg: '' });
+  const [loading,         setLoading]         = useState(false);
 
-  /* Initialise les champs dès que profile ou user_metadata sont disponibles.
-     On préfère la valeur de la table profiles ; à défaut, on retombe sur user_metadata. */
+  /* Initialise dès que profile ou user_metadata sont disponibles. On préfère
+     la ligne profiles ; à défaut on retombe sur user_metadata (utile
+     immédiatement après inscription avant que le trigger ait alimenté profiles). */
   useEffect(() => {
-    setFirstName(profile?.first_name ?? fallback.first_name ?? '');
-    setLastName (profile?.last_name  ?? fallback.last_name  ?? '');
-    setAge      (profile?.age ?? (fallback.age ? Number(fallback.age) : '') ?? '');
+    setGender         (profile?.gender            ?? fallback.gender          ?? '');
+    setFirstName      (profile?.first_name        ?? fallback.first_name      ?? '');
+    setLastName       (profile?.last_name         ?? fallback.last_name       ?? '');
+    setBirthDate      (profile?.birth_date        ?? fallback.birth_date      ?? '');
+    setPhone          (profile?.phone             ?? fallback.phone           ?? '');
+    setNewsletterOptIn(!!profile?.newsletter_opt_in);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, user]);
 
@@ -51,17 +61,33 @@ function ProfileCard({ user, profile, onSaved }) {
     e.preventDefault();
     if (!user) return;
     setStatus({ type: null, msg: '' });
-    const ageNum = age === '' ? null : Number(age);
-    if (ageNum !== null && (Number.isNaN(ageNum) || ageNum < 13 || ageNum > 120)) {
-      setStatus({ type: 'error', msg: 'Âge invalide (entre 13 et 120 ans).' });
-      return;
+
+    /* Validation de la date de naissance si fournie (13-120 ans). */
+    if (birthDate) {
+      const b = new Date(birthDate);
+      if (Number.isNaN(b.getTime())) {
+        setStatus({ type: 'error', msg: 'Date de naissance invalide.' });
+        return;
+      }
+      const now = new Date();
+      let age = now.getFullYear() - b.getFullYear();
+      const m = now.getMonth() - b.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age--;
+      if (age < 13 || age > 120) {
+        setStatus({ type: 'error', msg: 'Tu dois avoir entre 13 et 120 ans.' });
+        return;
+      }
     }
+
     setLoading(true);
     try {
       await updateProfile(user.id, {
-        firstName: firstName.trim(),
-        lastName:  lastName.trim(),
-        age:       ageNum,
+        firstName:       firstName.trim(),
+        lastName:        lastName.trim(),
+        gender:          gender || null,
+        birthDate:       birthDate || null,
+        phone:           phone.trim() || null,
+        newsletterOptIn,
       });
       await onSaved?.();
       setStatus({ type: 'success', msg: 'Profil mis à jour.' });
@@ -83,24 +109,76 @@ function ProfileCard({ user, profile, onSaved }) {
       </div>
 
       <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.row2}>
-          <div className={styles.field}>
-            <label htmlFor="prof-firstname" className={styles.label}>Prénom</label>
-            <input id="prof-firstname" className={styles.input} value={firstName}
-              onChange={(e) => setFirstName(e.target.value)} autoComplete="given-name" />
+        {/* Civilité en deux pilules radio */}
+        <fieldset className={styles.field}>
+          <legend className={styles.label}>Civilité</legend>
+          <div className={styles.genderChoice}>
+            <label className={`${styles.genderPill} ${gender === 'monsieur' ? styles.genderPillActive : ''}`}>
+              <input
+                type="radio"
+                name="prof-gender"
+                value="monsieur"
+                checked={gender === 'monsieur'}
+                onChange={(e) => setGender(e.target.value)}
+              />
+              Monsieur
+            </label>
+            <label className={`${styles.genderPill} ${gender === 'madame' ? styles.genderPillActive : ''}`}>
+              <input
+                type="radio"
+                name="prof-gender"
+                value="madame"
+                checked={gender === 'madame'}
+                onChange={(e) => setGender(e.target.value)}
+              />
+              Madame
+            </label>
           </div>
+        </fieldset>
+
+        <div className={styles.row2}>
           <div className={styles.field}>
             <label htmlFor="prof-lastname" className={styles.label}>Nom</label>
             <input id="prof-lastname" className={styles.input} value={lastName}
               onChange={(e) => setLastName(e.target.value)} autoComplete="family-name" />
           </div>
+          <div className={styles.field}>
+            <label htmlFor="prof-firstname" className={styles.label}>Prénom</label>
+            <input id="prof-firstname" className={styles.input} value={firstName}
+              onChange={(e) => setFirstName(e.target.value)} autoComplete="given-name" />
+          </div>
         </div>
-        <div className={styles.field}>
-          <label htmlFor="prof-age" className={styles.label}>Âge</label>
-          <input id="prof-age" type="number" min={13} max={120}
-            className={styles.input} value={age}
-            onChange={(e) => setAge(e.target.value)} />
+
+        <div className={styles.row2}>
+          <div className={styles.field}>
+            <label htmlFor="prof-birthdate" className={styles.label}>
+              <Calendar size={14} /> Date de naissance
+            </label>
+            <input id="prof-birthdate" type="date" className={styles.input}
+              value={birthDate ?? ''}
+              onChange={(e) => setBirthDate(e.target.value)}
+              autoComplete="bday" />
+          </div>
+          <div className={styles.field}>
+            <label htmlFor="prof-phone" className={styles.label}>
+              <Phone size={14} /> Téléphone
+            </label>
+            <input id="prof-phone" type="tel" className={styles.input}
+              placeholder="06 12 34 56 78"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              autoComplete="tel" />
+          </div>
         </div>
+
+        <label className={styles.checkboxRow}>
+          <input
+            type="checkbox"
+            checked={newsletterOptIn}
+            onChange={(e) => setNewsletterOptIn(e.target.checked)}
+          />
+          <span>Je souhaite recevoir la newsletter Booster (facultatif)</span>
+        </label>
 
         {status.type && (
           <p className={`${styles.message} ${status.type === 'success' ? styles.success : styles.error}`}>
