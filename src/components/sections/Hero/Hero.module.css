@@ -62,6 +62,10 @@
   gap: var(--space-16);
   align-items: center;
   padding-block: var(--space-20);
+  /* min-width: 0 sur les grid items descendants pour permettre au titre
+     de wrapper au lieu de forcer le container à s'élargir (bug Safari
+     mobile où le contenu débordait à droite du viewport). */
+  min-width: 0;
 }
 
 /* Contenu texte */
@@ -70,6 +74,7 @@
   flex-direction: column;
   gap: var(--space-6);
   animation: fadeInUp 0.7s ease both;
+  min-width: 0;
 }
 
 .badge {
@@ -77,11 +82,18 @@
 }
 
 .title {
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+  /* clamp(min, préféré, max) - min = text-xl (20px) pour laisser respirer
+     les petits écrans Safari mobile où text-3xl (30px) débordait. Le vw
+     augmente rapidement la taille dès qu'on dépasse ~500px. */
+  font-size: clamp(var(--text-xl), 5vw, var(--text-5xl));
   font-weight: var(--weight-extrabold);
-  line-height: 1.15;
-  letter-spacing: -0.03em;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   color: var(--color-text);
+  /* Coupe proprement les mots qui débordent (surtout Safari mobile) */
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
 }
 
 .subtitle {
@@ -363,10 +375,16 @@
 
   .ctaGroup {
     flex-direction: column;
+    width: 100%;
   }
 
   .ctaGroup > * {
     width: 100%;
     justify-content: center;
+    /* Le CTA "Définir mon projet et commencer à épargner" est long, on
+       autorise le wrap pour éviter qu'il déborde à droite. */
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
   }
 }

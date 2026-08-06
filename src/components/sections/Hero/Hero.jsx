@@ -55,12 +55,13 @@ export default function Hero({ onCTAClick, firstName }) {
             {firstName ? `Bonjour ${firstName} 👋` : 'Nouveau · Plateforme en version bêta'}
           </Badge>
 
+          {/* Titre laissé sans <br /> forcés : le navigateur wrap naturellement
+              selon la largeur disponible (mieux pour le responsive Safari mobile
+              où un <br /> maintenait des lignes trop longues qui débordaient). */}
           <h1 className={styles.title}>
             Avec <span className="gradient-text">Booster</span>, fais travailler ton argent
-            <br />
-            avec une <span className="gradient-text">épargne programmée dès 50 €</span>
-            <br />
-            et forme-toi avec l'<span className="gradient-text">Académie</span>
+            {' '}avec une <span className="gradient-text">épargne programmée dès 50 €</span>
+            {' '}et forme-toi avec l'<span className="gradient-text">Académie</span>
           </h1>
 
           <p className={styles.subtitle}>
