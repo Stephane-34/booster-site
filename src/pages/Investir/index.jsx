@@ -45,7 +45,7 @@ export default function Investir() {
   return (
     <div className={styles.page}>
       <BreadcrumbSteps />
-      <HeroAV onCTAClick={handleCTA} ctaLabel={ctaLabel} />
+      <HeroAV />
       <ProjectTabs onCTAClick={handleCTA} ctaLabel={ctaLabel} />
       <Modal isOpen={authModal} onClose={() => setAuthModal(false)} title="Créer mon compte gratuit">
         <AuthForm defaultTab="signup" onSuccess={() => setAuthModal(false)} />
@@ -147,11 +147,14 @@ const AV_GLASS_SECTIONS = [
   },
 ];
 
-function HeroAV({ onCTAClick, ctaLabel }) {
+function HeroAV() {
   return (
     <section className={styles.heroAV}>
       <div className="container">
-        {/* Titre centré */}
+        {/* Titre centré. Bouton "Créer mon compte / Prendre RDV" retiré :
+            l'inscription se fait via le CTA de l'accueil, et le user
+            connecté a déjà les boutons "Prendre RDV" dans chaque sous-onglet
+            (InlineBookingCTA en bas de Valoriser mon capital / Immobilier / … ). */}
         <div className={styles.heroAVHead}>
           <Badge variant="primary">Assurance vie</Badge>
           <h1 className={styles.heroAVTitle}>
@@ -162,10 +165,6 @@ function HeroAV({ onCTAClick, ctaLabel }) {
           <p className={styles.heroAVDesc}>
             L'outil le plus puissant pour transformer tes économies d'aujourd'hui en gros projets demain.
           </p>
-          <Button variant="accent" size="lg" onClick={onCTAClick}>
-            {ctaLabel}
-            <ArrowRight size={18} />
-          </Button>
         </div>
 
         {/* Glass card */}
@@ -759,13 +758,6 @@ const RETRAITE_SOLUTIONS = [
 ];
 
 
-const RETRAITE_POINTS = [
-  "Assurance vie + PER (Plan Épargne Retraite) : deux enveloppes complémentaires",
-  "PER : vos versements sont déductibles de votre revenu imposable",
-  "Assurance vie : capital disponible avant la retraite si besoin",
-  "Choix à la sortie : rente viagère, capital unique ou versements programmés",
-  "Stratégie de désensibilisation progressive du risque à l'approche de la retraite",
-];
 
 /* Taux de remplacement moyens estimés par le COR (Conseil d'Orientation des Retraites).
    Les TNS sont particulièrement pénalisés par la réforme de 2023. */
@@ -885,15 +877,6 @@ function TabRetraite() {
             </div>
           </div>
         </div>
-
-        {/* Points clés (checklist) - placés après le bloc pédagogique */}
-        <ul className={styles.checkList}>
-          {RETRAITE_POINTS.map((p) => (
-            <li key={p} className={styles.checkItem}>
-              <CheckCircle size={16} className={styles.checkIcon} /><span>{p}</span>
-            </li>
-          ))}
-        </ul>
 
         {/* Simulateur taux de remplacement */}
         <SimCard title="Simulateur taux de remplacement">

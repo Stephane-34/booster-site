@@ -12,7 +12,7 @@ import styles from './Header.module.css';
    protected: true → onglet verrouillé tant que l'utilisateur n'est pas connecté */
 const NAV_LINKS = [
   { label: 'Accueil',  to: '/',         cta: false, protected: false },
-  { label: 'Investir', to: '/investir', cta: true,  protected: false },
+  { label: 'Investir', to: '/investir', cta: true,  protected: true  },
   { label: 'Académie', to: '/academie', cta: true,  protected: true  },
 ];
 

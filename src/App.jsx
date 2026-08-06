@@ -32,10 +32,13 @@ export default function App() {
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/investir" element={<Investir />} />
-            <Route path="/academie" element={<RequireAuth><Academy /></RequireAuth>} />
-            <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-            <Route path="/profil" element={<RequireAuth><Profile /></RequireAuth>} />
+            {/* /investir : signup par défaut (parcours découverte depuis la Home).
+                /academie, /dashboard, /profil : login par défaut (l'user est censé
+                déjà avoir un compte, il revient s'identifier). */}
+            <Route path="/investir" element={<RequireAuth defaultTab="signup"><Investir /></RequireAuth>} />
+            <Route path="/academie" element={<RequireAuth defaultTab="login"><Academy /></RequireAuth>} />
+            <Route path="/dashboard" element={<RequireAuth defaultTab="login"><Dashboard /></RequireAuth>} />
+            <Route path="/profil" element={<RequireAuth defaultTab="login"><Profile /></RequireAuth>} />
             {/* Redirige les anciens liens /ton-projet vers /investir - à conserver tant que des partages externes peuvent pointer cette URL */}
             <Route path="/ton-projet" element={<TonProjet />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />

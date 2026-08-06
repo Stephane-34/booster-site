@@ -1,24 +1,20 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Brain } from 'lucide-react';
 import Hero from '../../components/sections/Hero/Hero';
 import Testimonials from '../../components/sections/Testimonials/Testimonials';
-import Modal from '../../components/ui/Modal/Modal';
-import AuthForm from '../../components/sections/AuthForm/AuthForm';
 import Badge from '../../components/ui/Badge/Badge';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Home.module.css';
 
 export default function Home() {
-  const [authModal, setAuthModal] = useState(false);
   const { firstName, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  /* Si l'user est déjà connecté, le CTA du Hero l'envoie vers son espace.
-     Sinon il ouvre le modal d'inscription. */
+  /* Le CTA du Hero renvoie systématiquement vers /investir. La page est
+     protégée par RequireAuth : un visiteur non connecté sera intercepté
+     et invité à créer un compte via le modal d'auth. */
   const handleHeroCTA = () => {
-    if (isAuthenticated) navigate('/academie');
-    else                 setAuthModal(true);
+    navigate('/investir');
   };
 
   return (
@@ -29,17 +25,6 @@ export default function Home() {
       />
       <WhoWeAre />
       <Testimonials />
-
-      <Modal
-        isOpen={authModal}
-        onClose={() => setAuthModal(false)}
-        title="Créer mon compte gratuit"
-      >
-        <AuthForm
-          defaultTab="signup"
-          onSuccess={() => setAuthModal(false)}
-        />
-      </Modal>
     </>
   );
 }
