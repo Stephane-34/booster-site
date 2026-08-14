@@ -70,7 +70,7 @@ export function useAcademyProgress() {
   }, [user]);
 
   /* Enregistre le résultat d'un module.
-     `day` = objet issu de WEEK_1 ; `answersByIndex` = { [qIdx]: optionIdx }. */
+     `day` = objet issu de WEEKS[weekN] ; `answersByIndex` = { [qIdx]: optionIdx }. */
   const saveResult = useCallback(async (day, answersByIndex) => {
     if (!user) return;
 

@@ -75,7 +75,7 @@ Trois statuts :
 éditorial papier + violet, isolé du thème sombre du site). Bandeau de retour
 en haut + 3 sous-onglets :
 
-- **Quiz du jour** - les questions spécifiques du module (WEEK_1[x].questions).
+- **Quiz du jour** - les questions spécifiques du module (WEEKS[weekN][dayIdx].questions).
   Une question à la fois, tampon "VALIDÉ / À REVOIR" après réponse,
   explication en dessous, récap final à la fin. Si le module est déjà complété,
   affiche directement le récap avec un bouton "Refaire le quiz".
@@ -138,9 +138,11 @@ requise pour la démo).
 
 - **`PROGRAM_52`** - 4 phases, chacune avec 13 semaines détaillées.
   6 topics par semaine (un par thème / jour). Utilisé par `ProgramSection`.
-- **`WEEK_1`** - 6 modules (Lun→Sam), chacun avec `dayName`, `theme`,
-  `title`, `questions[]` (format : `{ q, options: [text], correct: index,
-  rationale }`). Utilisé par `DashboardSection` et `ModuleQuizView`.
+- **`WEEKS`** - objet indexé par numéro de semaine (1, 2, ...). Chaque
+  semaine = 6 modules (Lun→Sam), chacun avec `dayName`, `theme`, `title`,
+  `questions[]` (format : `{ q, options: [text], correct: index, rationale }`).
+  IDs : sem 1 utilise `day-0`→`day-5` (rétrocompat DB), sem 2+ utilise
+  `wN-dI` préfixé. Utilisé par `DashboardSection` et `ModuleQuizView`.
 - **`MOCK_PLAYERS`** - 12 joueurs simulés avec score, pour illustrer le
   classement.
 - **`FLASHCARDS`** - 13 fiches (`{ id, front, back }`). Corpus global

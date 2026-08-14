@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import Button from '../../components/ui/Button/Button';
 import { useAcademyProgress } from '../../hooks/useAcademyProgress';
-import { PROGRAM_52, MOCK_PLAYERS, WEEK_1, FLASHCARDS, KEY_PRINCIPLES } from './data';
+import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES } from './data';
 import styles from './Academy.module.css';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -381,19 +381,21 @@ function ProgramSection({ currentWeek }) {
      - review    : quiz complété mais < 80 %
      - todo      : semaine débloquée, module non commencé
      - locked    : semaine > currentWeek
-   Seule la Semaine 1 a du contenu quiz aujourd'hui - cliquer sur un module
-   d'une semaine ≥ 2 ouvre un modal "Contenu à venir". */
+   Les semaines rédigées sont listées dans WEEKS (indexé par n° de sem).
+   Cliquer sur un module d'une semaine non rédigée ouvre un modal
+   "Contenu à venir". */
 
 const VALIDATION_THRESHOLD = 80; // seuil vert ≥ 80 %
 const DAYS_HEADER = ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'];
 
 function moduleStatus(weekN, dayIdx, currentWeek, completed) {
   if (weekN > currentWeek) return 'locked';
-  /* Seule la Semaine 1 est actuellement rattachée au corpus de quiz : on
-     regarde `completed['day-<i>']` uniquement pour elle. Les Semaines 2+
-     restent en "todo" quelle que soit la progression. */
-  if (weekN === 1) {
-    const id = WEEK_1[dayIdx]?.id;
+  /* On regarde la complétion uniquement pour les semaines dont le corpus
+     est rédigé (présentes dans WEEKS). Les autres restent en "todo"
+     quelle que soit la progression. */
+  const week = WEEKS[weekN];
+  if (week) {
+    const id = week[dayIdx]?.id;
     const rec = id ? completed[id] : null;
     if (rec) {
       const pct = (rec.score / rec.total) * 100;
@@ -421,8 +423,9 @@ function ProgressionSection({ currentWeek, completed, onOpenModule }) {
   const handleClick = (weekN, dayIdx) => {
     const status = moduleStatus(weekN, dayIdx, currentWeek, completed);
     if (status === 'locked') return;
-    if (weekN === 1) {
-      const id = WEEK_1[dayIdx].id;
+    const week = WEEKS[weekN];
+    if (week) {
+      const id = week[dayIdx].id;
       onOpenModule(id);
     } else {
       setComingSoonWeek(weekN);
@@ -587,7 +590,9 @@ function DashboardSection({
   /* ── Vue module (ouverte au clic sur un module de la semaine ou depuis
         l'onglet "Ma progression"). Prime sur la vue dashboard/leaderboard. ── */
   if (activeModuleId) {
-    const day = WEEK_1.find((d) => d.id === activeModuleId);
+    /* On cherche le jour dans toutes les semaines rédigées : le module id
+       est unique globalement (sem 1 = 'day-N', sem 2+ = 'wN-dI'). */
+    const day = Object.values(WEEKS).flat().find((d) => d.id === activeModuleId);
     /* Sécurité : si l'id ne correspond à aucun module connu (par ex.
        arrivée d'un id de semaine 2+ non implémenté), on ferme la vue. */
     if (!day) {
@@ -731,7 +736,7 @@ function DashboardSection({
       )}
 
       <div className={styles.modulesGrid}>
-        {WEEK_1.map((day, i) => {
+        {(WEEKS[currentWeek] || WEEKS[1]).map((day, i) => {
           const status = dayStatus(i, day.id);
           return (
             <div key={day.id} className={`${styles.moduleCard} ${styles[`moduleStatus_${status}`]}`}>

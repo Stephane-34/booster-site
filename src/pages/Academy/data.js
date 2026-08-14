@@ -98,7 +98,13 @@ export const PROGRAM_52 = [
    réorganisés en 4 blocs). `correct` est un index 0-based (A=0, B=1,
    C=2, D=3). `rationale` reprend la formulation de la bonne réponse
    pour l'affichage post-clic. */
-export const WEEK_1 = [
+/* Semaines rédigées : indexées par numéro (1, 2, ...).
+   Chaque semaine = 6 jours (Lun→Sam) x 10 questions.
+   IDs : sem 1 garde 'day-0' à 'day-5' pour la rétrocompat avec les
+   résultats déjà stockés en base Supabase (academy_quiz_results).
+   Sem 2+ utilise 'wN-dI' (préfixé par la semaine). */
+export const WEEKS = {
+  1: [
   {
     id: 'day-0', dayName: 'Lundi', theme: 'Enrichissement & Placement', title: "L'épargne",
     questions: [
@@ -789,7 +795,662 @@ export const WEEK_1 = [
       },
     ],
   },
-];
+  ],
+
+  /* Sem 2 - Le budget + les 5 autres jours (tous nouveaux dans le corpus PDF). */
+  2: [
+  {
+    id: 'w2-d0', dayName: 'Lundi', theme: 'Enrichissement & Placement', title: 'Le budget',
+    questions: [
+      {
+        q: "À quoi sert l'établissement d'un budget personnel ?",
+        options: [
+          "À identifier clairement ses revenus et ses dépenses pour maîtriser ses flux financiers et éviter le découvert",
+          "À se priver de tout loisir",
+          "À payer plus d'impôts",
+          "À calculer le prix de sa maison",
+        ],
+        correct: 0,
+        rationale: "Identifier revenus et dépenses. Un budget est une feuille de route financière qui met en lumière où part l'argent.",
+      },
+      {
+        q: "Dans un budget, qu'est-ce qu'une « charge fixe » (ou dépense pré-engagée) ?",
+        options: [
+          "Une dépense liée à une sortie au restaurant",
+          "L'achat de vêtements",
+          "Une dépense récurrente, contractuelle et difficilement modifiable à court terme (loyer, assurances, crédit)",
+          "Un retrait au distributeur",
+        ],
+        correct: 2,
+        rationale: "Une dépense récurrente et contractuelle. Ce sont les dépenses incompressibles qui tombent chaque mois.",
+      },
+      {
+        q: "À l'inverse, que sont les « charges variables » (ou dépenses courantes) ?",
+        options: [
+          "Le loyer",
+          "Les abonnements internet",
+          "Les impôts",
+          "Les dépenses dont le montant fluctue chaque mois selon les besoins (alimentation, loisirs, carburant)",
+        ],
+        correct: 3,
+        rationale: "Les dépenses dont le montant fluctue. C'est sur ce poste que l'on a le plus de pouvoir d'action pour rééquilibrer un budget.",
+      },
+      {
+        q: "Qu'est-ce que le « reste à vivre » ?",
+        options: [
+          "L'argent de poche donné aux enfants",
+          "La somme qu'il reste sur le compte une fois que les charges fixes et impôts ont été déduits des revenus",
+          "Le montant du découvert autorisé",
+          "La différence entre le salaire brut et net",
+        ],
+        correct: 1,
+        rationale: "La somme restante après déduction des charges fixes. C'est la marge de manœuvre mensuelle pour payer l'alimentation et les loisirs.",
+      },
+      {
+        q: "En gestion budgétaire populaire, à quoi correspond la fameuse « règle des 50/30/20 » ?",
+        options: [
+          "50 % besoins (loyer, courses), 30 % envies/loisirs, 20 % épargne et investissements",
+          "50 % de dettes, 30 % d'épargne, 20 % de loisirs",
+          "Une répartition des impôts",
+          "Les tranches d'imposition sur le revenu",
+        ],
+        correct: 0,
+        rationale: "50 % besoins, 30 % envies, 20 % épargne. C'est un modèle d'équilibre budgétaire idéal.",
+      },
+      {
+        q: "Que permet la « mensualisation » des grandes factures dans la gestion d'un budget ?",
+        options: [
+          "D'annuler les frais bancaires",
+          "De payer moins cher au total",
+          "D'augmenter le salaire",
+          "De lisser les dépenses sur 12 mois pour éviter les chocs de trésorerie",
+        ],
+        correct: 3,
+        rationale: "Lisser les dépenses pour éviter les chocs. Cela permet de programmer son budget sans mauvaise surprise trimestrielle.",
+      },
+      {
+        q: "Quel est le danger du « paiement en plusieurs fois sans frais » (BNPL) ?",
+        options: [
+          "Il bloque le compte courant",
+          "Il baisse le prix du produit",
+          "Il crée des charges fixes artificielles qui s'accumulent et favorisent le surendettement",
+          "Il est interdit en Europe",
+        ],
+        correct: 2,
+        rationale: "Il accumule les charges fixes. Ces petites mensualités semblent indolores mais leur accumulation plombe rapidement le budget.",
+      },
+      {
+        q: "En comptabilité, de quel document d'entreprise s'inspire le budget d'un ménage ?",
+        options: [
+          "Le compte de résultat (produits/charges)",
+          "Le bilan (actif/passif)",
+          "Le registre du personnel",
+          "L'annexe légale",
+        ],
+        correct: 0,
+        rationale: "Le compte de résultat. Le ménage compare ses revenus (produits) et dépenses (charges) pour dégager une capacité d'épargne.",
+      },
+      {
+        q: "(Challenge) Un ménage a un revenu net de 3 000 €. Leurs charges fixes s'élèvent à 1 800 €. Quel est leur taux de charges fixes ?",
+        options: ["30 %", "45 %", "80 %", "60 %"],
+        correct: 3,
+        rationale: "60 %. (1 800 / 3 000) × 100 = 60 %. Ce taux est critique s'il dépasse ce seuil.",
+      },
+      {
+        q: "(Challenge) Qu'appelle-t-on « l'inflation du mode de vie » (lifestyle creep) ?",
+        options: [
+          "Le fait d'acheter des produits de luxe uniquement",
+          "La tendance à augmenter ses dépenses courantes à chaque fois que ses revenus augmentent, annulant l'épargne supplémentaire",
+          "La baisse des prix dans les supermarchés",
+          "Le passage à la retraite",
+        ],
+        correct: 1,
+        rationale: "Augmenter ses dépenses avec ses revenus. Gagner plus pour dépenser plus dans une plus grosse voiture empêche de développer son patrimoine.",
+      },
+    ],
+  },
+  {
+    id: 'w2-d1', dayName: 'Mardi', theme: 'Fiscalité', title: 'Le quotient familial',
+    questions: [
+      {
+        q: "Quel est le principe fondamental du quotient familial en France ?",
+        options: [
+          "Taxer davantage les familles nombreuses",
+          "Ajuster l'impôt sur le revenu en fonction de la composition et des charges de famille du foyer",
+          "Diviser les revenus par le nombre d'années de travail",
+          "Offrir une prime de naissance déductible des impôts",
+        ],
+        correct: 1,
+        rationale: "Ajuster l'impôt selon la composition du foyer. À revenu égal, une famille avec enfants paie moins d'impôts qu'un célibataire.",
+      },
+      {
+        q: "Combien de part(s) fiscale(s) un couple marié ou pacsé sans enfant possède-t-il ?",
+        options: ["1 part", "1,5 part", "2 parts", "3 parts"],
+        correct: 2,
+        rationale: "2 parts. Chaque conjoint compte pour une part entière (1 + 1).",
+      },
+      {
+        q: "Comment sont comptabilisés les deux premiers enfants à charge dans le calcul des parts fiscales ?",
+        options: [
+          "0,5 part chacun",
+          "1 part chacun",
+          "0,25 part chacun",
+          "Ils ne donnent droit à aucune part mais à un crédit d'impôt",
+        ],
+        correct: 0,
+        rationale: "0,5 part chacun. Le premier enfant apporte une demi-part, le deuxième aussi.",
+      },
+      {
+        q: "À partir du troisième enfant, combien de part(s) fiscale(s) supplémentaire(s) est/sont attribuée(s) par enfant ?",
+        options: ["0,5 part", "1 part entière", "1,5 part", "2 parts"],
+        correct: 1,
+        rationale: "1 part entière. Un couple avec 3 enfants = 4 parts.",
+      },
+      {
+        q: "Qu'appelle-t-on le « plafonnement du quotient familial » ?",
+        options: [
+          "L'interdiction d'avoir plus de 5 enfants sur sa déclaration",
+          "Une limite légale à la réduction d'impôt procurée par chaque demi-part liée aux personnes à charge",
+          "Le montant maximum que l'on peut gagner pour payer des impôts",
+          "Le plafond de revenus au-delà duquel on ne peut plus se pacser",
+        ],
+        correct: 1,
+        rationale: "Une limite légale à la réduction par demi-part. Pour les hauts revenus, la baisse d'impôt liée aux enfants est plafonnée (environ 1 759 € par demi-part en 2024).",
+      },
+      {
+        q: "Comment les parts fiscales sont-elles réparties pour un enfant en garde alternée (sans accord contraire des parents) ?",
+        options: [
+          "Le parent qui gagne le plus prend toutes les parts",
+          "L'avantage est divisé par deux (0,25 part pour les 2 premiers enfants)",
+          "Le juge décide chaque année qui prend la part",
+          "L'enfant compte double",
+        ],
+        correct: 1,
+        rationale: "L'avantage est divisé par deux. En garde alternée équilibrée, la charge est partagée, donc la demi-part est divisée en deux (0,25 par parent).",
+      },
+      {
+        q: "Quel avantage fiscal est accordé à un parent isolé (célibataire, divorcé, veuf) élevant seul son enfant (Case T cochée) ?",
+        options: [
+          "Il ne paie aucun impôt pendant 3 ans",
+          "Le premier enfant compte pour 1 part entière au lieu de 0,5 part",
+          "Ses revenus sont divisés par 3",
+          "L'enfant n'est pas compté pour éviter le plafonnement",
+        ],
+        correct: 1,
+        rationale: "Le premier enfant compte pour 1 part entière. C'est la majoration « parent isolé » : un parent seul avec un enfant bénéficie de 2 parts.",
+      },
+      {
+        q: "Mécaniquement, comment le quotient familial réduit-il l'impôt ?",
+        options: [
+          "Il s'agit d'une déduction à la fin du calcul",
+          "On divise le revenu net imposable par le nombre de parts avant d'appliquer le barème progressif, ce qui permet de rester dans des tranches d'imposition plus basses",
+          "Il rembourse directement 50 % de l'impôt",
+          "Il annule la tranche à 45 % pour toutes les familles",
+        ],
+        correct: 1,
+        rationale: "Le revenu est divisé par le nombre de parts avant le barème. En abaissant la base soumise au barème progressif, on paie moins.",
+      },
+      {
+        q: "(Challenge) Un couple non marié et non pacsé (concubins) a un enfant. Comment cela se passe-t-il pour le quotient familial ?",
+        options: [
+          "Les deux déclarent 1,5 part sur leurs feuilles d'impôts respectives",
+          "Ils ont l'obligation de faire une déclaration commune",
+          "L'enfant ne peut être rattaché qu'au foyer fiscal d'un seul des deux parents (qui aura donc 1,5 part), l'autre parent déclare 1 part",
+          "L'enfant est perdu fiscalement",
+        ],
+        correct: 2,
+        rationale: "L'enfant ne peut être rattaché qu'à un seul parent. Les concubins font des déclarations séparées.",
+      },
+      {
+        q: "(Challenge) Monsieur X, très fortuné, a 3 enfants. Sans ses enfants, il paierait 100 000 € d'impôts. Avec 4 parts (couple + 3 enfants), le calcul théorique donne 80 000 €. Sachant que le plafond de l'avantage fiscal est fixé (à titre d'exemple) à environ 1 750 € par demi-part. Que va-t-il se passer ?",
+        options: [
+          "Il paiera 80 000 €",
+          "Le fisc lui remboursera la différence",
+          "L'avantage théorique (20 000 €) dépasse le plafond légal pour ses 4 demi-parts (4 × 1750 = 7000 €), son impôt final sera donc de 93 000 € (100k - 7k)",
+          "Il perd le bénéfice de ses parts car il est trop riche",
+        ],
+        correct: 2,
+        rationale: "L'avantage théorique dépasse le plafond légal, l'impôt est recalculé. C'est le principe du plafonnement du quotient familial.",
+      },
+    ],
+  },
+  {
+    id: 'w2-d2', dayName: 'Mercredi', theme: 'Retraite', title: 'Trimestres cotisés vs validés',
+    questions: [
+      {
+        q: "Dans le système de retraite français, qu'est-ce qu'un trimestre « validé » ?",
+        options: [
+          "Un trimestre où l'on a obligatoirement travaillé 90 jours consécutifs",
+          "L'unité de base de la durée d'assurance, qui permet de déterminer si on a droit à une retraite à taux plein",
+          "Un trimestre payé par l'employeur sous forme de prime",
+          "Une période de 3 mois de vacances",
+        ],
+        correct: 1,
+        rationale: "L'unité de base de la durée d'assurance. Les trimestres validés (cotisés + assimilés) déterminent le taux de la pension.",
+      },
+      {
+        q: "Sur quel critère valide-t-on aujourd'hui un trimestre par le travail (trimestre cotisé) ?",
+        options: [
+          "En travaillant exactement 3 mois (90 jours)",
+          "En percevant une rémunération soumise à cotisations équivalente à au moins 150 fois le SMIC horaire",
+          "En faisant 35 heures par semaine minimum",
+          "Uniquement si on est en CDI",
+        ],
+        correct: 1,
+        rationale: "En percevant l'équivalent d'au moins 150 fois le SMIC horaire. On compte le salaire cotisé, pas le temps de travail.",
+      },
+      {
+        q: "Qu'est-ce qu'un « trimestre assimilé » ?",
+        options: [
+          "Un trimestre racheté à la caisse de retraite",
+          "Un trimestre validé lors de périodes d'inactivité involontaire (chômage, maladie, maternité, service militaire) sans avoir versé de cotisations",
+          "Un trimestre validé en travaillant à l'étranger hors Europe",
+          "Un trimestre donné gratuitement à tous les travailleurs à 50 ans",
+        ],
+        correct: 1,
+        rationale: "Un trimestre validé lors d'inactivité involontaire. Le système est solidaire lors des accidents ou événements de la vie.",
+      },
+      {
+        q: "Quelle est la principale différence concrète entre le nombre total de « trimestres validés » et le nombre de « trimestres cotisés » ?",
+        options: [
+          "Les trimestres cotisés sont toujours supérieurs aux trimestres validés",
+          "Les trimestres validés incluent les trimestres cotisés ET les trimestres assimilés",
+          "Il n'y a aucune différence, c'est un synonyme",
+          "Les trimestres cotisés ne comptent que pour la retraite complémentaire",
+        ],
+        correct: 1,
+        rationale: "Validés = Cotisés + Assimilés + Majorations (enfants).",
+      },
+      {
+        q: "Combien de trimestres au maximum peut-on valider par an ?",
+        options: ["3", "4", "5", "Il n'y a pas de limite, cela dépend du salaire"],
+        correct: 1,
+        rationale: "4 trimestres par an maximum. Même en gagnant 1000 fois le SMIC horaire dans l'année, impossible de valider plus.",
+      },
+      {
+        q: "Pour bénéficier du dispositif de départ anticipé pour « Carrière Longue », quel type de trimestre est scruté en priorité par les caisses de retraite ?",
+        options: [
+          "Les trimestres assimilés",
+          "Les trimestres validés globaux",
+          "Les trimestres cotisés (issus du travail effectif)",
+          "Uniquement les trimestres d'études",
+        ],
+        correct: 2,
+        rationale: "Les trimestres cotisés. La loi exige un nombre précis de trimestres réellement cotisés pour prouver l'effort contributif.",
+      },
+      {
+        q: "Quel avantage en trimestres (majoration) est généralement accordé au titre de la maternité et de l'éducation dans le régime général ?",
+        options: [
+          "1 trimestre par enfant",
+          "8 trimestres par enfant (généralement 4 pour la maternité/adoption et 4 pour l'éducation)",
+          "20 trimestres par enfant",
+          "Une retraite immédiate au 3ème enfant",
+        ],
+        correct: 1,
+        rationale: "8 trimestres par enfant. Ces majorations facilitent l'atteinte du taux plein.",
+      },
+      {
+        q: "Quel est le risque de partir à la retraite si l'on n'a pas atteint le nombre de « trimestres validés » requis pour sa génération ?",
+        options: [
+          "La pension sera annulée",
+          "On subit une « décote » (réduction définitive du montant de la pension)",
+          "On subit une « surcote »",
+          "La pension est payée sous forme de capital unique",
+        ],
+        correct: 1,
+        rationale: "On subit une décote. Le taux de liquidation est minoré, ce qui baisse la pension à vie.",
+      },
+      {
+        q: "(Challenge) Un étudiant travaille 2 mois l'été. Il gagne au total l'équivalent de 350 fois le SMIC horaire. Que se passe-t-il pour sa retraite ?",
+        options: [
+          "Il valide 0 trimestre car il n'a pas travaillé 3 mois entiers",
+          "Il valide 2 trimestres cotisés (car 350 / 150 = 2,33)",
+          "Il valide 4 trimestres automatiquement car il est étudiant",
+          "Il valide 1 trimestre assimilé",
+        ],
+        correct: 1,
+        rationale: "Il valide 2 trimestres cotisés. La validation dépend du salaire (1 trimestre = 150h SMIC), pas du temps de travail.",
+      },
+      {
+        q: "(Challenge) Le minimum contributif (MiCo) est un dispositif qui garantit une retraite minimale. Pour obtenir le MiCo « majoré », quelle est la condition sur les trimestres ?",
+        options: [
+          "Avoir au moins 120 trimestres assimilés (chômage)",
+          "Avoir racheté au moins 12 trimestres",
+          "Avoir au moins 120 trimestres réellement cotisés",
+          "Avoir 1 seul trimestre validé dans sa vie",
+        ],
+        correct: 2,
+        rationale: "120 trimestres réellement cotisés. Le système valorise le travail effectif pour la majoration.",
+      },
+    ],
+  },
+  {
+    id: 'w2-d3', dayName: 'Jeudi', theme: 'Transmission', title: 'La réserve héréditaire',
+    questions: [
+      {
+        q: "Qu'est-ce que la « réserve héréditaire » en droit français ?",
+        options: [
+          "Une taxe prélevée par l'État sur tous les héritages",
+          "La part du patrimoine dont on peut disposer librement par testament",
+          "Une part minimum du patrimoine obligatoirement réservée par la loi à certains héritiers très proches",
+          "Le compte bancaire sur lequel sont versés les fonds du défunt",
+        ],
+        correct: 2,
+        rationale: "Une part obligatoirement réservée à certains héritiers proches. Le droit français protège la famille et empêche de déshériter totalement certains membres.",
+      },
+      {
+        q: "Qui sont les principaux « héritiers réservataires » ?",
+        options: [
+          "Les frères et sœurs du défunt",
+          "Les enfants du défunt (descendants)",
+          "Les parents du défunt (ascendants)",
+          "L'État",
+        ],
+        correct: 1,
+        rationale: "Les enfants (descendants). Depuis 2006, les parents ne sont plus réservataires.",
+      },
+      {
+        q: "Dans le cas où le défunt laisse un seul enfant, quelle est la fraction du patrimoine qui constitue la réserve héréditaire ?",
+        options: ["1/4 du patrimoine", "1/2 du patrimoine", "3/4 du patrimoine", "100 % du patrimoine"],
+        correct: 1,
+        rationale: "1/2 du patrimoine. Avec un enfant, la moitié lui est obligatoirement réservée.",
+      },
+      {
+        q: "Si le défunt laisse deux enfants, quelle est la fraction de la réserve héréditaire globale ?",
+        options: ["1/2", "2/3 (soit 1/3 par enfant)", "3/4", "L'intégralité du patrimoine"],
+        correct: 1,
+        rationale: "2/3 du patrimoine. Avec deux enfants, les deux tiers leur sont réservés.",
+      },
+      {
+        q: "À partir de trois enfants et plus, à combien s'élève la réserve héréditaire globale ?",
+        options: [
+          "3/4 du patrimoine (à se partager entre tous les enfants)",
+          "90 % du patrimoine",
+          "100 % du patrimoine",
+          "Elle redescend à 1/2",
+        ],
+        correct: 0,
+        rationale: "3/4 du patrimoine. C'est le plafond : qu'il y ait 3, 4 ou 10 enfants, la réserve bloquera au maximum 3/4.",
+      },
+      {
+        q: "Comment nomme-t-on la part restante du patrimoine (qui n'est pas dans la réserve) et dont le défunt peut faire ce qu'il veut (donations, testament) ?",
+        options: ["Le reliquat successoral", "La quotité disponible", "L'usufruit", "La réserve secondaire"],
+        correct: 1,
+        rationale: "La quotité disponible. On peut la donner à un tiers, à une association, ou pour avantager un enfant.",
+      },
+      {
+        q: "Le conjoint survivant (veuf/veuve) est-il un héritier réservataire ?",
+        options: [
+          "Oui, dans 100 % des cas",
+          "Non, jamais",
+          "Oui, mais uniquement si le défunt n'a laissé aucun descendant (enfant/petit-enfant)",
+          "Uniquement s'il y a un contrat de mariage",
+        ],
+        correct: 2,
+        rationale: "Uniquement en l'absence de descendants. Le conjoint devient alors réservataire à hauteur de 1/4.",
+      },
+      {
+        q: "Que se passe-t-il si de son vivant, un parent donne tellement d'argent à un ami que, lors de son décès, il ne reste plus assez pour couvrir la réserve héréditaire des enfants ?",
+        options: [
+          "Tant pis pour les enfants, le don est définitif",
+          "L'ami va en prison pour abus de faiblesse",
+          "Les enfants peuvent intenter une « action en réduction » pour forcer l'ami à rembourser la part manquante",
+          "L'État compense la perte pour les enfants",
+        ],
+        correct: 2,
+        rationale: "Les enfants peuvent intenter une action en réduction. Les libéralités qui dépassent la quotité disponible doivent être réduites.",
+      },
+      {
+        q: "(Challenge) Un père a deux enfants (Marc et Sophie). Il rédige un testament indiquant : « Je lègue toute ma quotité disponible à Marc ». Le jour du décès, le patrimoine est de 300 000 €. Combien Marc va-t-il recevoir au total ?",
+        options: ["150 000 €", "200 000 €", "300 000 €", "100 000 € (Sophie est déshéritée)"],
+        correct: 1,
+        rationale: "200 000 €. Réserve 2/3 = 200k (100k par enfant), quotité disponible 1/3 = 100k. Marc reçoit 100k + 100k.",
+      },
+      {
+        q: "(Challenge) Est-il possible, par un acte légal en France, pour un enfant majeur d'accepter par avance de renoncer à attaquer un don qui empièterait sur sa part de réserve héréditaire ?",
+        options: [
+          "Non, la réserve est d'ordre public absolu",
+          "Oui, par un acte notarié spécifique appelé « Renonciation Anticipée à l'Action en Réduction » (RAAR)",
+          "Oui, sur simple lettre manuscrite",
+          "Oui, mais seulement si l'enfant gagne plus que ses parents",
+        ],
+        correct: 1,
+        rationale: "Oui, par une RAAR. Depuis 2006, un héritier peut consentir devant deux notaires (utile pour transmettre une entreprise).",
+      },
+    ],
+  },
+  {
+    id: 'w2-d4', dayName: 'Vendredi', theme: 'IARD & Prévoyance', title: 'Franchises et plafonds',
+    questions: [
+      {
+        q: "En matière d'assurance (auto, habitation, santé), qu'est-ce qu'une franchise ?",
+        options: [
+          "Le montant maximum remboursé par l'assurance",
+          "La prime annuelle que doit payer l'assuré",
+          "La somme qui reste à la charge de l'assuré après l'indemnisation d'un sinistre",
+          "Le bonus accordé aux bons conducteurs",
+        ],
+        correct: 2,
+        rationale: "La somme qui reste à charge. Sinistre à 1000 € avec franchise à 200 € : l'assureur paie 800 €.",
+      },
+      {
+        q: "Quel est le but principal de la franchise pour l'assureur ?",
+        options: [
+          "Gagner plus d'argent sur les primes",
+          "Responsabiliser l'assuré et éviter la gestion coûteuse des tous petits sinistres",
+          "Pousser l'assuré à résilier son contrat",
+          "Contourner la loi sur les assurances",
+        ],
+        correct: 1,
+        rationale: "Responsabiliser l'assuré et éviter les petits sinistres. Sans franchise, les frais de gestion exploseraient.",
+      },
+      {
+        q: "Quel est l'impact mécanique d'une franchise élevée sur la prime (la cotisation) d'assurance ?",
+        options: [
+          "La prime sera plus élevée",
+          "La prime sera plus basse",
+          "Cela n'a aucun impact sur la prime",
+          "La prime devient aléatoire",
+        ],
+        correct: 1,
+        rationale: "La prime sera plus basse. Plus l'assuré prend de risque financier, moins l'assureur en prend, donc moins la cotisation est chère.",
+      },
+      {
+        q: "Qu'est-ce qu'un « plafond de garantie » ?",
+        options: [
+          "La limite de revenus pour souscrire au contrat",
+          "La somme minimale que l'assureur s'engage à payer",
+          "Le montant maximum de l'indemnisation que l'assureur versera en cas de sinistre",
+          "Le délai maximal pour déclarer un sinistre",
+        ],
+        correct: 2,
+        rationale: "Le montant maximum de l'indemnisation. Sinistre à 100 000 €, plafond à 80 000 € : 20 000 € restent à charge.",
+      },
+      {
+        q: "Qu'est-ce qu'une « franchise absolue » ?",
+        options: [
+          "Elle est déduite de l'indemnité dans tous les cas, quel que soit le montant du sinistre",
+          "Elle annule purement et simplement le contrat",
+          "Elle n'est appliquée que si l'assuré est à 100 % responsable",
+          "L'assureur ne rembourse que si le sinistre est inférieur à la franchise",
+        ],
+        correct: 0,
+        rationale: "Déduite dans tous les cas. Que le sinistre soit de 500 ou 5000 €, on déduit toujours le montant fixe.",
+      },
+      {
+        q: "À l'inverse, comment fonctionne une « franchise relative » (ou franchise simple) ?",
+        options: [
+          "L'assureur paie un pourcentage du sinistre",
+          "L'assureur ne paie rien si le sinistre est inférieur à la franchise. S'il est supérieur, l'assureur rembourse le sinistre dans son intégralité (sans rien déduire)",
+          "Elle est relative aux revenus de l'assuré",
+          "L'assuré décide lui-même de la payer ou non",
+        ],
+        correct: 1,
+        rationale: "Remboursement intégral si le sinistre dépasse la franchise. Franchise 300 € : sinistre 200 € = 0, sinistre 400 € = 400.",
+      },
+      {
+        q: "En assurance auto/habitation, comment s'exprime une franchise proportionnelle ?",
+        options: [
+          "En jours (ex : 3 jours de franchise)",
+          "En pourcentage du montant du sinistre (souvent encadré par un montant minimum et maximum)",
+          "En points de fidélité",
+          "En pourcentage de la prime d'assurance",
+        ],
+        correct: 1,
+        rationale: "En pourcentage du sinistre. Exemple : 10 % avec un minimum de 150 € et un maximum de 500 €.",
+      },
+      {
+        q: "Dans le cadre d'un arrêté de « Catastrophe Naturelle » (Cat Nat), qui fixe le montant de la franchise (ex : inondation d'une maison) ?",
+        options: [
+          "L'assureur librement",
+          "Le maire de la commune",
+          "L'État par voie réglementaire (la franchise est légale et identique pour tous)",
+          "L'expert en assurance après évaluation",
+        ],
+        correct: 2,
+        rationale: "L'État par voie réglementaire. Franchise Cat Nat fixée par la loi (380 € pour les habitations), non modifiable dans le contrat.",
+      },
+      {
+        q: "(Challenge) Un client a un dégât des eaux estimé à 5 000 €. Son contrat prévoit une franchise proportionnelle de 10 %, avec un minimum de 200 € et un plafond de franchise de 400 €. Quelle somme va-t-il recevoir de l'assureur ?",
+        options: [
+          "4 500 € (il paie 10 % soit 500 €)",
+          "4 800 € (la franchise bloque au minimum de 200 €)",
+          "4 600 € (la franchise est de 10 % soit 500 €, mais elle est plafonnée à 400 €)",
+          "5 000 € (l'assureur paie tout)",
+        ],
+        correct: 2,
+        rationale: "4 600 €. 10 % de 5000 = 500 €, plafonné à 400 €. L'assureur verse 5000 - 400 = 4600 €.",
+      },
+      {
+        q: "(Challenge) Un assuré est victime d'un accident de voiture dont il n'est absolument pas responsable (un tiers l'a percuté à un feu rouge). Le tiers est identifié. Que se passe-t-il pour la franchise auto de la victime ?",
+        options: [
+          "Elle paie la franchise normalement",
+          "Elle paie la moitié de la franchise",
+          "L'assureur ne lui applique aucune franchise car elle est à 0 % en tort (recours contre l'assurance du tiers)",
+          "Sa franchise est doublée",
+        ],
+        correct: 2,
+        rationale: "Aucune franchise appliquée. Elle ne s'applique que si l'assuré est responsable ou s'il n'y a pas de tiers identifié.",
+      },
+    ],
+  },
+  {
+    id: 'w2-d5', dayName: 'Samedi', theme: 'Immobilier', title: 'Fonctionnement du crédit',
+    questions: [
+      {
+        q: "Dans un crédit immobilier « amortissable » classique, de quoi est composée la mensualité (hors assurance) ?",
+        options: [
+          "Uniquement d'intérêts",
+          "Uniquement de capital",
+          "D'une part de capital remboursé et d'une part d'intérêts payés à la banque",
+          "De la taxe foncière et des frais de notaire",
+        ],
+        correct: 2,
+        rationale: "Capital + intérêts. Chaque mois, l'emprunteur paie des intérêts sur le capital restant dû et rembourse une petite partie du capital.",
+      },
+      {
+        q: "Comment évolue la proportion des intérêts dans la mensualité d'un prêt amortissable à taux fixe au fil des années ?",
+        options: [
+          "Elle augmente avec le temps",
+          "Elle est très forte au début du crédit, puis diminue progressivement",
+          "Elle reste exactement la même du premier au dernier mois",
+          "Les intérêts ne sont payés qu'à la dernière mensualité",
+        ],
+        correct: 1,
+        rationale: "Très forte au début, puis diminue. Les intérêts sont calculés sur le capital restant dû.",
+      },
+      {
+        q: "Qu'est-ce qu'un prêt « In Fine » ?",
+        options: [
+          "Un prêt où les mensualités baissent chaque année",
+          "Un prêt où l'emprunteur ne paie que les intérêts pendant la durée du crédit, et rembourse l'intégralité du capital en une seule fois à la fin",
+          "Un prêt sans aucun intérêt bancaire",
+          "Un prêt accordé uniquement aux retraités",
+        ],
+        correct: 1,
+        rationale: "On ne paie que les intérêts, puis le capital en une fois à la fin. Souvent utilisé par les investisseurs pour maximiser la déduction fiscale.",
+      },
+      {
+        q: "Quel indicateur réglementaire permet de comparer le coût global (intérêts + assurance + frais de dossier/garantie) de deux offres de prêt immobilier ?",
+        options: [
+          "Le taux nominal",
+          "Le TAEG (Taux Annuel Effectif Global)",
+          "Le taux d'usure",
+          "Le taux d'endettement",
+        ],
+        correct: 1,
+        rationale: "Le TAEG. Il intègre le taux d'intérêt + tous les frais obligatoires (assurance, garantie, dossier).",
+      },
+      {
+        q: "Qu'est-ce que le « taux d'usure » défini par la Banque de France ?",
+        options: [
+          "Le taux d'usure de l'appartement acheté",
+          "Le taux d'intérêt minimal autorisé",
+          "Le taux d'intérêt maximum légal (TAEG) au-delà duquel une banque a l'interdiction de prêter",
+          "Le pourcentage du salaire qu'on a le droit de dépenser",
+        ],
+        correct: 2,
+        rationale: "Le taux d'intérêt maximum légal. Plafond fixé par la Banque de France pour protéger les emprunteurs.",
+      },
+      {
+        q: "Selon les recommandations actuelles du HCSF (Haut Conseil de Stabilité Financière), à quel pourcentage le « taux d'endettement » maximum (mensualités / revenus nets) est-il généralement plafonné ?",
+        options: [
+          "15 %",
+          "35 % (assurance emprunteur incluse)",
+          "50 %",
+          "66 %",
+        ],
+        correct: 1,
+        rationale: "35 % assurance incluse. Les banques ne doivent pas dépasser ce seuil pour éviter le surendettement.",
+      },
+      {
+        q: "À quoi sert « l'apport personnel » exigé par les banques (souvent 10 % du prix du bien) ?",
+        options: [
+          "À payer la commission de l'agent immobilier uniquement",
+          "À couvrir a minima les « frais de notaire » (frais de mutation) et de garantie, car la banque finance rarement plus que la valeur réelle du bien (les murs)",
+          "À payer l'assurance emprunteur en avance",
+          "À rémunérer le banquier",
+        ],
+        correct: 1,
+        rationale: "À couvrir les frais de notaire et de garantie. En cas de saisie, la banque récupère la valeur du bien mais pas les taxes.",
+      },
+      {
+        q: "En France, la loi Scrivener impose un délai de réflexion obligatoire à l'emprunteur après réception de l'offre de prêt. De combien est-il ?",
+        options: [
+          "2 jours",
+          "10 jours incompressibles (acceptation possible à partir du 11ème jour)",
+          "30 jours",
+          "3 mois",
+        ],
+        correct: 1,
+        rationale: "10 jours incompressibles. Délai d'ordre public qui protège le consommateur contre la précipitation.",
+      },
+      {
+        q: "(Challenge) Un client souhaite faire un remboursement anticipé de son prêt immobilier. La banque lui demande des IRA (Indemnités de Remboursement Anticipé). Quel est le plafond légal de ces pénalités ?",
+        options: [
+          "6 mois d'intérêts sur le capital remboursé au taux moyen du prêt, dans la limite de 3 % du capital restant dû",
+          "10 % du capital restant dû",
+          "Les IRA sont totalement interdites par la loi en France",
+          "1 mois de salaire",
+        ],
+        correct: 0,
+        rationale: "6 mois d'intérêts, limité à 3 % du capital restant dû. Plafond légal pour protéger le consommateur.",
+      },
+      {
+        q: "(Challenge) Pourquoi un crédit sur 25 ans coûte-t-il au total beaucoup plus cher en intérêts qu'un crédit sur 15 ans pour le même montant emprunté ?",
+        options: [
+          "Parce que les banques appliquent des frais de dossier plus élevés",
+          "Parce que l'assurance est obligatoire sur 25 ans mais pas sur 15 ans",
+          "Parce qu'on rembourse le capital beaucoup plus lentement, donc les intérêts (calculés chaque mois sur le capital restant dû) courent sur une base élevée pendant plus longtemps, et le taux nominal est souvent supérieur",
+          "Parce que la loi sanctionne les prêts longs par une taxe d'État",
+        ],
+        correct: 2,
+        rationale: "On rembourse plus lentement, donc les intérêts courent plus longtemps sur une base élevée. Effet boule de neige du temps.",
+      },
+    ],
+  },
+  ],
+};
 
 export const MOCK_PLAYERS = [
   { id: 'p1',  name: 'Marie D.',   score: 98 },
