@@ -198,16 +198,22 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
       {/* Tabs */}
       <div className={styles.tabs} role="tablist">
         <button
+          type="button"
           role="tab"
+          id="auth-tab-login"
           aria-selected={tab === 'login'}
+          aria-controls="auth-panel"
           className={[styles.tab, tab === 'login' ? styles.tabActive : ''].join(' ')}
           onClick={() => switchTab('login')}
         >
           Connexion
         </button>
         <button
+          type="button"
           role="tab"
+          id="auth-tab-signup"
           aria-selected={tab === 'signup'}
+          aria-controls="auth-panel"
           className={[styles.tab, tab === 'signup' ? styles.tabActive : ''].join(' ')}
           onClick={() => switchTab('signup')}
         >
@@ -215,7 +221,14 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className={styles.form} noValidate>
+      <form
+        onSubmit={handleSubmit}
+        className={styles.form}
+        noValidate
+        id="auth-panel"
+        role="tabpanel"
+        aria-labelledby={tab === 'signup' ? 'auth-tab-signup' : 'auth-tab-login'}
+      >
         {/* Identité (inscription seulement) */}
         {tab === 'signup' && (
           <>
@@ -299,7 +312,10 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
                 </div>
               </div>
               <div className={styles.field}>
-                <label htmlFor="auth-phone" className={styles.label}>Téléphone</label>
+                <label htmlFor="auth-phone" className={styles.label}>
+                  Téléphone
+                  <span className={styles.labelHint}>(facultatif)</span>
+                </label>
                 <div className={styles.inputWrapper}>
                   <Phone size={16} className={styles.inputIcon} />
                   <input
@@ -309,7 +325,6 @@ export default function AuthForm({ defaultTab = 'login', onTabChange, onSuccess 
                     placeholder="06 12 34 56 78"
                     value={fields.phone}
                     onChange={updateField('phone')}
-                    required
                     autoComplete="tel"
                   />
                 </div>

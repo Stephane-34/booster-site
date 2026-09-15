@@ -29,15 +29,17 @@
 }
 
 /* Variantes */
+/* Le gradient part de --color-primary-on-white-text et non de --color-primary :
+   sur #a855f7 le texte blanc ne donne que 3.96:1, sous le seuil WCAG AA. */
 .primary {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  background: linear-gradient(135deg, var(--color-primary-on-white-text) 0%, var(--color-primary-dark) 100%);
   color: #fff;
   border: 1px solid transparent;
   box-shadow: 0 4px 20px var(--color-primary-glow);
 }
 
 .primary:not(:disabled):hover {
-  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+  background: linear-gradient(135deg, var(--color-primary-on-white-text-hover) 0%, var(--color-primary-on-white-text) 100%);
   box-shadow: 0 6px 28px rgba(168, 85, 247, 0.45);
   transform: translateY(-1px);
 }

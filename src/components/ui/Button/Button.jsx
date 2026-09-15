@@ -11,8 +11,21 @@ export default function Button({
   as: Tag = 'button',
   className = '',
   loading = false,
+  disabled = false,
   ...props
 }) {
+  const isDisabled = loading || disabled;
+
+  /* `disabled` n'existe pas sur <a> : posé sur un lien, l'attribut est ignoré par
+     le navigateur et le lien reste activable au clavier malgré son apparence
+     désactivée. On traduit donc l'état en ARIA et on neutralise la navigation
+     (le CSS coupe déjà les pointer-events, mais pas la touche Entrée). */
+  const stateProps = Tag === 'button'
+    ? { disabled: isDisabled }
+    : isDisabled
+      ? { 'aria-disabled': true, tabIndex: -1, onClick: (e) => e.preventDefault() }
+      : {};
+
   return (
     <Tag
       className={[
@@ -22,8 +35,8 @@ export default function Button({
         loading ? styles.loading : '',
         className,
       ].join(' ')}
-      disabled={loading || props.disabled}
       {...props}
+      {...stateProps}
     >
       {loading && <span className={styles.spinner} aria-hidden="true" />}
       <span className={styles.content}>{children}</span>

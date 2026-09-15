@@ -24,11 +24,12 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
   BookOpen, ChevronRight, ChevronLeft, CheckCircle, Lock, Unlock, Clock,
-  Trophy, TrendingUp, Calendar, Target, Gift, Library, PlayCircle, FileText,
+  Trophy, TrendingUp, Calendar, Gift, Library, PlayCircle, FileText,
   HelpCircle, Sparkles, Route, GraduationCap, LineChart,
   Check, X, CheckSquare, Layers, RotateCw, Shuffle,
 } from 'lucide-react';
 import Button from '../../components/ui/Button/Button';
+import Modal from '../../components/ui/Modal/Modal';
 import { useAcademyProgress } from '../../hooks/useAcademyProgress';
 import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES } from './data';
 import styles from './Academy.module.css';
@@ -515,24 +516,29 @@ function ProgressionSection({ currentWeek, completed, onOpenModule }) {
         ))}
       </div>
 
-      {/* Modal "Contenu à venir" pour les semaines 2-52 */}
-      {comingSoonWeek !== null && (
-        <div className={styles.comingSoonOverlay} onClick={() => setComingSoonWeek(null)}>
-          <div className={styles.comingSoonModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.comingSoonIcon}>
-              <Clock size={28} />
-            </div>
-            <h3 className={styles.comingSoonTitle}>Contenu de la semaine {comingSoonWeek} à venir</h3>
-            <p className={styles.comingSoonText}>
-              Le corpus de quiz pour cette semaine est en cours de rédaction.
-              Il sera disponible prochainement - reviens la semaine prochaine !
-            </p>
-            <Button variant="ghost" size="md" onClick={() => setComingSoonWeek(null)}>
-              Fermer
-            </Button>
+      {/* Modal "Contenu à venir" pour les semaines 2-52.
+          Passe par le composant Modal pour hériter du focus trap, de la
+          fermeture Escape et du role="dialog" (l'ancienne version était un
+          simple div, inatteignable au clavier). */}
+      <Modal
+        isOpen={comingSoonWeek !== null}
+        onClose={() => setComingSoonWeek(null)}
+        title={`Contenu de la semaine ${comingSoonWeek} à venir`}
+        size="sm"
+      >
+        <div className={styles.comingSoonBody}>
+          <div className={styles.comingSoonIcon}>
+            <Clock size={28} />
           </div>
+          <p className={styles.comingSoonText}>
+            Le corpus de quiz pour cette semaine est en cours de rédaction.
+            Il sera disponible prochainement - reviens la semaine prochaine !
+          </p>
+          <Button variant="ghost" size="md" onClick={() => setComingSoonWeek(null)}>
+            Fermer
+          </Button>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

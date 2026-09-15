@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { Star } from 'lucide-react';
 import Badge from '../../ui/Badge/Badge';
 import styles from './Testimonials.module.css';

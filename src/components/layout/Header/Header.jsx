@@ -59,7 +59,8 @@ export default function Header() {
         <div className={`container ${styles.inner}`}>
           {/* Logo */}
           <Link to="/" className={styles.logo} onClick={closeMenu}>
-            <img src="/logo-rocket.png" className={styles.logoImg} alt="Booster" />
+            {/* Décorative : le nom « Booster » est déjà porté par le texte adjacent. */}
+            <img src="/logo-rocket.png" className={styles.logoImg} alt="" width="120" height="120" />
             <span className={styles.logoText}>Booster</span>
           </Link>
 

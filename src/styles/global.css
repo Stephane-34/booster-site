@@ -9,6 +9,11 @@
   --color-border-active: rgba(168, 85, 247, 0.4);
 
   --color-primary: #a855f7;
+  /* Variante assombrie réservée aux fonds portant du texte blanc :
+     #a855f7 ne donne que 3.96:1 en blanc, #9333ea monte à 5.38:1 (AA). */
+  --color-primary-on-white-text: #9333ea;
+  /* Survol des boutons primaires : éclairci mais encore à 4.68:1 en blanc. */
+  --color-primary-on-white-text-hover: #a03ff2;
   --color-primary-light: #c084fc;
   --color-primary-dark: #7c3aed;
   --color-primary-glow: rgba(168, 85, 247, 0.25);
@@ -23,7 +28,8 @@
 
   --color-text: #f1f0f5;
   --color-text-secondary: #9d96b0;
-  --color-text-muted: #5c5474;
+  /* Contraste WCAG AA sur --color-bg : 4.89:1 (l'ancien #5c5474 plafonnait à 2.82:1). */
+  --color-text-muted: #8079a0;
 
   /* Typographie */
   --font-primary: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -183,4 +189,51 @@ input, textarea, select {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
+}
+
+/* ─── Lien d'évitement ──────────────────────────────────────────────────────
+   Premier élément focusable de la page : permet aux utilisateurs au clavier
+   et aux lecteurs d'écran de sauter le header et d'atteindre directement le
+   contenu. Hors écran tant qu'il n'a pas le focus. */
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 1000;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  box-shadow: var(--shadow-lg);
+  /* Sorti du flux visuel sans être retiré de l'ordre de tabulation
+     (contrairement à display:none ou visibility:hidden). */
+  transform: translateY(calc(-100% - var(--space-4)));
+  transition: transform var(--transition-fast);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* ─── Mouvement réduit ──────────────────────────────────────────────────────
+   WCAG 2.3.3. Respecte le réglage système de l'utilisateur : on neutralise
+   animations, transitions et défilement fluide plutôt que de les raccourcir,
+   car ce sont les mouvements de parallaxe/translation qui posent problème
+   (troubles vestibulaires). La durée non nulle (0.01ms) laisse les
+   callbacks `animationend`/`transitionend` se déclencher normalement. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

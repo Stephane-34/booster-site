@@ -26,7 +26,8 @@ export default function Footer() {
         {/* Colonne marque */}
         <div className={styles.brand}>
           <Link to="/" className={styles.logo}>
-            <img src="/logo-rocket.png" className={styles.logoImg} alt="Booster" />
+            {/* Décorative : le nom « Booster » est déjà porté par le texte adjacent. */}
+            <img src="/logo-rocket.png" className={styles.logoImg} alt="" width="120" height="120" />
             <span>Booster</span>
           </Link>
           <p className={styles.tagline}>

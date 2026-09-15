@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import {
   CheckCircle, TrendingUp, Info, ArrowRight, Landmark, BarChart2, Percent, Shield, Rocket,
-  Calendar, Lock, RotateCw, Wallet, Banknote, Sparkles, Clock, Hourglass, PiggyBank, Cookie,
+  Calendar, Lock, RotateCw, Wallet, Banknote, Sparkles, Hourglass, PiggyBank, Cookie,
 } from 'lucide-react';
 import { getCookieConsent } from '../../components/layout/CookieBanner/CookieBanner';
 import clsx from 'clsx';
