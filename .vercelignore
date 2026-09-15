@@ -1,0 +1,51 @@
+# Fichiers exclus de l'upload vers Vercel.
+#
+# ATTENTION : dès que ce fichier existe, le CLI Vercel l'utilise À LA PLACE du
+# .gitignore. Toute exclusion du .gitignore qui compte doit donc être reprise
+# ici, sous peine de se retrouver uploadée. Garder les deux fichiers synchronisés.
+
+# ─── Critique : secrets et surcharges d'environnement ───────────────────────
+# Vite lit .env.local EN PRIORITÉ sur les variables d'environnement de la
+# plateforme : uploadé, il écraserait silencieusement la config Vercel au build.
+.env
+.env.local
+.env.*.local
+*.local
+
+# ─── Inutile au build ───────────────────────────────────────────────────────
+node_modules
+dist
+dist-ssr
+
+# Le projet utilise npm. Un pnpm-lock.yaml qui traînerait ferait détecter pnpm
+# au build (cf. la même règle dans .gitignore).
+pnpm-lock.yaml
+
+# Source haute résolution du logo, conservée pour régénérer d'autres tailles :
+# ~1 Mo qui n'a rien à faire dans chaque déploiement.
+assets-source/
+
+# Migrations appliquées via le CLI Supabase, jamais par le build.
+supabase/
+
+# Documentation interne, aucun .md n'est importé par le code.
+*.md
+
+# ─── Briefs et sources internes ─────────────────────────────────────────────
+cdc.pages
+cdc_extracted/
+contexte/
+
+# ─── Environnement de travail ───────────────────────────────────────────────
+.claude/
+.vercel
+logs
+*.log
+.vscode/*
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
