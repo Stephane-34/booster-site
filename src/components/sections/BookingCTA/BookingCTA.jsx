@@ -2,6 +2,7 @@ import { Calendar, Clock, User, CheckCircle, Lock } from 'lucide-react';
 import Badge from '../../ui/Badge/Badge';
 import Button from '../../ui/Button/Button';
 import { useAuth } from '../../../contexts/AuthContext';
+import { HUBSPOT_CALENDAR_EMBED_URL } from '../../../config/booking';
 import styles from './BookingCTA.module.css';
 
 const PERKS = [
@@ -9,9 +10,6 @@ const PERKS = [
   { icon: User, text: 'Conseiller dédié, pas de script' },
   { icon: CheckCircle, text: '100 % gratuit, zéro pression commerciale' },
 ];
-
-/* Remplace HUBSPOT_CALENDAR_URL par ton vrai lien HubSpot */
-const HUBSPOT_CALENDAR_URL = 'https://meetings.hubspot.com/booster';
 
 /* Déclenche l'ouverture du modal de connexion via l'event global écouté par Header. */
 const openAuthModal = (tab = 'signup') =>
@@ -57,7 +55,7 @@ export default function BookingCTA() {
           <div className={styles.calendarWrapper}>
             {isAuthenticated ? (
               <iframe
-                src={HUBSPOT_CALENDAR_URL}
+                src={HUBSPOT_CALENDAR_EMBED_URL}
                 title="Prendre rendez-vous avec un conseiller Booster"
                 className={styles.iframe}
                 loading="lazy"

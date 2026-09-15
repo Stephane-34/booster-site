@@ -12,6 +12,7 @@ import Button from '../../components/ui/Button/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { computeFutureValue, computeRequiredMonthly, computeMonthsToGoal } from '../../utils/calculators';
 import { formatCurrency } from '../../utils/formatters';
+import { HUBSPOT_CALENDAR_URL, HUBSPOT_CALENDAR_EMBED_URL } from '../../config/booking';
 import styles from './Investir.module.css';
 
 /* Taux utilisés uniquement à des fins d'illustration dans les simulateurs.
@@ -20,9 +21,7 @@ import styles from './Investir.module.css';
 const RATE_BOOSTER  = 0.05;
 const RATE_LIVRET_A = 0.015;
 
-/* Lien de prise de RDV - dupliqué depuis BookingCTA pour rester indépendant.
-   À centraliser dans une config si un troisième endroit apparaît. */
-const HUBSPOT_CALENDAR_URL = 'https://meetings.hubspot.com/booster';
+/* Lien de prise de RDV - source unique dans src/config/booking.js */
 
 /* ─── Page principale ─────────────────────────────────────── */
 export default function Investir() {
@@ -1046,7 +1045,7 @@ function InlineBookingCTA() {
   } else {
     slot = (
       <iframe
-        src={HUBSPOT_CALENDAR_URL}
+        src={HUBSPOT_CALENDAR_EMBED_URL}
         title="Prendre rendez-vous avec un conseiller Booster"
         className={styles.bookingIframe}
         loading="lazy"
