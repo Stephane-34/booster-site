@@ -178,15 +178,29 @@ export async function getSession() {
 
 /* ─── Académie ──────────────────────────────────────────── */
 
+/* Colonnes listées explicitement : `correct` n'est plus lisible par le client
+   (migration 20260915000002). La vérification d'une réponse passe désormais par
+   la RPC `check_quiz_answer`. */
 export async function getQuizQuestions(theme) {
   const { data, error } = await supabase
     .from('quiz_questions')
-    .select('*')
+    .select('id, theme, question, options, explanation, difficulty, created_at')
     .eq('theme', theme)
     .order('created_at', { ascending: true });
 
   if (error) throw error;
   return data;
+}
+
+/* Valide une réponse côté serveur : la bonne option n'est jamais transmise au
+   navigateur. */
+export async function checkQuizAnswer(questionId, answer) {
+  const { data, error } = await supabase.rpc('check_quiz_answer', {
+    p_question_id: questionId,
+    p_answer: answer,
+  });
+  if (error) throw error;
+  return data === true;
 }
 
 export async function saveQuizAnswer(userId, questionId, isCorrect) {
