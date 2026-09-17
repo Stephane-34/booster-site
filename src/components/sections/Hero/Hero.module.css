@@ -99,6 +99,10 @@
   word-break: normal;
   -webkit-hyphens: none;
   hyphens: none;
+  /* Équilibre la longueur des lignes au lieu de remplir chaque ligne au
+     maximum : évite la dernière ligne orpheline d'un seul mot. Ignoré
+     silencieusement par les navigateurs qui ne le connaissent pas. */
+  text-wrap: balance;
 }
 
 .subtitle {

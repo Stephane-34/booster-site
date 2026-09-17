@@ -11,7 +11,7 @@ const PHONE_STATS = [
 ];
 
 /* Points de réassurance en bas du hero. On y ressort les arguments clés
-   qu'on a sortis du titre h1 pour l'alléger visuellement : dès 50 €/mois,
+   qu'on a sortis du titre h1 pour l'alléger visuellement : dès 50 €/mois,
    0 frais de versement, académie gratuite, expert accompagnant. */
 const REASSURANCE = [
   { icon: TrendingUp,    text: 'Dès 50 € / mois' },
@@ -60,12 +60,12 @@ export default function Hero({ onCTAClick, firstName }) {
               où un <br /> maintenait des lignes trop longues qui débordaient). */}
           <h1 className={styles.title}>
             Avec <span className="gradient-text">Booster</span>, fais travailler ton argent
-            {' '}avec une <span className="gradient-text">épargne programmée dès 50 €</span>
+            {' '}avec une <span className="gradient-text">épargne programmée dès 50 €</span>
             {' '}et forme-toi avec l'<span className="gradient-text">Académie</span>
           </h1>
 
           <p className={styles.subtitle}>
-            Fais fructifier ton argent à ton rythme : épargne programmée dès 50 € par mois
+            Fais fructifier ton argent à ton rythme : épargne programmée dès 50 € par mois
             sur ton assurance vie selon tes projets, zéro frais de versement, et un contrat
             ouvert en ligne accompagné par un expert financier.
           </p>
