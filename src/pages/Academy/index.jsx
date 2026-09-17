@@ -713,7 +713,7 @@ function DashboardSection({
       <div className={styles.dashWrap}>
         <div className={styles.notStarted}>
           <div className={styles.notStartedIcon}><Calendar size={28} /></div>
-          <p className={styles.notStartedEyebrow}>Ton parcours est réservé</p>
+          <p className={styles.notStartedEyebrow}>Ton parcours démarre</p>
           <h2 className={styles.notStartedTitle}>
             Rendez-vous {academy.startDate ? formatStartDate(academy.startDate) : 'lundi prochain'}
           </h2>
