@@ -90,10 +90,15 @@
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--color-text);
-  /* Coupe proprement les mots qui débordent (surtout Safari mobile) */
+  /* Coupe proprement les mots qui débordent (surtout Safari mobile).
+     overflow-wrap suffit à empêcher le débordement ; la césure avec tirets
+     (hyphens) est réservée au mobile, où la largeur disponible l'impose.
+     Sur grand écran le titre a la place de passer à la ligne sans être
+     coupé au milieu d'un mot. */
   overflow-wrap: break-word;
   word-break: normal;
-  hyphens: auto;
+  -webkit-hyphens: none;
+  hyphens: none;
 }
 
 .subtitle {
@@ -341,6 +346,14 @@
 
 /* Responsive */
 @media (max-width: 900px) {
+  /* Sous 900px la largeur devient contrainte : on réactive la césure pour
+     éviter qu'un mot long ne déborde (le préfixe -webkit- reste nécessaire
+     pour Safari). */
+  .title {
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+
   .inner {
     grid-template-columns: 1fr;
     text-align: center;
