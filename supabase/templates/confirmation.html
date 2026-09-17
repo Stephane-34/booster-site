@@ -1,0 +1,119 @@
+<!-- Template Supabase : « Confirm signup ».
+     À coller dans Dashboard > Authentication > Emails > Confirm signup.
+
+     Variables disponibles (moteur text/template de Go) :
+       {{ .ConfirmationURL }}  lien de validation complet
+       {{ .Token }}            code à 6 chiffres (non utilisé ici)
+       {{ .Email }}            adresse du destinataire
+       {{ .SiteURL }}          URL du site
+       {{ .Data.<clé> }}       user_metadata envoyé au signup (first_name, last_name…)
+
+     Contraintes email respectées : styles en inline, mise en page en tableaux
+     (Outlook ne gère ni flex ni grid), largeur fixe 600px, aucune ressource
+     externe hormis le logo. -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="margin:0;padding:0;background-color:#0f0518;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
+             style="width:100%;max-width:600px;background-color:#160a24;border-radius:16px;
+                    border:1px solid rgba(255,255,255,0.08);">
+
+        <!-- En-tête -->
+        <tr>
+          <td align="center" style="padding:36px 32px 8px 32px;">
+            <img src="https://edouard-app.vercel.app/logo-rocket.png"
+                 width="48" height="48" alt=""
+                 style="display:block;border:0;border-radius:10px;" />
+            <div style="margin-top:12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                        font-size:24px;font-weight:800;color:#f1f0f5;letter-spacing:-0.02em;">
+              Booster
+            </div>
+          </td>
+        </tr>
+
+        <!-- Titre -->
+        <tr>
+          <td align="center" style="padding:20px 32px 0 32px;">
+            <h1 style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                       font-size:26px;line-height:1.3;font-weight:800;color:#f1f0f5;letter-spacing:-0.02em;">
+              Bienvenue{{ if .Data.first_name }} {{ .Data.first_name }}{{ end }}&nbsp;👋
+            </h1>
+          </td>
+        </tr>
+
+        <!-- Corps -->
+        <tr>
+          <td align="center" style="padding:16px 40px 0 40px;">
+            <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                      font-size:16px;line-height:1.6;color:#9d96b0;">
+              Ton compte Booster est presque prêt. Il ne reste qu'à confirmer ton
+              adresse email pour accéder à ton espace et démarrer l'Académie.
+            </p>
+          </td>
+        </tr>
+
+        <!-- Bouton : table + bgcolor plutôt qu'un <a> stylé, seule méthode
+             fiable sur Outlook. Le violet #9333ea donne 5.38:1 avec du blanc
+             (l'ancien #a855f7 tombait à 3.96:1, sous le seuil WCAG AA). -->
+        <tr>
+          <td align="center" style="padding:32px 40px 0 40px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" bgcolor="#9333ea" style="border-radius:9999px;">
+                  <a href="{{ .ConfirmationURL }}"
+                     style="display:inline-block;padding:16px 36px;
+                            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                            font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;
+                            border-radius:9999px;">
+                    Confirmer mon adresse email
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Lien de secours : indispensable, beaucoup de clients mail
+             n'ouvrent pas les boutons correctement. -->
+        <tr>
+          <td align="center" style="padding:28px 40px 0 40px;">
+            <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                      font-size:13px;line-height:1.6;color:#8079a0;">
+              Le bouton ne fonctionne pas ? Copie ce lien dans ton navigateur :
+            </p>
+            <p style="margin:8px 0 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                      font-size:12px;line-height:1.5;color:#c084fc;word-break:break-all;">
+              {{ .ConfirmationURL }}
+            </p>
+          </td>
+        </tr>
+
+        <!-- Séparateur -->
+        <tr>
+          <td style="padding:32px 40px 0 40px;">
+            <div style="height:1px;background-color:rgba(255,255,255,0.08);line-height:1px;font-size:0;">&nbsp;</div>
+          </td>
+        </tr>
+
+        <!-- Pied -->
+        <tr>
+          <td align="center" style="padding:24px 40px 36px 40px;">
+            <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                      font-size:13px;line-height:1.6;color:#8079a0;">
+              Tu n'es pas à l'origine de cette inscription ? Ignore simplement cet
+              email, aucun compte ne sera activé.
+            </p>
+            <p style="margin:16px 0 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                      font-size:12px;line-height:1.6;color:#5c5474;">
+              Booster — apprendre et investir, dès 50&nbsp;€ par mois.
+            </p>
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
