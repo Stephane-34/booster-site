@@ -8,18 +8,22 @@
    Le state `completed` est remonté au parent pour être partagé entre onglets.
 
    ─── ALGORITHME DE DÉBLOCAGE ─────────────────────────────────
-   Règle produit : chaque utilisateur suit les 52 semaines à SON rythme, à partir
-   de sa date d'inscription. Personne ne rate le début : quelqu'un qui s'inscrit
-   le 30 avril démarre au Jour 1 comme celui qui s'est inscrit le 10 janvier.
+   Règle produit : le parcours est calé sur les JOURS RÉELS de la semaine.
+   Lundi = module 1, mardi = module 2, … samedi = module 6 ; le dimanche est un
+   jour de repos. Une inscription en cours de semaine ne démarre donc pas sur
+   le champ : le parcours commence au lundi suivant, pour que « mardi »
+   corresponde toujours au 2e module de la semaine.
    Concrètement :
-     - Le déblocage se fait en `daysPassed = (aujourd'hui − date_inscription)`,
-       pas sur la date calendaire globale.
+     - `profiles.academy_start_date` contient ce lundi de démarrage (posé par
+       le trigger handle_new_user, cf. migration 20260917000001).
+     - Tant que ce lundi n'est pas atteint, l'Académie affiche un écran
+       d'attente annonçant la date de démarrage.
      - Un nouveau quizz devient disponible chaque jour à 00h, indépendamment
        du fait que l'utilisateur ait terminé (ou raté) celui de la veille.
      - Les modules manqués restent accessibles ; on ne "perd" jamais un module,
        on prend juste du retard sur son propre calendrier.
-   En prod, `userStart` viendra du profil (created_at Supabase). Ici on utilise
-   Date.now() au premier rendu + un bouton "+24h" pour tester la mécanique. */
+   Toute l'arithmétique vit dans utils/academyCalendar.js (jours civils, pour
+   ne pas dériver aux changements d'heure). */
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
@@ -32,6 +36,7 @@ import Button from '../../components/ui/Button/Button';
 import Modal from '../../components/ui/Modal/Modal';
 import { useAcademyProgress } from '../../hooks/useAcademyProgress';
 import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES } from './data';
+import { academyState, isModuleUnlocked, formatStartDate } from '../../utils/academyCalendar';
 import styles from './Academy.module.css';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -69,19 +74,18 @@ export default function Academy() {
   const [simulated, setSimulated] = useState(() => Date.now());
 
   /* Aligne `simulated` sur `userStart` dès qu'on connaît la vraie date
-     d'inscription (auth.users.created_at). Sinon, un premier daysPassed
-     énorme apparaîtrait puisque `simulated` = maintenant et
-     userStart = fallback initial. */
+     de démarrage. Sinon le calendrier partirait du fallback initial et
+     afficherait une semaine aberrante le temps du chargement du profil. */
   useEffect(() => {
     setSimulated((s) => Math.max(s, Date.now()));
   }, [userStart]);
 
-  const daysPassed = Math.floor((simulated - userStart) / DAY_MS);
   const simulateDay = () => setSimulated((s) => s + DAY_MS);
 
-  /* Semaine de formation atteinte : 6 modules/semaine, plafonné à 52.
-     Utilisée par le déblocage des phases du Programme. */
-  const currentWeek = Math.min(52, Math.max(1, Math.floor(daysPassed / 6) + 1));
+  /* État du calendrier : semaine en cours, jour dans la semaine, dernier
+     module débloqué, et si le parcours a seulement commencé. */
+  const academy = academyState(userStart, new Date(simulated));
+  const currentWeek = academy.week;
 
   const sections = [
     { id: 'week',        label: 'Ma semaine en cours',   icon: Trophy },
@@ -125,7 +129,7 @@ export default function Academy() {
             <DashboardSection
               simulated={simulated}
               completed={completed}
-              daysPassed={daysPassed}
+              academy={academy}
               simulateDay={simulateDay}
               saveResult={saveResult}
               loading={progressLoading}
@@ -548,7 +552,7 @@ function ProgressionSection({ currentWeek, completed, onOpenModule }) {
    partagés avec ProgressionSection pour permettre d'ouvrir un module
    depuis "Ma progression" (on bascule ici et on affiche direct la vue module). */
 function DashboardSection({
-  simulated, completed, daysPassed, simulateDay, saveResult, loading,
+  simulated, completed, academy, simulateDay, saveResult, loading,
   activeModuleId, setActiveModule, moduleTab, setModuleTab,
 }) {
   const [view, setView] = useState('dashboard'); // dashboard | leaderboard
@@ -568,14 +572,17 @@ function DashboardSection({
     return max === 0 ? 0 : Math.round((sum / max) * 100);
   }, [completed, simulated]);
 
-  /* Statut d'un module de la semaine - la seule chose qui compte pour
-     débloquer, c'est le nombre de jours écoulés depuis l'inscription. On ne
-     regarde JAMAIS si le module de la veille a été complété : cf. règle
-     produit "un nouveau quizz débloqué chaque jour à 00h, quoi qu'il arrive".
+  /* Statut d'un module de la semaine affichée. Le déblocage dépend du jour
+     réel de la semaine (lundi = module 1, …), jamais de la complétion du
+     module précédent : cf. règle produit "un nouveau quizz débloqué chaque
+     jour à 00h, quoi qu'il arrive".
+     L'ancienne version comparait `i <= daysPassed`, ce qui ouvrait d'un coup
+     toute la semaine dès que daysPassed dépassait 5 - le déblocage quotidien
+     ne fonctionnait donc qu'en semaine 1.
      Bypass complet en mode test (voir TEST_MODE_UNLOCK_ALL). */
   const dayStatus = (i, id) => {
     if (completed[id]) return 'completed';
-    if (TEST_MODE_UNLOCK_ALL || i <= daysPassed) return 'unlocked';
+    if (TEST_MODE_UNLOCK_ALL || isModuleUnlocked(academy.week, i, academy)) return 'unlocked';
     return 'locked';
   };
 
@@ -698,9 +705,40 @@ function DashboardSection({
     );
   }
 
-  /* Semaine du programme atteinte : 6 modules par semaine (Lun→Sam).
-     Plafonné à 52 pour éviter "Semaine 314" sur un compte très ancien. */
-  const currentWeek = Math.min(52, Math.max(1, Math.floor(daysPassed / 6) + 1));
+  /* Inscription en cours de semaine : le parcours ne commence qu'au lundi
+     suivant, on annonce la date plutôt que d'afficher une semaine vide. Les
+     autres onglets (Programme, Aide) restent accessibles pour patienter. */
+  if (!academy.started) {
+    return (
+      <div className={styles.dashWrap}>
+        <div className={styles.notStarted}>
+          <div className={styles.notStartedIcon}><Calendar size={28} /></div>
+          <p className={styles.notStartedEyebrow}>Ton parcours est réservé</p>
+          <h2 className={styles.notStartedTitle}>
+            Rendez-vous {academy.startDate ? formatStartDate(academy.startDate) : 'lundi prochain'}
+          </h2>
+          <p className={styles.notStartedText}>
+            L'Académie suit les jours de la semaine : un module chaque matin du lundi
+            au samedi. Comme tu t'inscris en cours de semaine, ton parcours démarre au
+            prochain lundi pour que tu commences par le premier module.
+          </p>
+          {academy.daysUntilStart > 0 && (
+            <p className={styles.notStartedCount}>
+              <strong>{academy.daysUntilStart}</strong>
+              {academy.daysUntilStart > 1 ? ' jours à patienter' : ' jour à patienter'}
+            </p>
+          )}
+          <p className={styles.notStartedHint}>
+            En attendant, va jeter un œil au <strong>Programme 52 semaines</strong> pour
+            découvrir ce qui t'attend.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  /* Semaine du programme atteinte, calculée une seule fois par le parent. */
+  const currentWeek = academy.week;
 
   return (
     <div className={styles.dashWrap}>
@@ -708,12 +746,13 @@ function DashboardSection({
         <div className={styles.dashHero}>
           <p className={styles.dashHeroEyebrow}>Ton parcours personnel</p>
           <h2 className={styles.dashHeroTitle}>
-            Jour <span className={styles.dashHeroBig}>{daysPassed + 1}</span> de ta formation
+            Jour <span className={styles.dashHeroBig}>{academy.moduleNumber}</span> de ta formation
           </h2>
           <p className={styles.dashHeroSub}>
-            Tu es en <strong>Semaine {currentWeek}</strong> - quel que soit ton jour d'inscription,
-            tu démarres au début et tu avances à ton rythme. Un nouveau module se débloque
-            chaque jour à minuit, même si tu n'as pas fini celui de la veille.
+            Tu es en <strong>Semaine {currentWeek}</strong> - le parcours suit les jours de la
+            semaine : un nouveau module chaque matin du lundi au samedi, le dimanche au repos.
+            Rien ne se perd si tu sautes un jour, tu peux revenir sur les modules précédents
+            quand tu veux.
           </p>
         </div>
         <div className={styles.dashStat}>
