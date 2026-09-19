@@ -248,6 +248,22 @@ otp_expiry = 3600
 subject = "Plus qu'un clic pour activer ton compte Booster 🚀"
 content_path = "./supabase/templates/confirmation.html"
 
+# Mot de passe oublié — déclenché par resetPassword() (services/supabase.js).
+[auth.email.template.recovery]
+subject = "Réinitialise ton mot de passe Booster"
+content_path = "./supabase/templates/recovery.html"
+
+# Changement d'adresse — déclenché par updateEmail() depuis la page Profil.
+# double_confirm_changes = true : l'ancienne ET la nouvelle adresse reçoivent
+# ce mail, chacune devant confirmer.
+[auth.email.template.email_change]
+subject = "Confirme ta nouvelle adresse email Booster"
+content_path = "./supabase/templates/email_change.html"
+
+# Les templates magic_link, invite et reauthentication restent aux valeurs par
+# défaut de Supabase : aucun flux de l'application ne les déclenche
+# (pas de signInWithOtp, pas d'invitation, secure_password_change = false).
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"
