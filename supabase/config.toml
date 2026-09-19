@@ -154,6 +154,7 @@ enabled = true
 site_url = "https://edouard-app.vercel.app"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
+  "https://edouard-app.vercel.app",
   "https://edouard-app.vercel.app/reset-password",
   "https://edouard-app.vercel.app/email-confirmed",
   "http://localhost:5173/reset-password",
@@ -218,9 +219,11 @@ enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
-max_frequency = "1s"
+# Aligné sur le projet distant : un email par minute maximum.
+max_frequency = "1m0s"
 # Number of characters used in the email OTP.
-otp_length = 6
+# Aligné sur le projet distant (8 et non 6).
+otp_length = 8
 # Number of seconds before the email OTP expires (defaults to 1 hour).
 otp_expiry = 3600
 
@@ -235,6 +238,10 @@ otp_expiry = 3600
 # sender_name = "Admin"
 
 # Template de confirmation d'inscription aux couleurs Booster.
+# Le fichier ne contient volontairement aucun commentaire HTML : son contenu
+# est envoyé tel quel dans chaque email.
+# Variables disponibles (moteur text/template de Go) : {{ .ConfirmationURL }},
+# {{ .Token }}, {{ .Email }}, {{ .SiteURL }}, {{ .Data.<clé> }} (user_metadata).
 # Poussé vers le projet distant par `supabase config push` (et NON par
 # `supabase db push`, qui ne touche qu'aux migrations).
 [auth.email.template.confirmation]
@@ -298,8 +305,9 @@ max_enrolled_factors = 10
 
 # Control MFA via App Authenticator (TOTP)
 [auth.mfa.totp]
-enroll_enabled = false
-verify_enabled = false
+# MFA TOTP actif sur le projet distant : le défaut false l'aurait désactivé.
+enroll_enabled = true
+verify_enabled = true
 
 # Configure MFA via Phone Messaging
 [auth.mfa.phone]
