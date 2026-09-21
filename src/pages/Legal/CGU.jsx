@@ -15,7 +15,7 @@ export default function CGU() {
           <p>
             Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et
             l'utilisation de la plateforme Booster, accessible à l'adresse{' '}
-            <a href="https://booster.lu">booster.lu</a>, exploitée par Booster S.A.,
+            <a href="https://boosterfintech.com">boosterfintech.com</a>, exploitée par Booster S.A.,
             société anonyme de droit luxembourgeois (RCS Luxembourg B 123456).
           </p>
           <p>
@@ -154,7 +154,7 @@ export default function CGU() {
           <h2>8. Résiliation</h2>
           <p>
             Vous pouvez résilier votre compte à tout moment depuis les paramètres de votre
-            espace personnel ou en contactant <a href="mailto:contact@booster.lu">contact@booster.lu</a>.
+            espace personnel ou en contactant <a href="mailto:contact@boosterfintech.com">contact@boosterfintech.com</a>.
           </p>
           <p>
             Booster S.A. se réserve le droit de suspendre ou supprimer tout compte en cas
@@ -179,7 +179,7 @@ export default function CGU() {
           <h2>Contact</h2>
           <p>
             Pour toute question relative aux présentes CGU :{' '}
-            <a href="mailto:legal@booster.lu">legal@booster.lu</a>
+            <a href="mailto:legal@boosterfintech.com">legal@boosterfintech.com</a>
           </p>
         </article>
       </div>

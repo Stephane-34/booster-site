@@ -15,7 +15,7 @@ const LINKS = {
   ],
   contact: [
     { label: 'Prendre RDV', to: '/investir#rdv' },
-    { label: 'contact@booster.lu', to: 'mailto:contact@booster.lu' },
+    { label: 'contact@boosterfintech.com', to: 'mailto:contact@boosterfintech.com' },
   ],
 };
 

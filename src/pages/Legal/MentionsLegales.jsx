@@ -23,7 +23,7 @@ export default function MentionsLegales() {
           <p>
             <strong>Directeur de la publication :</strong> Édouard Martin<br />
             <strong>Contact :</strong>{' '}
-            <a href="mailto:contact@booster.lu">contact@booster.lu</a>
+            <a href="mailto:contact@boosterfintech.com">contact@boosterfintech.com</a>
           </p>
 
           <h2>Hébergement</h2>

@@ -151,12 +151,22 @@ max_indexes = 5
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "https://edouard-app.vercel.app"
+site_url = "https://www.boosterfintech.com"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
+  # Domaine principal (avec et sans www : Vercel redirige la racine vers www,
+  # mais un lien construit sur la racine doit rester accepté).
+  "https://www.boosterfintech.com",
+  "https://www.boosterfintech.com/reset-password",
+  "https://www.boosterfintech.com/email-confirmed",
+  "https://boosterfintech.com",
+  "https://boosterfintech.com/reset-password",
+  "https://boosterfintech.com/email-confirmed",
+  # Ancienne URL Vercel, conservée le temps que plus rien ne la référence.
   "https://edouard-app.vercel.app",
   "https://edouard-app.vercel.app/reset-password",
   "https://edouard-app.vercel.app/email-confirmed",
+  # Développement local.
   "http://localhost:5173/reset-password",
   "http://localhost:5173/email-confirmed",
 ]
