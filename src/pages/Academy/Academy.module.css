@@ -2740,7 +2740,11 @@
               color var(--transition-fast);
 }
 
-.moduleSwitchBtn:hover {
+/* :not(.moduleSwitchBtnActive) est indispensable : `.moduleSwitchBtn:hover`
+   est plus spécifique que `.moduleSwitchBtnActive` (0-2-0 contre 0-1-0), et
+   son `background` écrasait le dégradé du bouton sélectionné — donc en
+   permanence, puisque la souris reste sur le bouton qu'on vient de cliquer. */
+.moduleSwitchBtn:not(.moduleSwitchBtnActive):hover {
   background: var(--color-surface-hover);
   color: var(--color-text);
 }

@@ -1708,3 +1708,103 @@ export const WEEK_GUIDES = {
       "propres documents.",
   },
 };
+
+/* ─── Fiches mémo par module ────────────────────────────────────────────────
+   Indexé par `module_id` (les mêmes ids que WEEKS). Cinq fiches par module :
+   les notions qu'il faut encore savoir dans six mois, pas la totalité des dix
+   questions — plusieurs d'entre elles éclairent la même notion, et les
+   « Challenge » sont des exercices de calcul, pas des concepts à mémoriser.
+
+   Le contenu reformule les `rationale` du quiz sans rien y ajouter : ce sont
+   les mêmes faits, ramassés en recto/verso. Distinction avec WEEK_GUIDES : la
+   fiche est MICRO (une notion), le guide est MACRO (le lien entre les six
+   sujets de la semaine). */
+export const MODULE_FLASHCARDS = {
+  /* ── Semaine 1 ── */
+  'day-0': [
+    { id: 'd0f1', front: 'Épargne de précaution',   back: "Une réserve immédiatement disponible pour les coups durs. C'est le premier matelas de sécurité, à constituer avant tout autre placement." },
+    { id: 'd0f2', front: 'Combien mettre de côté',  back: "3 à 6 mois de dépenses courantes. De quoi absorber la majorité des urgences sans recourir au crédit à la consommation." },
+    { id: 'd0f3', front: 'Où la placer',            back: "Sur un support garanti et liquide (Livret A, LEP). L'urgence n'attend pas : l'argent doit être retirable le jour même, sans risque de perte." },
+    { id: 'd0f4', front: 'Se payer en premier',     back: "Mettre de côté dès la réception du salaire, avant les factures. Épargner « ce qu'il reste » en fin de mois est souvent voué à l'échec." },
+    { id: 'd0f5', front: 'Argent dormant',          back: "Sur un compte courant non rémunéré, l'épargne perd de sa valeur réelle : le coût de la vie augmente chaque année, le rendement reste nul." },
+  ],
+  'day-1': [
+    { id: 'd1f1', front: 'Prélèvement à la source', back: "L'impôt est prélevé au moment où le revenu est perçu, pour s'adapter en temps réel à la situation." },
+    { id: 'd1f2', front: 'Qui prélève',             back: "L'employeur, ou le tiers verseur (France Travail, caisses de retraite). Pour les revenus sans collecteur, l'administration prélève des acomptes." },
+    { id: 'd1f3', front: 'Les trois taux',          back: "Personnalisé : calculé sur les revenus du foyer. Individualisé : propre à chaque conjoint, en gardant le quotient conjugal. Neutre : appliqué par défaut, sans la situation familiale." },
+    { id: 'd1f4', front: 'La déclaration reste due', back: "Le prélèvement à la source ne la supprime pas : elle régularise la situation, calcule réductions et crédits d'impôt, et ajuste le taux." },
+    { id: 'd1f5', front: 'Changement de situation', back: "Mariage, naissance, variation de revenus : à signaler sur impots.gouv.fr pour actualiser son taux sans attendre." },
+  ],
+  'day-2': [
+    { id: 'd2f1', front: 'Répartition',             back: "Les cotisations des actifs d'aujourd'hui financent immédiatement les pensions des retraités actuels. Un contrat de solidarité intergénérationnelle." },
+    { id: 'd2f2', front: 'Ratio démographique',     back: "Le rapport entre le nombre de retraités et le nombre d'actifs cotisants. Le vieillissement pèse directement sur l'équilibre du système." },
+    { id: 'd2f3', front: 'Salaire annuel moyen',    back: "La moyenne des salaires revalorisés des 25 meilleures années de la carrière, dans le régime général du privé." },
+    { id: 'd2f4', front: 'Décote et surcote',       back: "La décote minore la pension à vie si les trimestres requis manquent. La surcote récompense les trimestres cotisés au-delà du taux plein." },
+    { id: 'd2f5', front: 'Deux étages obligatoires', back: "Pour un salarié du privé : le régime de base (Cnav) et le régime complémentaire obligatoire (Agirc-Arrco)." },
+  ],
+  'day-3': [
+    { id: 'd3f1', front: 'Le risque de l\'acceptation pure', back: "Accepter une succession sans en connaître le passif expose à payer les dettes du défunt sur ses propres deniers." },
+    { id: 'd3f2', front: 'Acceptation à concurrence de l\'actif net', back: "L'option qui limite le paiement des dettes à la valeur des biens reçus. Elle protège le patrimoine personnel de l'héritier." },
+    { id: 'd3f3', front: 'Délai pour prendre parti', back: "4 mois pour formaliser un choix, avec des délais complémentaires pouvant aller jusqu'à 10 ans sans mise en demeure." },
+    { id: 'd3f4', front: 'Indivision successorale', back: "Les héritiers deviennent propriétaires ensemble. Situation précaire : les décisions exigent la majorité, parfois l'unanimité." },
+    { id: 'd3f5', front: 'Anticiper de son vivant', back: "Donation-partage, testament ou assurance-vie ciblée évitent l'essentiel des pièges, et permettent de lisser la fiscalité." },
+  ],
+  'day-4': [
+    { id: 'd4f1', front: 'Responsabilité civile',   back: "L'obligation de réparer le dommage causé à autrui, par sa faute, sa négligence, ou par les personnes et les choses dont on a la garde." },
+    { id: 'd4f2', front: 'Les trois conditions',    back: "Un fait générateur, un dommage subi (matériel, corporel ou moral), et un lien de causalité direct entre les deux. Les trois sont cumulatifs." },
+    { id: 'd4f3', front: 'Où elle se trouve',       back: "La RC vie privée est systématiquement incluse dans le contrat multirisque habitation (MRH)." },
+    { id: 'd4f4', front: 'Uniquement les tiers',    back: "La RC ne couvre jamais les dommages qu'on s'inflige à soi-même : elle ne répare que ceux causés à autrui." },
+    { id: 'd4f5', front: 'Vérifier les plafonds',   back: "En cas de dommage corporel grave causé à autrui, les réparations peuvent atteindre plusieurs millions d'euros." },
+  ],
+  'day-5': [
+    { id: 'd5f1', front: 'Ce que l\'achat apporte', back: "La constitution d'un capital au fil des remboursements, là où le loyer est à fonds perdu." },
+    { id: 'd5f2', front: 'Les frais qu\'on oublie', back: "Frais de notaire, intérêts d'emprunt, taxe foncière, charges de copropriété et travaux d'entretien." },
+    { id: 'd5f3', front: 'Horizon minimum',         back: "5 à 8 ans de détention pour amortir les frais d'acquisition. En dessous, l'achat est rarement rentable." },
+    { id: 'd5f4', front: 'Effet de levier',         back: "Le crédit permet d'acquérir un bien de grande valeur en n'engageant qu'une partie de son épargne." },
+    { id: 'd5f5', front: 'L\'inflation joue pour l\'emprunteur', back: "À taux fixe, la valeur réelle de la dette diminue avec le temps : l'inflation érode ce qu'il reste à rembourser." },
+  ],
+
+  /* ── Semaine 2 ── */
+  'w2-d0': [
+    { id: 'w2d0f1', front: 'Charges fixes vs variables', back: "Fixes : récurrentes et contractuelles (loyer, assurances, crédit), difficilement modifiables. Variables : fluctuantes (alimentation, loisirs) — c'est là qu'on a du pouvoir d'action." },
+    { id: 'w2d0f2', front: 'Reste à vivre',         back: "Ce qu'il reste une fois les charges fixes et les impôts déduits des revenus. La marge de manœuvre réelle du mois." },
+    { id: 'w2d0f3', front: 'Règle 50/30/20',        back: "50 % besoins, 30 % envies, 20 % épargne et investissement. Un repère d'équilibre budgétaire." },
+    { id: 'w2d0f4', front: 'Le piège du paiement en plusieurs fois', back: "Le BNPL crée des charges fixes artificielles. Indolores une à une, elles s'accumulent et plombent le budget." },
+    { id: 'w2d0f5', front: 'Inflation du mode de vie', back: "Augmenter ses dépenses à chaque hausse de revenus annule l'épargne supplémentaire. Gagner plus ne suffit pas à s'enrichir." },
+  ],
+  'w2-d1': [
+    { id: 'w2d1f1', front: 'Le principe',           back: "Le revenu imposable est divisé par le nombre de parts avant d'appliquer le barème : on reste dans des tranches plus basses, donc on paie moins." },
+    { id: 'w2d1f2', front: 'Le compte des parts',   back: "Couple marié ou pacsé : 2 parts. Les deux premiers enfants : 0,5 part chacun. À partir du troisième : 1 part entière." },
+    { id: 'w2d1f3', front: 'Plafonnement',          back: "L'avantage procuré par chaque demi-part est plafonné par la loi (environ 1 759 € par demi-part en 2024). Les hauts revenus n'en profitent pas sans limite." },
+    { id: 'w2d1f4', front: 'Parent isolé',          back: "Case T : le premier enfant compte pour 1 part entière au lieu de 0,5. Un parent seul avec un enfant atteint donc 2 parts." },
+    { id: 'w2d1f5', front: 'Garde alternée',        back: "L'avantage est partagé : 0,25 part par parent pour chacun des deux premiers enfants." },
+  ],
+  'w2-d2': [
+    { id: 'w2d2f1', front: 'Validés = cotisés + assimilés', back: "Les trimestres validés incluent les cotisés (travail), les assimilés (chômage, maladie, maternité) et les majorations (enfants)." },
+    { id: 'w2d2f2', front: 'Comment se valide un trimestre', back: "Par le salaire, pas par le temps de travail : il faut percevoir l'équivalent d'au moins 150 fois le SMIC horaire." },
+    { id: 'w2d2f3', front: 'Le plafond annuel',     back: "4 trimestres par an au maximum, quels que soient les revenus perçus dans l'année." },
+    { id: 'w2d2f4', front: 'Carrière longue',       back: "Le dispositif regarde les trimestres réellement cotisés, pas les validés : c'est l'effort contributif qui est exigé." },
+    { id: 'w2d2f5', front: 'Majoration pour enfant', back: "8 trimestres par enfant dans le régime général : 4 au titre de la maternité ou de l'adoption, 4 au titre de l'éducation." },
+  ],
+  'w2-d3': [
+    { id: 'w2d3f1', front: 'Réserve héréditaire',   back: "La part du patrimoine que la loi réserve obligatoirement aux héritiers proches. On ne peut pas déshériter totalement ses enfants." },
+    { id: 'w2d3f2', front: 'Qui est réservataire',  back: "Les enfants (descendants). Depuis 2006, les parents ne le sont plus. Le conjoint ne l'est qu'en l'absence de descendant." },
+    { id: 'w2d3f3', front: 'Le barème',             back: "1 enfant : la moitié du patrimoine. 2 enfants : les deux tiers. 3 enfants et plus : les trois quarts, quel que soit leur nombre." },
+    { id: 'w2d3f4', front: 'Quotité disponible',    back: "La part restante, dont on dispose librement : pour un tiers, une association, ou pour avantager un enfant." },
+    { id: 'w2d3f5', front: 'Action en réduction',   back: "Si des donations entament la réserve, les héritiers peuvent en exiger la restitution. La RAAR permet d'y renoncer par avance, devant deux notaires." },
+  ],
+  'w2-d4': [
+    { id: 'w2d4f1', front: 'Franchise',             back: "La somme qui reste à la charge de l'assuré après indemnisation. Sinistre de 1 000 € avec 200 € de franchise : l'assureur verse 800 €." },
+    { id: 'w2d4f2', front: 'Absolue vs relative',   back: "Absolue : toujours déduite, quel que soit le montant. Relative : rien en dessous du seuil, mais remboursement intégral au-dessus." },
+    { id: 'w2d4f3', front: 'Plafond de garantie',   back: "Le montant maximum que l'assureur versera. Au-delà, le reste est à la charge de l'assuré." },
+    { id: 'w2d4f4', front: 'Franchise et prime',    back: "Plus la franchise est élevée, plus la prime baisse : l'assuré prend une part du risque à sa charge." },
+    { id: 'w2d4f5', front: 'Catastrophe naturelle', back: "La franchise Cat Nat est fixée par l'État (380 € pour les habitations) et ne peut pas être modifiée par le contrat." },
+  ],
+  'w2-d5': [
+    { id: 'w2d5f1', front: 'Composition d\'une mensualité', back: "Une part de capital et une part d'intérêts. Les intérêts sont très élevés au début puis diminuent : ils portent sur le capital restant dû." },
+    { id: 'w2d5f2', front: 'TAEG',                  back: "Le seul indicateur qui permet de comparer deux offres : il intègre le taux d'intérêt et tous les frais obligatoires (assurance, garantie, dossier)." },
+    { id: 'w2d5f3', front: 'Taux d\'endettement',   back: "Plafonné à 35 % des revenus nets, assurance comprise, selon les recommandations du HCSF." },
+    { id: 'w2d5f4', front: 'À quoi sert l\'apport', back: "À couvrir les frais de notaire et de garantie : la banque finance les murs, pas les taxes. Environ 10 % du prix." },
+    { id: 'w2d5f5', front: 'Délai de réflexion',    back: "La loi Scrivener impose 10 jours incompressibles après réception de l'offre de prêt. Acceptation possible à partir du 11e jour." },
+  ],
+};

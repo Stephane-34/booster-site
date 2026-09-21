@@ -35,7 +35,7 @@ import {
 import Button from '../../components/ui/Button/Button';
 import Modal from '../../components/ui/Modal/Modal';
 import { useAcademyProgress } from '../../hooks/useAcademyProgress';
-import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES, WEEK_GUIDES } from './data';
+import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES, WEEK_GUIDES, MODULE_FLASHCARDS } from './data';
 import { academyState, isModuleUnlocked, isWeekGuideUnlocked, formatStartDate } from '../../utils/academyCalendar';
 import styles from './Academy.module.css';
 
@@ -684,7 +684,12 @@ function DashboardSection({
                 onSubmit={(results) => saveQuizResult(day, results)}
               />
             )}
-            {moduleTab === 'flashcards' && <ModuleFlashcardsView />}
+            {moduleTab === 'flashcards' && (
+              <ModuleFlashcardsView
+                key={day.id}
+                cards={MODULE_FLASHCARDS[day.id] ?? FLASHCARDS}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -1211,8 +1216,10 @@ function ModuleQuizView({ day, existingRecord, onSubmit }) {
 }
 
 /* ── Sous-onglet Fiches mémo (corpus global partagé) ─────── */
-/* Le brief (choix C) : réutiliser le corpus FLASHCARDS pour tous les
-   modules dans la démo - chaque module aura son propre corpus en prod. */
+/* Chaque module a désormais ses propres fiches (MODULE_FLASHCARDS, indexé par
+   module_id) : elles reformulent les justifications de SON quiz. Le corpus
+   global FLASHCARDS ne sert plus que de repli si un module n'a pas encore les
+   siennes. */
 const shuffleFlashcards = (list) => {
   const c = [...list];
   for (let i = c.length - 1; i > 0; i--) {
@@ -1222,15 +1229,15 @@ const shuffleFlashcards = (list) => {
   return c;
 };
 
-function ModuleFlashcardsView() {
-  const [order, setOrder]     = useState(() => FLASHCARDS.map((c) => c.id));
+function ModuleFlashcardsView({ cards }) {
+  const [order, setOrder]     = useState(() => cards.map((c) => c.id));
   const [filter, setFilter]   = useState('all');
   const [mastery, setMastery] = useState({});
   const [index, setIndex]     = useState(0);
   const [flipped, setFlipped] = useState(false);
   const sceneRef = useRef(null);
 
-  const cardsById = useMemo(() => Object.fromEntries(FLASHCARDS.map((c) => [c.id, c])), []);
+  const cardsById = useMemo(() => Object.fromEntries(cards.map((c) => [c.id, c])), [cards]);
 
   const visible = useMemo(() => {
     if (filter === 'all') return order;
@@ -1242,9 +1249,9 @@ function ModuleFlashcardsView() {
     if (index >= visible.length && visible.length > 0) setIndex(visible.length - 1);
   }, [visible, index]);
 
-  const known      = FLASHCARDS.filter((c) => mastery[c.id] === 'known').length;
-  const reviewN    = FLASHCARDS.length - known;
-  const pctKnown   = Math.round((known / FLASHCARDS.length) * 100);
+  const known      = cards.filter((c) => mastery[c.id] === 'known').length;
+  const reviewN    = cards.length - known;
+  const pctKnown   = cards.length ? Math.round((known / cards.length) * 100) : 0;
   const current    = visible.length > 0 ? cardsById[visible[index]] : null;
 
   const goNext = useCallback(() => {
@@ -1276,7 +1283,7 @@ function ModuleFlashcardsView() {
   };
 
   const filters = [
-    { id: 'all',    label: `Toutes (${FLASHCARDS.length})` },
+    { id: 'all',    label: `Toutes (${cards.length})` },
     { id: 'review', label: `À revoir (${reviewN})` },
     { id: 'known',  label: `Connues (${known})` },
   ];
