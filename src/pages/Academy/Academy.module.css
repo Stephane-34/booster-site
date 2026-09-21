@@ -1133,51 +1133,10 @@
 }
 
 /* - Vidéos - */
-.libraryVideo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  transition: all var(--transition-fast);
-}
 
-.libraryVideo:hover {
-  border-color: var(--color-border-active);
-  transform: translateY(-3px);
-}
 
-.libraryVideoThumb {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 120px;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(74, 222, 128, 0.1));
-  border-radius: var(--radius-md);
-  color: white;
-  margin-bottom: var(--space-2);
-}
 
-.libraryVideoDuration {
-  position: absolute;
-  bottom: var(--space-2);
-  right: var(--space-2);
-  padding: 2px var(--space-2);
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: white;
-}
 
-.libraryVideoAuthor {
-  margin: 0;
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-}
 
 /* - Documents - */
 .libraryDocs {
@@ -2695,4 +2654,55 @@
   font-size: var(--text-2xl);
   font-weight: var(--weight-bold);
   color: var(--color-text-secondary);
+}
+
+/* ─── Navigation entre semaines (vue semaine) ───────────────────────────────
+   Permet de revenir sur une semaine déjà parcourue pour relire un module ou
+   son guide. La flèche « suivant » est désactivée au-delà de la semaine
+   atteinte : on ne déverrouille jamais l'avenir. */
+.weekNav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.weekNavBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--transition-fast), opacity var(--transition-fast);
+}
+
+.weekNavBtn:not(:disabled):hover {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: var(--color-border-active);
+}
+
+.weekNavBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.weekNavBack {
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary-light);
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .weekNav { gap: var(--space-2); }
+  .weekNavBtn { width: 32px; height: 32px; }
 }

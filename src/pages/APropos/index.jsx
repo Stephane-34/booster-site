@@ -18,7 +18,7 @@ const PILLARS = [
     emoji: '🧠',
     title: 'Apprenez en vous amusant',
     subtitle: 'Le pouvoir du savoir.',
-    body: "Rejoignez la Booster Academy. Chaque semaine, relevez un nouveau challenge sous forme de QCM pour valider vos acquis. Retrouvez tous vos contenus et vidéos dans votre bibliothèque personnelle pour réviser à votre rythme et suivre votre progression.",
+    body: "Rejoignez la Booster Academy. Chaque semaine, relevez un nouveau challenge sous forme de QCM pour valider vos acquis. Retrouvez tous vos contenus dans votre bibliothèque personnelle pour réviser à votre rythme et suivre votre progression.",
     color: 'accent',
   },
 ];

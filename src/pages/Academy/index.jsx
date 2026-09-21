@@ -3,7 +3,7 @@
    4 onglets :
    - Ma semaine en cours : dashboard quotidien avec déblocage jour par jour.
    - Programme 52 semaines : 4 phases dont 3 verrouillées selon la progression.
-   - Bibliothèque : fiches mémoire acquises + vidéos et ressources.
+   - Bibliothèque : fiches mémoire acquises + documents pratiques.
    - Aide : principes clés et FAQ.
    Le state `completed` est remonté au parent pour être partagé entre onglets.
 
@@ -28,7 +28,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
   BookOpen, ChevronRight, ChevronLeft, CheckCircle, Lock, Unlock, Clock,
-  Trophy, TrendingUp, Calendar, Gift, Library, PlayCircle, FileText,
+  Trophy, TrendingUp, Calendar, Gift, Library, FileText,
   HelpCircle, Sparkles, Route, GraduationCap, LineChart,
   Check, X, CheckSquare, Layers, RotateCw, Shuffle,
 } from 'lucide-react';
@@ -193,7 +193,7 @@ function HelpSection({ goTo }) {
     {
       icon: Library,
       title: '5 · Ta Bibliothèque se remplit à chaque module validé',
-      body: "Chaque quiz complété devient une fiche mémoire archivée dans ta bibliothèque personnelle. Tu y retrouves aussi les vidéos courtes (3 à 6 min) et les documents pratiques (checklists, simulateurs) pour approfondir ou réviser à ton rythme.",
+      body: "Chaque quiz complété devient une fiche mémoire archivée dans ta bibliothèque personnelle. Tu y retrouves aussi les documents pratiques (checklists, simulateurs) pour approfondir ou réviser à ton rythme.",
       action: { label: 'Voir ma bibliothèque', to: 'library' },
     },
     {
@@ -556,6 +556,10 @@ function DashboardSection({
   activeModuleId, setActiveModule, moduleTab, setModuleTab,
 }) {
   const [view, setView] = useState('dashboard'); // dashboard | leaderboard | guide
+  /* Semaine affichée. Par défaut la semaine atteinte, mais l'utilisateur peut
+     revenir en arrière pour relire un module ou un guide déjà débloqué. On ne
+     peut jamais dépasser academy.week : les semaines futures restent fermées. */
+  const [viewedWeek, setViewedWeek] = useState(null);
   /* Sous-onglets à l'intérieur d'un module ouvert (quiz / flashcards / guide).
      La vue module s'affiche dès que `activeModuleId` est set - indépendant
      de `view`, qui gère seulement dashboard vs leaderboard. */
@@ -580,9 +584,9 @@ function DashboardSection({
      toute la semaine dès que daysPassed dépassait 5 - le déblocage quotidien
      ne fonctionnait donc qu'en semaine 1.
      Bypass complet en mode test (voir TEST_MODE_UNLOCK_ALL). */
-  const dayStatus = (i, id) => {
+  const dayStatus = (weekN, i, id) => {
     if (completed[id]) return 'completed';
-    if (TEST_MODE_UNLOCK_ALL || isModuleUnlocked(academy.week, i, academy)) return 'unlocked';
+    if (TEST_MODE_UNLOCK_ALL || isModuleUnlocked(weekN, i, academy)) return 'unlocked';
     return 'locked';
   };
 
@@ -707,7 +711,12 @@ function DashboardSection({
   }
 
   if (view === 'guide') {
-    return <WeekGuideView weekN={academy.week} onBack={() => setView('dashboard')} />;
+    return (
+      <WeekGuideView
+        weekN={Math.min(viewedWeek ?? academy.week, academy.week)}
+        onBack={() => setView('dashboard')}
+      />
+    );
   }
 
   /* Inscription en cours de semaine : le parcours ne commence qu'au lundi
@@ -743,22 +752,55 @@ function DashboardSection({
   }
 
   /* Semaine du programme atteinte, calculée une seule fois par le parent. */
-  const currentWeek = academy.week;
+  const reachedWeek = academy.week;
+  /* viewedWeek === null : on suit la semaine en cours, y compris quand elle
+     avance d'elle-même à minuit. Dès que l'utilisateur navigue, on fige. */
+  const currentWeek = Math.min(viewedWeek ?? reachedWeek, reachedWeek);
+  const isPastWeek  = currentWeek < reachedWeek;
 
   return (
     <div className={styles.dashWrap}>
       <div className={styles.dashTop}>
         <div className={styles.dashHero}>
           <p className={styles.dashHeroEyebrow}>Ton parcours personnel</p>
-          <h2 className={styles.dashHeroTitle}>
-            Semaine <span className={styles.dashHeroBig}>{currentWeek}</span>
-            <span className={styles.dashHeroTotal}> / 52</span>
-          </h2>
-          <p className={styles.dashHeroSub}>
-            Un nouveau module chaque matin du lundi au samedi, le dimanche au repos.
-            Rien ne se perd si tu sautes un jour, tu peux revenir sur les modules
-            précédents quand tu veux.
-          </p>
+          <div className={styles.weekNav}>
+            <button
+              className={styles.weekNavBtn}
+              onClick={() => setViewedWeek(Math.max(1, currentWeek - 1))}
+              disabled={currentWeek <= 1}
+              aria-label="Semaine précédente"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <h2 className={styles.dashHeroTitle}>
+              Semaine <span className={styles.dashHeroBig}>{currentWeek}</span>
+              <span className={styles.dashHeroTotal}> / 52</span>
+            </h2>
+            <button
+              className={styles.weekNavBtn}
+              onClick={() => setViewedWeek(Math.min(reachedWeek, currentWeek + 1))}
+              disabled={currentWeek >= reachedWeek}
+              aria-label="Semaine suivante"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+
+          {isPastWeek ? (
+            <p className={styles.dashHeroSub}>
+              Tu consultes une semaine passée : tous ses modules et son guide restent
+              ouverts.{' '}
+              <button className={styles.weekNavBack} onClick={() => setViewedWeek(null)}>
+                Revenir à la semaine {reachedWeek}
+              </button>
+            </p>
+          ) : (
+            <p className={styles.dashHeroSub}>
+              Un nouveau module chaque matin du lundi au samedi, le dimanche au repos.
+              Rien ne se perd si tu sautes un jour, tu peux revenir sur les semaines
+              précédentes avec les flèches.
+            </p>
+          )}
         </div>
         <div className={styles.dashStat}>
           <TrendingUp size={22} />
@@ -787,7 +829,7 @@ function DashboardSection({
 
       <div className={styles.modulesGrid}>
         {(WEEKS[currentWeek] || WEEKS[1]).map((day, i) => {
-          const status = dayStatus(i, day.id);
+          const status = dayStatus(currentWeek, i, day.id);
           return (
             <div key={day.id} className={`${styles.moduleCard} ${styles[`moduleStatus_${status}`]}`}>
               <div className={styles.moduleHead}>
@@ -854,15 +896,10 @@ function DashboardSection({
 }
 
 /* ─── Section Bibliothèque ────────────────────────────────── */
-/* Contenu volontairement en 3 rubriques distinctes pour donner un aperçu :
-   - Fiches acquises : agrégation dynamique des quiz complétés (state parent).
-   - Vidéos, Documents : placeholders pour visualiser le principe. */
-const LIBRARY_VIDEOS = [
-  { title: "Les intérêts composés en 3 minutes",        author: 'Booster', duration: '3:24', theme: 'Placement' },
-  { title: "Comprendre le PFU (flat tax) sans jargon",  author: 'Booster', duration: '5:12', theme: 'Fiscalité' },
-  { title: "Retraite : 3 idées reçues à démonter",      author: 'Booster', duration: '4:48', theme: 'Retraite' },
-  { title: "Faut-il acheter ou louer ? Le vrai calcul", author: 'Booster', duration: '6:20', theme: 'Immobilier' },
-];
+/* Deux rubriques : les fiches acquises (agrégation dynamique des quiz
+   complétés) et les documents pratiques. La rubrique "Vidéos courtes" a été
+   retirée avant le lancement, faute de contenu vidéo : elle promettait un
+   format qui n'existe pas encore. */
 
 const LIBRARY_DOCS = [
   { title: 'Checklist "Ma première assurance vie"',         type: 'PDF', pages: 4 },
@@ -878,7 +915,7 @@ function BibliothequeSection({ completed, onGoToWeek }) {
     <div className={styles.libraryWrap}>
       <p className={styles.sectionLead}>
         Toutes tes ressources d'apprentissage réunies au même endroit : les fiches mémoire de tes quiz validés,
-        les vidéos courtes pour approfondir, et les documents pratiques à télécharger.
+        et les documents pratiques à télécharger.
       </p>
 
       <section className={styles.librarySection}>
@@ -925,33 +962,6 @@ function BibliothequeSection({ completed, onGoToWeek }) {
             })}
           </div>
         )}
-      </section>
-
-      <section className={styles.librarySection}>
-        <div className={styles.librarySectionHead}>
-          <div>
-            <h2 className={styles.librarySectionTitle}>
-              <PlayCircle size={20} /> Vidéos courtes
-              <span className={styles.librarySoon}>À venir</span>
-            </h2>
-            <p className={styles.librarySectionSub}>
-              Format 3 à 6 minutes pour approfondir un concept sans engagement.
-            </p>
-          </div>
-        </div>
-        <div className={styles.libraryGrid}>
-          {LIBRARY_VIDEOS.map((v) => (
-            <div key={v.title} className={styles.libraryVideo}>
-              <div className={styles.libraryVideoThumb}>
-                <PlayCircle size={36} />
-                <span className={styles.libraryVideoDuration}>{v.duration}</span>
-              </div>
-              <span className={styles.libraryFicheTheme}>{v.theme}</span>
-              <h3 className={styles.libraryFicheTitle}>{v.title}</h3>
-              <p className={styles.libraryVideoAuthor}>Par {v.author}</p>
-            </div>
-          ))}
-        </div>
       </section>
 
       <section className={styles.librarySection}>
