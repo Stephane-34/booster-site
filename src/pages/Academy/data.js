@@ -1615,3 +1615,96 @@ export const KEY_PRINCIPLES = [
   { title: 'Hiérarchie financière',   body: "Constituer un fonds d'urgence avant de s'exposer aux marchés financiers." },
   { title: 'Équilibre budgétaire',    body: "Des règles simples (50/30/20) structurent les finances et automatisent l'épargne." },
 ];
+
+/* ─── Guides hebdomadaires ──────────────────────────────────────────────────
+   Un guide par semaine, publié le samedi (cf. isWeekGuideUnlocked dans
+   utils/academyCalendar.js).
+
+   Distinction avec les fiches mémo : la fiche mémo est MICRO, elle reprend une
+   notion précise d'un quiz. Le guide est MACRO, il relie les six sujets de la
+   semaine entre eux et dégage le concept général. Les six thèmes reviennent
+   chaque semaine (Enrichissement, Fiscalité, Retraite, Transmission, IARD,
+   Immobilier) : le guide explique ce qu'ils avaient en commun cette
+   semaine-là.
+
+   Les semaines sans guide rédigé affichent un message d'attente. */
+export const WEEK_GUIDES = {
+  1: {
+    title: 'Poser les fondations',
+    intro:
+      "Cette première semaine balaie les six domaines de ta vie financière sans " +
+      "entrer dans les calculs. L'objectif n'est pas de tout retenir, mais de " +
+      "comprendre de quoi chaque domaine parle et pourquoi il te concerne déjà.",
+    sections: [
+      {
+        title: 'Le fil rouge de la semaine',
+        body:
+          "Les six sujets abordés — l'épargne, le prélèvement à la source, la " +
+          "retraite par répartition, la succession non préparée, la responsabilité " +
+          "civile et le choix entre acheter et louer — ont un point commun : ce sont " +
+          "des mécanismes qui fonctionnent déjà autour de toi, que tu t'en occupes ou " +
+          "non. Ne rien décider reste une décision.",
+      },
+      {
+        title: 'Ce qui se joue tôt',
+        body:
+          "L'épargne et la retraite partagent la même logique : le temps fait le plus " +
+          "gros du travail. Un euro placé à 20 ans ne vaut pas le même effort qu'un " +
+          "euro placé à 40 ans. À l'inverse, la succession et l'assurance sont des " +
+          "sujets qu'on découvre souvent trop tard, au moment où le problème est déjà là.",
+      },
+      {
+        title: 'Deux réflexes à garder',
+        body:
+          "Distinguer ce qui est subi (le prélèvement à la source, les règles de " +
+          "succession par défaut) de ce qui se pilote (le montant que tu épargnes, ta " +
+          "couverture, ton choix de logement). Et se rappeler qu'aucun de ces sujets " +
+          "ne se traite isolément : ton loyer conditionne ton épargne, ton épargne " +
+          "conditionne ta retraite.",
+      },
+    ],
+    takeaway:
+      "Tu n'as pas à devenir expert des six domaines. Il te suffit de savoir " +
+      "lequel te concerne le plus aujourd'hui, et de commencer par celui-là.",
+  },
+  2: {
+    title: 'Passer aux chiffres',
+    intro:
+      "Après la vue d'ensemble, cette semaine entre dans les mécanismes de calcul. " +
+      "Budget, quotient familial, trimestres, réserve héréditaire, franchises, " +
+      "crédit : derrière chaque sujet, une formule ou un seuil détermine ce que tu " +
+      "touches réellement.",
+    sections: [
+      {
+        title: 'Le fil rouge de la semaine',
+        body:
+          "Tous les sujets de la semaine reposent sur des seuils et des règles de " +
+          "calcul. Ce n'est pas le principe qui décide du résultat, c'est le chiffre : " +
+          "le nombre de parts fiscales, le nombre de trimestres, le niveau de la " +
+          "franchise, le taux du crédit. Connaître le principe sans connaître le seuil " +
+          "ne sert à rien de concret.",
+      },
+      {
+        title: 'Cotisé, validé, garanti : les faux amis',
+        body:
+          "Plusieurs notions de la semaine se ressemblent sans se confondre. Un " +
+          "trimestre cotisé n'est pas un trimestre validé. Une franchise n'est pas un " +
+          "plafond. Un montant emprunté n'est pas un coût total. Ces nuances de " +
+          "vocabulaire changent le montant final, parfois du simple au double.",
+      },
+      {
+        title: 'Ce que tu peux vérifier dès maintenant',
+        body:
+          "Contrairement à la semaine 1, les sujets de cette semaine sont tous " +
+          "chiffrables sur ta propre situation : ton nombre de parts figure sur ton " +
+          "avis d'imposition, tes trimestres sur ton relevé de carrière, tes franchises " +
+          "sur tes contrats d'assurance. Le budget est le point de départ : sans lui, " +
+          "les autres calculs restent théoriques.",
+      },
+    ],
+    takeaway:
+      "Un principe compris mais jamais chiffré sur ta situation reste une " +
+      "connaissance inutile. Prends une seule des six notions et applique-la à tes " +
+      "propres documents.",
+  },
+};

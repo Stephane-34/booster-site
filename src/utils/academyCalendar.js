@@ -89,6 +89,19 @@ export function isModuleUnlocked(weekN, dayIdx, state) {
   return dayIdx <= state.unlockedIndex;
 }
 
+/* Le guide hebdomadaire sort le samedi, une fois les six modules de la semaine
+   publiés : il fait la synthèse de la semaine, il ne peut donc pas précéder
+   les quiz qu'il récapitule. Les semaines déjà passées gardent leur guide
+   accessible. */
+export const GUIDE_DAY_INDEX = 5;   // 0 = lundi … 5 = samedi
+
+export function isWeekGuideUnlocked(weekN, state) {
+  if (!state.started) return false;
+  if (weekN <  state.week) return true;
+  if (weekN >  state.week) return false;
+  return state.dayIndex >= GUIDE_DAY_INDEX;
+}
+
 /* « lundi 22 septembre » — pour annoncer la date de démarrage. */
 export function formatStartDate(date) {
   return new Intl.DateTimeFormat('fr-FR', {

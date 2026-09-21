@@ -2572,3 +2572,127 @@
     font-size: var(--text-2xl);
   }
 }
+
+/* ─── Carte « Guide de la semaine » (vue semaine) ────────────────────────────
+   Se débloque le samedi. Volontairement pleine largeur sous la grille des six
+   modules : c'est une synthèse de la semaine, pas un septième module. */
+.guideCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.guideCardUnlocked {
+  border-color: var(--color-border-active);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.10), rgba(74, 222, 128, 0.06));
+}
+
+.guideCardIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-muted);
+}
+
+.guideCardUnlocked .guideCardIcon {
+  background: rgba(168, 85, 247, 0.16);
+  color: var(--color-primary-light);
+}
+
+.guideCardBody { flex: 1; min-width: 0; }
+
+.guideCardEyebrow {
+  margin: 0 0 var(--space-1) 0;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.guideCardTitle {
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text);
+}
+
+.guideCardText {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 600px) {
+  .guideCard {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ─── Guide hebdomadaire (vue détaillée) ────────────────────────────────── */
+.guideBack {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.guideBack:hover { color: var(--color-text); }
+
+.guideIntro {
+  margin: 0 0 var(--space-6) 0;
+  font-size: var(--text-lg);
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.guideTakeaway {
+  margin: var(--space-8) 0;
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.guideTakeawayLabel {
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.guideTakeawayText {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+/* Compteur de semaine dans le hero : « Semaine 3 / 52 ». */
+.dashHeroTotal {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-secondary);
+}

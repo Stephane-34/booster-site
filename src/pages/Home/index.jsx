@@ -1,7 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { Shield, Brain } from 'lucide-react';
 import Hero from '../../components/sections/Hero/Hero';
-import Testimonials from '../../components/sections/Testimonials/Testimonials';
+/* Avis clients masqués temporairement avant le lancement : le produit part
+   sans témoignages, ils seront réactivés une fois de vrais retours collectés.
+   Le composant et ses données restent en place, il suffit de décommenter. */
+// import Testimonials from '../../components/sections/Testimonials/Testimonials';
 import Badge from '../../components/ui/Badge/Badge';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Home.module.css';
@@ -24,7 +27,7 @@ export default function Home() {
         firstName={isAuthenticated ? firstName : ''}
       />
       <WhoWeAre />
-      <Testimonials />
+      {/* <Testimonials /> */}
     </>
   );
 }

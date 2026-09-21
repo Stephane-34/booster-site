@@ -35,8 +35,8 @@ import {
 import Button from '../../components/ui/Button/Button';
 import Modal from '../../components/ui/Modal/Modal';
 import { useAcademyProgress } from '../../hooks/useAcademyProgress';
-import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES } from './data';
-import { academyState, isModuleUnlocked, formatStartDate } from '../../utils/academyCalendar';
+import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES, WEEK_GUIDES } from './data';
+import { academyState, isModuleUnlocked, isWeekGuideUnlocked, formatStartDate } from '../../utils/academyCalendar';
 import styles from './Academy.module.css';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -555,7 +555,7 @@ function DashboardSection({
   simulated, completed, academy, simulateDay, saveResult, loading,
   activeModuleId, setActiveModule, moduleTab, setModuleTab,
 }) {
-  const [view, setView] = useState('dashboard'); // dashboard | leaderboard
+  const [view, setView] = useState('dashboard'); // dashboard | leaderboard | guide
   /* Sous-onglets à l'intérieur d'un module ouvert (quiz / flashcards / guide).
      La vue module s'affiche dès que `activeModuleId` est set - indépendant
      de `view`, qui gère seulement dashboard vs leaderboard. */
@@ -613,10 +613,12 @@ function DashboardSection({
       return null;
     }
     const existingRecord = completed[day.id]; // récap si déjà complété
+    /* Le Guide ne figure plus ici : il est passé hebdomadaire et vit sur la
+       vue semaine (cf. WeekGuideCard). Restent les deux contenus liés au
+       module du jour : le quiz et ses fiches mémo. */
     const moduleTabs = [
       { id: 'quiz',       label: 'Quiz du jour',  icon: CheckSquare },
       { id: 'flashcards', label: 'Fiches mémo',   icon: Layers },
-      { id: 'guide',      label: 'Guide',         icon: BookOpen },
     ];
     return (
       <div className={styles.dashWrap}>
@@ -660,7 +662,6 @@ function DashboardSection({
               />
             )}
             {moduleTab === 'flashcards' && <ModuleFlashcardsView />}
-            {moduleTab === 'guide'      && <ModuleGuideView theme={day.theme} title={day.title} />}
           </div>
         </div>
       </div>
@@ -705,6 +706,10 @@ function DashboardSection({
     );
   }
 
+  if (view === 'guide') {
+    return <WeekGuideView weekN={academy.week} onBack={() => setView('dashboard')} />;
+  }
+
   /* Inscription en cours de semaine : le parcours ne commence qu'au lundi
      suivant, on annonce la date plutôt que d'afficher une semaine vide. Les
      autres onglets (Programme, Aide) restent accessibles pour patienter. */
@@ -746,13 +751,13 @@ function DashboardSection({
         <div className={styles.dashHero}>
           <p className={styles.dashHeroEyebrow}>Ton parcours personnel</p>
           <h2 className={styles.dashHeroTitle}>
-            Jour <span className={styles.dashHeroBig}>{academy.moduleNumber}</span> de ta formation
+            Semaine <span className={styles.dashHeroBig}>{currentWeek}</span>
+            <span className={styles.dashHeroTotal}> / 52</span>
           </h2>
           <p className={styles.dashHeroSub}>
-            Tu es en <strong>Semaine {currentWeek}</strong> - le parcours suit les jours de la
-            semaine : un nouveau module chaque matin du lundi au samedi, le dimanche au repos.
-            Rien ne se perd si tu sautes un jour, tu peux revenir sur les modules précédents
-            quand tu veux.
+            Un nouveau module chaque matin du lundi au samedi, le dimanche au repos.
+            Rien ne se perd si tu sautes un jour, tu peux revenir sur les modules
+            précédents quand tu veux.
           </p>
         </div>
         <div className={styles.dashStat}>
@@ -812,6 +817,38 @@ function DashboardSection({
           );
         })}
       </div>
+
+      {/* Guide de la semaine : se débloque le samedi, une fois les six modules
+          sortis. Présenté comme une récompense de fin de semaine plutôt que
+          comme un septième module, puisqu'il les récapitule tous. */}
+      {(() => {
+        const unlocked = isWeekGuideUnlocked(currentWeek, academy);
+        return (
+          <div className={`${styles.guideCard} ${unlocked ? styles.guideCardUnlocked : ''}`}>
+            <div className={styles.guideCardIcon}>
+              {unlocked ? <BookOpen size={26} /> : <Lock size={24} />}
+            </div>
+            <div className={styles.guideCardBody}>
+              <p className={styles.guideCardEyebrow}>Guide hebdomadaire</p>
+              <h3 className={styles.guideCardTitle}>
+                {unlocked
+                  ? (WEEK_GUIDES[currentWeek]?.title ?? `Semaine ${currentWeek}`)
+                  : 'Disponible samedi'}
+              </h3>
+              <p className={styles.guideCardText}>
+                {unlocked
+                  ? "La synthèse des six sujets de la semaine, et ce qu'ils ont en commun."
+                  : "Chaque samedi, un récap plus large que les quiz : le concept général derrière les six modules de la semaine."}
+              </p>
+            </div>
+            {unlocked && (
+              <Button variant="primary" size="md" onClick={() => setView('guide')}>
+                Lire le guide <ChevronRight size={16} />
+              </Button>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -1261,47 +1298,71 @@ function ModuleFlashcardsView() {
 }
 
 /* ── Sous-onglet Guide (corpus global partagé) ───────────── */
-function ModuleGuideView({ theme, title }) {
+/* ─── Guide hebdomadaire ──────────────────────────────────────────────────
+   Remplace l'ancien guide quotidien, qui répétait le même contenu générique
+   sur les six modules d'une semaine. Le guide est désormais MACRO : il relie
+   entre eux les six sujets de la semaine et en dégage le concept général,
+   là où les fiches mémo restent MICRO, rattachées à une question de quiz.
+   Publié le samedi, une fois les six modules sortis. */
+function WeekGuideView({ weekN, onBack }) {
+  const guide = WEEK_GUIDES[weekN];
+
   return (
     <div className={styles.guideWrap}>
+      <button className={styles.guideBack} onClick={onBack}>
+        <ChevronLeft size={16} /> Retour à ma semaine
+      </button>
+
       <header className={styles.guideHeader}>
-        <p className={styles.livretMono}>Cahier d'étude · {theme}</p>
-        <h2 className={styles.guideTitle}>{title}</h2>
-        <p className={styles.guideSub}>Synthèse pédagogique du corpus Booster</p>
-      </header>
-      <section>
-        <h3 className={styles.guideSectionTitle}><Layers size={18} /> Résumé</h3>
-        <p className={styles.guideText}>
-          Ce guide synthétise les concepts essentiels de finances personnelles : mécanismes de la
-          croissance du capital, stratégies de protection contre les imprévus et l'inflation, et
-          principes pour construire un portefeuille équilibré entre risque et rendement.
+        <p className={styles.livretMono}>Guide hebdomadaire · Semaine {weekN}</p>
+        <h2 className={styles.guideTitle}>{guide ? guide.title : `Semaine ${weekN}`}</h2>
+        <p className={styles.guideSub}>
+          Le récap macro de ta semaine, publié chaque samedi
         </p>
-      </section>
-      <section>
-        <h3 className={styles.guideSectionTitle}>Principes clés</h3>
-        <div className={styles.guidePrinciples}>
-          {KEY_PRINCIPLES.map((p, i) => (
-            <div key={p.title} className={styles.guidePrinciple}>
-              <span className={styles.guidePrincipleNum}>{String(i + 1).padStart(2, '0')}</span>
-              <div>
-                <p className={styles.guidePrincipleTitle}>{p.title}</p>
-                <p className={styles.guidePrincipleBody}>{p.body}</p>
-              </div>
-            </div>
+      </header>
+
+      {!guide ? (
+        <p className={styles.guideText}>
+          Le guide de cette semaine est en cours de rédaction. Les fiches mémo de
+          chaque module restent disponibles dans ta bibliothèque.
+        </p>
+      ) : (
+        <>
+          <section>
+            <p className={styles.guideIntro}>{guide.intro}</p>
+          </section>
+
+          {guide.sections.map((sec, i) => (
+            <section key={sec.title}>
+              <h3 className={styles.guideSectionTitle}>
+                <span className={styles.guidePrincipleNum}>{String(i + 1).padStart(2, '0')}</span>
+                {sec.title}
+              </h3>
+              <p className={styles.guideText}>{sec.body}</p>
+            </section>
           ))}
-        </div>
-      </section>
-      <section>
-        <h3 className={styles.guideSectionTitle}>Glossaire</h3>
-        <div className={styles.guideGlossary}>
-          {FLASHCARDS.map((c) => (
-            <div key={c.id} className={styles.guideTerm}>
-              <span className={styles.guideTermFront}>{c.front}</span>
-              <span className={styles.guideTermBack}>{c.back}</span>
+
+          <section className={styles.guideTakeaway}>
+            <p className={styles.guideTakeawayLabel}>À retenir</p>
+            <p className={styles.guideTakeawayText}>{guide.takeaway}</p>
+          </section>
+
+          <section>
+            <h3 className={styles.guideSectionTitle}>Principes transverses</h3>
+            <div className={styles.guidePrinciples}>
+              {KEY_PRINCIPLES.map((p, i) => (
+                <div key={p.title} className={styles.guidePrinciple}>
+                  <span className={styles.guidePrincipleNum}>{String(i + 1).padStart(2, '0')}</span>
+                  <div>
+                    <p className={styles.guidePrincipleTitle}>{p.title}</p>
+                    <p className={styles.guidePrincipleBody}>{p.body}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
+        </>
+      )}
     </div>
   );
 }
