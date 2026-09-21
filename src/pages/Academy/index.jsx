@@ -65,6 +65,15 @@ export default function Academy() {
     setSection('week');
   };
 
+  /* Changement d'onglet depuis le menu. On ferme le module ouvert : sans cela,
+     `activeModuleId` restant renseigné, DashboardSection réaffichait la vue
+     module et cliquer sur "Ma semaine en cours" depuis un quiz ne renvoyait
+     pas à la semaine. */
+  const changeSection = (id) => {
+    setActiveModule(null);
+    setSection(id);
+  };
+
   /* Source de vérité : la table academy_quiz_results + auth.users.created_at
      (via useAcademyProgress). `simulated` reste local pour le mode démo - il
      permet de faire avancer artificiellement le calendrier en dev via le
@@ -115,7 +124,7 @@ export default function Academy() {
               key={id}
               role="tab"
               aria-selected={section === id}
-              onClick={() => setSection(id)}
+              onClick={() => changeSection(id)}
               className={`${styles.tab} ${section === id ? styles.tabActive : ''}`}
             >
               <Icon size={16} />
