@@ -626,39 +626,46 @@ function DashboardSection({
     ];
     return (
       <div className={styles.dashWrap}>
-        {/* Jour et thème sont repris juste en dessous par l'en-tête du
-            module : la barre ne garde que le retour. */}
-        <div className={styles.moduleTopbar}>
-          <button onClick={closeModule} className={styles.linkBtn}>
-            <ChevronLeft size={16} /> Retour à ma semaine
-          </button>
-        </div>
-
         <div className={styles.livretRoot}>
-          {/* En-tête du module : le titre prime, la ligne module/jour/thème le
-              situe, et les deux contenus sont offerts comme un choix explicite
-              plutôt que comme de petits onglets. */}
-          <header className={styles.moduleHeader}>
-            <p className={styles.moduleHeaderMeta}>
-              Module {day.dayName.toLowerCase()} · {day.theme}
-            </p>
-            <h2 className={styles.moduleHeaderTitle}>{day.title}</h2>
-          </header>
-
-          <div className={styles.moduleSwitch}>
-            {moduleTabs.map(({ id, label, icon: Icon }) => (
+          {/* Header du module, en un seul bloc. Les quatre niveaux empilés
+              (retour, jour/thème, titre, onglets) tenaient sur quatre lignes
+              distinctes : le retour passe en bouton rond aligné sur le titre,
+              le jour et le thème en surtitre, et les deux contenus en
+              sélecteur compact sur la même ligne que le titre en grand écran. */}
+          <header className={styles.moduleHero}>
+            <div className={styles.moduleHeroTop}>
               <button
-                key={id}
                 type="button"
-                onClick={() => setModuleTab(id)}
-                aria-pressed={moduleTab === id}
-                className={`${styles.moduleSwitchBtn} ${moduleTab === id ? styles.moduleSwitchBtnActive : ''}`}
+                onClick={closeModule}
+                className={styles.moduleBackBtn}
+                aria-label="Retour à ma semaine"
               >
-                <Icon size={22} />
-                <span>{label}</span>
+                <ChevronLeft size={18} />
               </button>
-            ))}
-          </div>
+              <div className={styles.moduleHeroText}>
+                <p className={styles.moduleHeroMeta}>
+                  {day.dayName} · {day.theme}
+                </p>
+                <h2 className={styles.moduleHeroTitle}>{day.title}</h2>
+              </div>
+            </div>
+
+            <div className={styles.moduleSwitch} role="tablist" aria-label="Contenu du module">
+              {moduleTabs.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={moduleTab === id}
+                  onClick={() => setModuleTab(id)}
+                  className={`${styles.moduleSwitchBtn} ${moduleTab === id ? styles.moduleSwitchBtnActive : ''}`}
+                >
+                  <Icon size={18} />
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
+          </header>
 
           <div className={styles.livretBody}>
             {moduleTab === 'quiz' && (

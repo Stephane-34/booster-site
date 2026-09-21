@@ -3,7 +3,7 @@
    du site, mais l'onglet "Le Grand Livret" est volontairement éditorial. */
 
 .page {
-  padding: var(--space-12) 0 var(--space-16);
+  padding: calc(var(--nav-height) + var(--space-12)) 0 var(--space-16);
   min-height: 70vh;
 }
 
@@ -562,13 +562,6 @@
 }
 
 /* - Topbar au-dessus de la vue module (retour + meta jour/thème) - */
-.moduleTopbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-4);
-  flex-wrap: wrap;
-}
 
 
 
@@ -1672,17 +1665,6 @@
   font-weight: var(--weight-regular);
 }
 
-.livretBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0 0 var(--space-3);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--brass);
-}
 
 .livretResultsMsg {
   color: rgba(26, 22, 37, 0.8);
@@ -2063,31 +2045,9 @@
   line-height: 1.6;
 }
 
-.guideGlossary {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-3);
-}
 
-.guideTerm {
-  padding: var(--space-4);
-  background: var(--paper-soft);
-  border: 1px solid var(--paper-line);
-  border-radius: var(--radius-sm);
-}
 
-.guideTermFront {
-  display: block;
-  font-weight: var(--weight-bold);
-  margin-bottom: var(--space-1);
-  color: var(--brass-deep);
-}
 
-.guideTermBack {
-  font-size: var(--text-sm);
-  color: rgba(26, 22, 37, 0.8);
-  line-height: 1.5;
-}
 
 @media (max-width: 700px) {
   .guideGlossary { grid-template-columns: 1fr; }
@@ -2626,74 +2586,14 @@
 
 /* ─── En-tête d'un module ───────────────────────────────────────────────────
    Le titre du module prime ; la ligne au-dessus le situe dans la semaine. */
-.moduleHeader {
-  padding-bottom: var(--space-6);
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: var(--space-6);
-}
 
-.moduleHeaderMeta {
-  margin: 0 0 var(--space-2) 0;
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-primary-light);
-}
 
-.moduleHeaderTitle {
-  margin: 0;
-  font-size: var(--text-4xl);
-  font-weight: var(--weight-extrabold);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--color-text);
-  text-wrap: balance;
-}
 
 /* Deux contenus du module présentés comme un choix franc, et non comme de
    petits onglets : ce sont les deux actions principales de l'écran. */
-.moduleSwitch {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
-  margin-bottom: var(--space-8);
-}
 
-.moduleSwitchBtn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-6) var(--space-4);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast),
-              color var(--transition-fast);
-}
 
-.moduleSwitchBtn:hover {
-  background: var(--color-surface-hover);
-  color: var(--color-text);
-}
 
-.moduleSwitchBtnActive {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.20), rgba(124, 58, 237, 0.12));
-  border-color: var(--color-border-active);
-  color: var(--color-text);
-}
-
-@media (max-width: 600px) {
-  .moduleHeaderTitle { font-size: var(--text-2xl); }
-  .moduleSwitchBtn   { padding: var(--space-4) var(--space-3); font-size: var(--text-sm); }
-}
 
 /* ─── Semaine sans corpus rédigé ────────────────────────────────────────── */
 .weekEmpty {
@@ -2751,3 +2651,109 @@
 /* Le retour à la semaine en cours est une action, pas une note de bas de
    paragraphe : il prend la forme d'un bouton. */
 .weekNavBack { margin-top: var(--space-4); }
+
+/* ─── Header d'un module ────────────────────────────────────────────────────
+   Tout tient dans un bloc : retour, situation dans la semaine, titre et choix
+   du contenu. Le retour est un bouton rond aligné sur le titre plutôt qu'une
+   ligne à part, ce qui économise un niveau d'empilement. */
+.moduleHero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  margin-bottom: var(--space-8);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.10), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.moduleHeroTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.moduleBackBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.moduleBackBtn:hover {
+  background: rgba(168, 85, 247, 0.20);
+  border-color: var(--color-border-active);
+}
+
+.moduleHeroText { min-width: 0; }
+
+.moduleHeroMeta {
+  margin: 0 0 var(--space-1) 0;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary-light);
+}
+
+.moduleHeroTitle {
+  margin: 0;
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-extrabold);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  text-wrap: balance;
+}
+
+/* Sélecteur de contenu : deux boutons côte à côte, assez larges pour être
+   des cibles franches sans occuper toute la hauteur d'écran. */
+.moduleSwitch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.moduleSwitchBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+              color var(--transition-fast);
+}
+
+.moduleSwitchBtn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.moduleSwitchBtnActive {
+  background: linear-gradient(135deg, var(--color-primary-on-white-text), var(--color-primary-dark));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 20px var(--color-primary-glow);
+}
+
+@media (max-width: 600px) {
+  .moduleHero      { padding: var(--space-5); gap: var(--space-4); }
+  .moduleHeroTitle { font-size: var(--text-2xl); }
+  .moduleSwitchBtn { padding: var(--space-3); font-size: var(--text-sm); }
+}
