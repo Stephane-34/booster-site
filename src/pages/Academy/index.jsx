@@ -626,33 +626,36 @@ function DashboardSection({
     ];
     return (
       <div className={styles.dashWrap}>
+        {/* Jour et thème sont repris juste en dessous par l'en-tête du
+            module : la barre ne garde que le retour. */}
         <div className={styles.moduleTopbar}>
           <button onClick={closeModule} className={styles.linkBtn}>
             <ChevronLeft size={16} /> Retour à ma semaine
           </button>
-          <div className={styles.moduleTopbarMeta}>
-            <span className={styles.moduleTopbarDay}>{day.dayName}</span>
-            <span className={styles.moduleTopbarTheme}>{day.theme}</span>
-          </div>
         </div>
 
         <div className={styles.livretRoot}>
-          <header className={styles.livretHeader}>
-            <div className={styles.livretPlate}><BookOpen size={22} /></div>
-            <div>
-              <p className={styles.livretBrand}>{day.title}</p>
-              <p className={styles.livretSub}>Module {day.dayName.toLowerCase()} · {day.theme}</p>
-            </div>
+          {/* En-tête du module : le titre prime, la ligne module/jour/thème le
+              situe, et les deux contenus sont offerts comme un choix explicite
+              plutôt que comme de petits onglets. */}
+          <header className={styles.moduleHeader}>
+            <p className={styles.moduleHeaderMeta}>
+              Module {day.dayName.toLowerCase()} · {day.theme}
+            </p>
+            <h2 className={styles.moduleHeaderTitle}>{day.title}</h2>
           </header>
 
-          <div className={styles.livretTabs}>
+          <div className={styles.moduleSwitch}>
             {moduleTabs.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
+                type="button"
                 onClick={() => setModuleTab(id)}
-                className={`${styles.livretTab} ${moduleTab === id ? styles.livretTabActive : ''}`}
+                aria-pressed={moduleTab === id}
+                className={`${styles.moduleSwitchBtn} ${moduleTab === id ? styles.moduleSwitchBtnActive : ''}`}
               >
-                <Icon size={16} /> {label}
+                <Icon size={22} />
+                <span>{label}</span>
               </button>
             ))}
           </div>
@@ -787,13 +790,16 @@ function DashboardSection({
           </div>
 
           {isPastWeek ? (
-            <p className={styles.dashHeroSub}>
-              Tu consultes une semaine passée : tous ses modules et son guide restent
-              ouverts.{' '}
-              <button className={styles.weekNavBack} onClick={() => setViewedWeek(null)}>
-                Revenir à la semaine {reachedWeek}
-              </button>
-            </p>
+            <>
+              <p className={styles.dashHeroSub}>
+                Tu consultes une semaine passée : tous ses modules et son guide
+                restent ouverts.
+              </p>
+              <Button variant="outline" size="md" onClick={() => setViewedWeek(null)}
+                      className={styles.weekNavBack}>
+                <RotateCw size={16} /> Revenir à la semaine {reachedWeek}
+              </Button>
+            </>
           ) : (
             <p className={styles.dashHeroSub}>
               Un nouveau module chaque matin du lundi au samedi, le dimanche au repos.
@@ -827,8 +833,25 @@ function DashboardSection({
         <p className={styles.dashLoading}>Chargement de ta progression…</p>
       )}
 
+      {/* `WEEKS[currentWeek] || WEEKS[1]` retombait silencieusement sur la
+          semaine 1 quand le corpus d'une semaine n'était pas rédigé : on
+          croyait avancer en refaisant les mêmes six quiz. On le dit
+          explicitement à la place. */}
+      {!WEEKS[currentWeek] ? (
+        <div className={styles.weekEmpty}>
+          <div className={styles.weekEmptyIcon}><FileText size={26} /></div>
+          <h3 className={styles.weekEmptyTitle}>
+            Le corpus de la semaine {currentWeek} est en cours de rédaction
+          </h3>
+          <p className={styles.weekEmptyText}>
+            Les quiz de cette semaine ne sont pas encore publiés. En attendant, tu
+            peux revenir sur les semaines précédentes avec les flèches : tous leurs
+            modules et leurs guides restent ouverts.
+          </p>
+        </div>
+      ) : (
       <div className={styles.modulesGrid}>
-        {(WEEKS[currentWeek] || WEEKS[1]).map((day, i) => {
+        {WEEKS[currentWeek].map((day, i) => {
           const status = dayStatus(currentWeek, i, day.id);
           return (
             <div key={day.id} className={`${styles.moduleCard} ${styles[`moduleStatus_${status}`]}`}>
@@ -859,6 +882,7 @@ function DashboardSection({
           );
         })}
       </div>
+      )}
 
       {/* Guide de la semaine : se débloque le samedi, une fois les six modules
           sortis. Présenté comme une récompense de fin de semaine plutôt que
@@ -871,7 +895,10 @@ function DashboardSection({
               {unlocked ? <BookOpen size={26} /> : <Lock size={24} />}
             </div>
             <div className={styles.guideCardBody}>
-              <p className={styles.guideCardEyebrow}>Guide hebdomadaire</p>
+              <p className={styles.guideCardEyebrow}>
+                Guide hebdomadaire
+                {unlocked && <span className={styles.guideCardBadge}>Nouveau</span>}
+              </p>
               <h3 className={styles.guideCardTitle}>
                 {unlocked
                   ? (WEEK_GUIDES[currentWeek]?.title ?? `Semaine ${currentWeek}`)
@@ -884,8 +911,9 @@ function DashboardSection({
               </p>
             </div>
             {unlocked && (
-              <Button variant="primary" size="md" onClick={() => setView('guide')}>
-                Lire le guide <ChevronRight size={16} />
+              <Button variant="accent" size="lg" onClick={() => setView('guide')}
+                      className={styles.guideCardBtn}>
+                <BookOpen size={18} /> Lire le guide
               </Button>
             )}
           </div>

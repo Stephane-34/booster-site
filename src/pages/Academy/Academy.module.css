@@ -39,8 +39,19 @@
   justify-content: center;
   gap: var(--space-2);
   margin-bottom: var(--space-10);
+  padding-top: var(--space-4);
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-border);
+  /* Reste accessible pendant le scroll, juste sous le header principal
+     (--nav-height). Le fond est opaque et le flou reprend celui du header,
+     sinon le contenu défilerait en transparence derrière les onglets.
+     z-index sous celui du header (100) pour passer dessous, pas devant. */
+  position: sticky;
+  top: var(--nav-height);
+  z-index: 20;
+  background: rgba(15, 5, 24, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .tab {
@@ -559,31 +570,8 @@
   flex-wrap: wrap;
 }
 
-.moduleTopbarMeta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
 
-.moduleTopbarDay {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-text-muted);
-  font-weight: var(--weight-bold);
-}
 
-.moduleTopbarTheme {
-  display: inline-block;
-  padding: var(--space-1) var(--space-3);
-  background: rgba(168, 85, 247, 0.12);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  color: var(--color-primary-light);
-  font-weight: var(--weight-semibold);
-}
 
 /* - Quiz vue (dashboard) - */
 .quizHeader {
@@ -1453,73 +1441,13 @@
   color: var(--paper);
 }
 
-.livretHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding-bottom: var(--space-6);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: var(--space-6);
-}
 
-.livretPlate {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #B794F6, #7C3AED 55%, #4C1D95);
-  color: white;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.45);
-}
 
-.livretBrand {
-  margin: 0;
-  font-size: var(--text-lg);
-  font-weight: var(--weight-extrabold);
-  color: white;
-  letter-spacing: -0.01em;
-}
 
-.livretSub {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.55);
-}
 
-.livretTabs {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: var(--space-4);
-}
 
-.livretTab {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  cursor: pointer;
-  position: relative;
-  transition: color var(--transition-fast);
-}
 
-.livretTab:hover {
-  color: white;
-}
 
-.livretTabActive {
-  color: white;
-}
 
 .livretTabActive::after {
   content: '';
@@ -2691,18 +2619,135 @@
   cursor: not-allowed;
 }
 
-.weekNavBack {
-  padding: 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: inherit;
-  font-weight: var(--weight-semibold);
-  color: var(--color-primary-light);
-  text-decoration: underline;
-}
-
 @media (max-width: 600px) {
   .weekNav { gap: var(--space-2); }
   .weekNavBtn { width: 32px; height: 32px; }
 }
+
+/* ─── En-tête d'un module ───────────────────────────────────────────────────
+   Le titre du module prime ; la ligne au-dessus le situe dans la semaine. */
+.moduleHeader {
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-6);
+}
+
+.moduleHeaderMeta {
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary-light);
+}
+
+.moduleHeaderTitle {
+  margin: 0;
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-extrabold);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  text-wrap: balance;
+}
+
+/* Deux contenus du module présentés comme un choix franc, et non comme de
+   petits onglets : ce sont les deux actions principales de l'écran. */
+.moduleSwitch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.moduleSwitchBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+              color var(--transition-fast);
+}
+
+.moduleSwitchBtn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.moduleSwitchBtnActive {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.20), rgba(124, 58, 237, 0.12));
+  border-color: var(--color-border-active);
+  color: var(--color-text);
+}
+
+@media (max-width: 600px) {
+  .moduleHeaderTitle { font-size: var(--text-2xl); }
+  .moduleSwitchBtn   { padding: var(--space-4) var(--space-3); font-size: var(--text-sm); }
+}
+
+/* ─── Semaine sans corpus rédigé ────────────────────────────────────────── */
+.weekEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  padding: var(--space-10) var(--space-8);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.weekEmptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-muted);
+}
+
+.weekEmptyTitle {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text);
+  text-wrap: balance;
+}
+
+.weekEmptyText {
+  margin: 0;
+  max-width: 520px;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+/* Pastille « Nouveau » sur le guide fraîchement débloqué. */
+.guideCardBadge {
+  margin-left: var(--space-2);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: #052e16;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.guideCardBtn { flex-shrink: 0; }
+
+/* Le retour à la semaine en cours est une action, pas une note de bas de
+   paragraphe : il prend la forme d'un bouton. */
+.weekNavBack { margin-top: var(--space-4); }
