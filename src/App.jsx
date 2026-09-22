@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect, lazy, Suspense } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import RequireAuth from './components/RequireAuth';
@@ -15,7 +15,6 @@ import Home from './pages/Home';
    découpage, chaque visiteur non connecté la téléchargeait quand même. */
 const Investir         = lazy(() => import('./pages/Investir'));
 const Academy          = lazy(() => import('./pages/Academy'));
-const Dashboard        = lazy(() => import('./pages/Dashboard'));
 const Profile          = lazy(() => import('./pages/Profile'));
 const TonProjet        = lazy(() => import('./pages/TonProjet'));
 const MentionsLegales  = lazy(() => import('./pages/Legal/MentionsLegales'));
@@ -54,7 +53,13 @@ export default function App() {
                   déjà avoir un compte, il revient s'identifier). */}
               <Route path="/investir" element={<RequireAuth defaultTab="signup"><Investir /></RequireAuth>} />
               <Route path="/academie" element={<RequireAuth defaultTab="login"><Academy /></RequireAuth>} />
-              <Route path="/dashboard" element={<RequireAuth defaultTab="login"><Dashboard /></RequireAuth>} />
+              {/* Dashboard retiré avant le lancement : la page affichait un
+                  portefeuille entièrement codé en dur (12 840 €, 8,2 % de
+                  performance, un historique de versements fictif) sans aucune
+                  mention de son caractère fictif — inacceptable sur un site
+                  financier. Redirigée plutôt que supprimée, pour ne pas casser
+                  un signet ou un lien existant. */}
+              <Route path="/dashboard" element={<Navigate to="/academie" replace />} />
               <Route path="/profil" element={<RequireAuth defaultTab="login"><Profile /></RequireAuth>} />
               {/* Redirige les anciens liens /ton-projet vers /investir - à conserver tant que des partages externes peuvent pointer cette URL */}
               <Route path="/ton-projet" element={<TonProjet />} />

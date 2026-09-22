@@ -10,7 +10,7 @@ export default function EmailConfirmed() {
 
   useEffect(() => {
     if (count <= 0) {
-      navigate('/dashboard', { replace: true });
+      navigate('/academie', { replace: true });
       return;
     }
     const t = setTimeout(() => setCount((c) => c - 1), 1000);
@@ -28,7 +28,7 @@ export default function EmailConfirmed() {
         <p className={styles.countdown}>
           Redirection dans <strong>{count}</strong> seconde{count > 1 ? 's' : ''}…
         </p>
-        <Button variant="primary" size="lg" onClick={() => navigate('/dashboard', { replace: true })}>
+        <Button variant="primary" size="lg" onClick={() => navigate('/academie', { replace: true })}>
           Accéder à mon espace
         </Button>
       </div>

@@ -34,7 +34,7 @@ export default function ResetPassword() {
       const { error: err } = await supabase.auth.updateUser({ password });
       if (err) throw err;
       setDone(true);
-      setTimeout(() => navigate('/dashboard', { replace: true }), 3000);
+      setTimeout(() => navigate('/academie', { replace: true }), 3000);
     } catch (err) {
       setError(err.message || 'Une erreur est survenue. Réessaie.');
     } finally {

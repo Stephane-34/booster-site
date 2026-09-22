@@ -100,11 +100,6 @@ export default function CGU() {
                 <td>Avancé</td>
               </tr>
               <tr>
-                <td>Dashboard</td>
-                <td>Limité</td>
-                <td>Complet</td>
-              </tr>
-              <tr>
                 <td>Accès prioritaire conseillers</td>
                 <td>-</td>
                 <td>✓</td>

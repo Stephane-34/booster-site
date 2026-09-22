@@ -151,6 +151,7 @@ export default function Academy() {
           {section === 'progression' && (
             <ProgressionSection
               currentWeek={currentWeek}
+              academy={academy}
               completed={completed}
               onOpenModule={openModule}
             />
@@ -402,8 +403,13 @@ function ProgramSection({ currentWeek }) {
 const VALIDATION_THRESHOLD = 80; // seuil vert ≥ 80 %
 const DAYS_HEADER = ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'];
 
-function moduleStatus(weekN, dayIdx, currentWeek, completed) {
-  if (weekN > currentWeek) return 'locked';
+function moduleStatus(weekN, dayIdx, academy, completed) {
+  /* Même règle que la vue semaine : la comparaison porte sur le JOUR atteint,
+     pas seulement sur la semaine. L'ancienne version ne testait que
+     `weekN > currentWeek`, si bien que les six jours de la semaine en cours
+     apparaissaient ouverts dans « Ma progression » — on pouvait y démarrer le
+     quiz de vendredi un mardi, alors que la vue semaine le cadenassait. */
+  if (!isModuleUnlocked(weekN, dayIdx, academy)) return 'locked';
   /* On regarde la complétion uniquement pour les semaines dont le corpus
      est rédigé (présentes dans WEEKS). Les autres restent en "todo"
      quelle que soit la progression. */
@@ -419,7 +425,7 @@ function moduleStatus(weekN, dayIdx, currentWeek, completed) {
   return 'todo';
 }
 
-function ProgressionSection({ currentWeek, completed, onOpenModule }) {
+function ProgressionSection({ currentWeek, academy, completed, onOpenModule }) {
   const [comingSoonWeek, setComingSoonWeek] = useState(null);
 
   /* Stats globales - sur les modules effectivement validés parmi les
@@ -435,7 +441,7 @@ function ProgressionSection({ currentWeek, completed, onOpenModule }) {
     : 0;
 
   const handleClick = (weekN, dayIdx) => {
-    const status = moduleStatus(weekN, dayIdx, currentWeek, completed);
+    const status = moduleStatus(weekN, dayIdx, academy, completed);
     if (status === 'locked') return;
     const week = WEEKS[weekN];
     if (week) {
@@ -504,7 +510,7 @@ function ProgressionSection({ currentWeek, completed, onOpenModule }) {
                 <div key={week.n} className={styles.progressionWeekRow}>
                   <span className={styles.progressionWeekLabel}>S{week.n}</span>
                   {week.topics.map((topic, dayIdx) => {
-                    const status = moduleStatus(week.n, dayIdx, currentWeek, completed);
+                    const status = moduleStatus(week.n, dayIdx, academy, completed);
                     const isLocked = status === 'locked';
                     return (
                       <button
