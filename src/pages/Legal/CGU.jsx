@@ -154,7 +154,7 @@ export default function CGU() {
           <h2>8. Résiliation</h2>
           <p>
             Vous pouvez résilier votre compte à tout moment depuis les paramètres de votre
-            espace personnel ou en contactant <a href="mailto:contact@boosterfintech.com">contact@boosterfintech.com</a>.
+            espace personnel, ou par courrier adressé au siège social.
           </p>
           <p>
             Booster S.A. se réserve le droit de suspendre ou supprimer tout compte en cas
@@ -178,8 +178,8 @@ export default function CGU() {
 
           <h2>Contact</h2>
           <p>
-            Pour toute question relative aux présentes CGU :{' '}
-            <a href="mailto:legal@boosterfintech.com">legal@boosterfintech.com</a>
+            Pour toute question relative aux présentes CGU, écrivez-nous au siège
+            social : 2, Rue du Fort Bourbon, L-1249 Luxembourg.
           </p>
         </article>
       </div>

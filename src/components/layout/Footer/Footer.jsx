@@ -13,9 +13,12 @@ const LINKS = {
     { label: 'Politique de confidentialité', to: '/confidentialite' },
     { label: 'CGU', to: '/cgu' },
   ],
+  /* Aucune adresse email n'est publiée tant que les boîtes ne sont pas
+     ouvertes : mieux vaut pas de contact qu'un contact qui ne répond pas.
+     Le contact légal passe par le siège social, indiqué dans les mentions. */
   contact: [
     { label: 'Prendre RDV', to: '/investir#rdv' },
-    { label: 'contact@boosterfintech.com', to: 'mailto:contact@boosterfintech.com' },
+    { label: 'Mentions légales', to: '/mentions-legales' },
   ],
 };
 

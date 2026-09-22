@@ -22,8 +22,8 @@ export default function MentionsLegales() {
           </p>
           <p>
             <strong>Directeur de la publication :</strong> Édouard Martin<br />
-            <strong>Contact :</strong>{' '}
-            <a href="mailto:contact@boosterfintech.com">contact@boosterfintech.com</a>
+            <strong>Contact :</strong> par courrier au siège social,
+            2, Rue du Fort Bourbon, L-1249 Luxembourg
           </p>
 
           <h2>Hébergement</h2>

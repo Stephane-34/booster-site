@@ -24,7 +24,8 @@ export default function Confidentialite() {
             <strong>Booster S.A.</strong><br />
             2, Rue du Fort Bourbon, L-1249 Luxembourg<br />
             RCS Luxembourg : B 123456<br />
-            Contact DPO : <a href="mailto:privacy@boosterfintech.com">privacy@boosterfintech.com</a>
+            Contact du délégué à la protection des données : par courrier à
+            l'adresse ci-dessus, mention « DPO »
           </p>
 
           <h2>2. Données collectées</h2>
@@ -173,8 +174,8 @@ export default function Confidentialite() {
             </li>
           </ul>
           <p>
-            Pour tout autre exercice de vos droits, contactez notre DPO :{' '}
-            <a href="mailto:privacy@boosterfintech.com">privacy@boosterfintech.com</a>. Nous répondrons
+            Pour tout autre exercice de vos droits, adressez votre demande par
+            courrier au siège social (2, Rue du Fort Bourbon, L-1249 Luxembourg), mention « DPO ». Nous répondrons
             dans un délai d'un mois. En cas de réponse insatisfaisante, vous pouvez
             introduire une réclamation auprès de la{' '}
             <strong>Commission Nationale pour la Protection des Données (CNPD)</strong>{' '}
@@ -200,8 +201,8 @@ export default function Confidentialite() {
           <p>
             Vous pouvez changer d'avis à tout moment en vidant les cookies de votre
             navigateur pour ce site : la bannière de consentement réapparaîtra à la
-            visite suivante. Vous pouvez aussi nous contacter à{' '}
-            <a href="mailto:privacy@boosterfintech.com">privacy@boosterfintech.com</a>.
+            visite suivante. Vous pouvez aussi nous écrire par courrier au siège
+            social, mention « DPO ».
           </p>
 
           <h2>8. Sécurité</h2>

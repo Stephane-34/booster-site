@@ -23,6 +23,7 @@ const CGU              = lazy(() => import('./pages/Legal/CGU'));
 const Confidentialite  = lazy(() => import('./pages/Legal/Confidentialite'));
 const EmailConfirmed   = lazy(() => import('./pages/EmailConfirmed'));
 const ResetPassword    = lazy(() => import('./pages/ResetPassword'));
+const NotFound         = lazy(() => import('./pages/NotFound'));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -62,6 +63,10 @@ export default function App() {
               <Route path="/confidentialite" element={<Confidentialite />} />
               <Route path="/email-confirmed" element={<EmailConfirmed />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              {/* Attrape-tout : le rewrite Vercel sert index.html pour toute
+                  URL inconnue, sans quoi une adresse erronée afficherait la
+                  page d'accueil sans le dire. */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </main>
