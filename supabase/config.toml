@@ -194,8 +194,11 @@ minimum_password_length = 6
 password_requirements = ""
 
 [auth.rate_limit]
-# Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-email_sent = 2
+# Nombre d'emails par heure. Le plafond de 2 venait du service intégré de
+# Supabase ; avec un SMTP dédié il devient inutilement bloquant — il suffisait
+# de deux inscriptions dans l'heure pour que la troisième ne reçoive rien.
+# 100 correspond à la limite quotidienne du plan gratuit Resend.
+email_sent = 100
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 sms_sent = 30
 # Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
@@ -237,15 +240,25 @@ otp_length = 8
 # Number of seconds before the email OTP expires (defaults to 1 hour).
 otp_expiry = 3600
 
-# Use a production-ready SMTP server
-# [auth.email.smtp]
-# enabled = true
-# host = "smtp.sendgrid.net"
-# port = 587
-# user = "apikey"
-# pass = "env(SENDGRID_API_KEY)"
-# admin_email = "admin@email.com"
-# sender_name = "Admin"
+# SMTP de production (Resend).
+# Le service intégré de Supabase ne livrait qu'aux membres de l'équipe du
+# projet — toute autre adresse recevait « Email address not authorized », donc
+# aucun inscrit ne pouvait confirmer son compte.
+#
+# La clé n'est JAMAIS écrite ici : `env(...)` la lit dans l'environnement au
+# moment du `supabase config push`. Ce fichier est versionné sur GitHub.
+#
+# Port 587 (STARTTLS) plutôt que 465 (SSL implicite) : c'est le port sortant
+# le plus largement autorisé, et celui que retiennent la plupart des
+# configurations standard.
+[auth.email.smtp]
+enabled = true
+host = "smtp.resend.com"
+port = 587
+user = "resend"
+pass = "env(RESEND_API_KEY)"
+admin_email = "noreply@boosterfintech.com"
+sender_name = "Booster"
 
 # Template de confirmation d'inscription aux couleurs Booster.
 # Le fichier ne contient volontairement aucun commentaire HTML : son contenu
