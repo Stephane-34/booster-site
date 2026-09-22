@@ -1,3 +1,10 @@
+/* ─── NON UTILISÉ ───────────────────────────────────────────────────────────
+   Ce module n'est plus monté nulle part : il n'était monté que sur la Home, qui ne l'affiche plus.
+   La prise de RDV vit dans InlineBookingCTA, sur /investir.
+   Conservé volontairement, pas supprimé — il reste fonctionnel et prêt à être
+   rebranché. Tant qu'il n'est importé par aucune route, il ne part pas dans
+   le bundle (Vite ne bundle que ce qui est importé).
+   ─────────────────────────────────────────────────────────────────────────── */
 import { Calendar, Clock, User, CheckCircle, Lock } from 'lucide-react';
 import Badge from '../../ui/Badge/Badge';
 import Button from '../../ui/Button/Button';

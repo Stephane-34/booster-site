@@ -1,3 +1,10 @@
+/* ─── NON UTILISÉ ───────────────────────────────────────────────────────────
+   Ce module n'est plus monté nulle part : plus monté depuis la refonte de la Home. Les simulateurs vivent
+   aujourd'hui sur /investir.
+   Conservé volontairement, pas supprimé — il reste fonctionnel et prêt à être
+   rebranché. Tant qu'il n'est importé par aucune route, il ne part pas dans
+   le bundle (Vite ne bundle que ce qui est importé).
+   ─────────────────────────────────────────────────────────────────────────── */
 import { useState, useMemo } from 'react';
 import { TrendingUp, Info } from 'lucide-react';
 import clsx from 'clsx';

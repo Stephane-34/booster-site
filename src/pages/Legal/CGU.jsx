@@ -39,9 +39,6 @@ export default function CGU() {
               Une <strong>mise en relation</strong> avec des conseillers en gestion de
               patrimoine pour l'ouverture et le suivi de contrats d'assurance-vie luxembourgeois.
             </li>
-            <li>
-              Un <strong>dashboard</strong> personnel permettant de suivre ses investissements.
-            </li>
           </ul>
 
           <div className={styles.infoBox}>

@@ -17,5 +17,13 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      /* Les espaces insécables sont délibérés dans les textes français :
+         ils empêchent « 50 € » de se couper en fin de ligne. Sans cette
+         option, trois avertissements permanents finiraient par masquer un
+         vrai caractère invisible collé par erreur. `skipJSXText` n'autorise
+         l'irrégularité que dans le texte affiché, pas dans le code. */
+      'no-irregular-whitespace': ['error', { skipJSXText: true }],
+    },
   },
 ])

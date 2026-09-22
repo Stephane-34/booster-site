@@ -1,3 +1,10 @@
+/* ─── NON UTILISÉ ───────────────────────────────────────────────────────────
+   Ce module n'est plus monté nulle part : aucune route ne pointe vers cette page dans App.jsx — elle n'a jamais été
+   branchée.
+   Conservé volontairement, pas supprimé — il reste fonctionnel et prêt à être
+   rebranché. Tant qu'il n'est importé par aucune route, il ne part pas dans
+   le bundle (Vite ne bundle que ce qui est importé).
+   ─────────────────────────────────────────────────────────────────────────── */
 import { Link } from 'react-router-dom';
 import { Shield, Brain, ArrowRight } from 'lucide-react';
 import Badge from '../../components/ui/Badge/Badge';

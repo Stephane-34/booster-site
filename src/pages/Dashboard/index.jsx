@@ -1,3 +1,10 @@
+/* ─── NON UTILISÉ ───────────────────────────────────────────────────────────
+   Ce module n'est plus monté nulle part : la page affichait un portefeuille codé en dur, retirée avant le lancement.
+   /dashboard redirige désormais vers /academie.
+   Conservé volontairement, pas supprimé — il reste fonctionnel et prêt à être
+   rebranché. Tant qu'il n'est importé par aucune route, il ne part pas dans
+   le bundle (Vite ne bundle que ce qui est importé).
+   ─────────────────────────────────────────────────────────────────────────── */
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {

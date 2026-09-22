@@ -150,7 +150,6 @@ export default function Academy() {
           )}
           {section === 'progression' && (
             <ProgressionSection
-              currentWeek={currentWeek}
               academy={academy}
               completed={completed}
               onOpenModule={openModule}
@@ -425,7 +424,7 @@ function moduleStatus(weekN, dayIdx, academy, completed) {
   return 'todo';
 }
 
-function ProgressionSection({ currentWeek, academy, completed, onOpenModule }) {
+function ProgressionSection({ academy, completed, onOpenModule }) {
   const [comingSoonWeek, setComingSoonWeek] = useState(null);
 
   /* Stats globales - sur les modules effectivement validés parmi les

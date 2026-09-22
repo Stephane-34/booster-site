@@ -1054,7 +1054,11 @@ function InlineBookingCTA() {
   }
 
   return (
-    <div className={styles.bookingBlock}>
+    /* id="rdv" : cible du lien « Prendre RDV » du footer (/investir#rdv).
+       L'ancre vivait auparavant dans BookingCTA, qui n'est plus monté depuis
+       que les avis ont été retirés de la Home — le lien ne menait donc nulle
+       part. */
+    <div id="rdv" className={styles.bookingBlock}>
       <div className={styles.bookingHeader}>
         <Badge variant="primary">
           <Calendar size={12} />

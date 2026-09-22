@@ -1,3 +1,10 @@
+/* ─── NON UTILISÉ ───────────────────────────────────────────────────────────
+   Ce module n'est plus monté nulle part : plus monté depuis la refonte de la Home. Son texte promettait encore un
+   accès au dashboard, page depuis retirée.
+   Conservé volontairement, pas supprimé — il reste fonctionnel et prêt à être
+   rebranché. Tant qu'il n'est importé par aucune route, il ne part pas dans
+   le bundle (Vite ne bundle que ce qui est importé).
+   ─────────────────────────────────────────────────────────────────────────── */
 import { ArrowRight } from 'lucide-react';
 import Badge from '../../ui/Badge/Badge';
 import Button from '../../ui/Button/Button';
