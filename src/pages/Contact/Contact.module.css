@@ -1,0 +1,144 @@
+.page {
+  /* Header en position: fixed sur --nav-height, comme les autres pages. */
+  padding: calc(var(--nav-height) + var(--space-16)) 0 var(--space-24);
+  min-height: 70vh;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.icon,
+.successIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.14);
+  color: var(--color-primary-light);
+}
+
+.successIcon {
+  background: rgba(74, 222, 128, 0.14);
+  color: var(--color-accent);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+  font-weight: var(--weight-extrabold);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  text-wrap: balance;
+}
+
+.text {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.text a { color: var(--color-primary-light); }
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+  margin-top: var(--space-6);
+  text-align: left;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 160px;
+  line-height: 1.6;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-border-active);
+  background: var(--color-surface-hover);
+}
+
+.counter {
+  margin: 0;
+  text-align: right;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* Honeypot : hors écran plutôt que display:none, certains robots ignorant les
+   champs masqués de cette façon. aria-hidden et tabIndex -1 le retirent de
+   l'ordre de tabulation et des lecteurs d'écran. */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: rgba(248, 113, 113, 0.10);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+}
+
+.submit { align-self: flex-start; }
+
+.legal {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.legal a { color: var(--color-text-secondary); text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .submit { align-self: stretch; }
+}

@@ -17,6 +17,7 @@ const LINKS = {
      ouvertes : mieux vaut pas de contact qu'un contact qui ne répond pas.
      Le contact légal passe par le siège social, indiqué dans les mentions. */
   contact: [
+    { label: 'Nous écrire', to: '/contact' },
     { label: 'Prendre RDV', to: '/investir#rdv' },
     { label: 'Mentions légales', to: '/mentions-legales' },
   ],

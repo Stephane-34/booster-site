@@ -99,7 +99,7 @@ export default function Hero({ onCTAClick, firstName }) {
             <div className={styles.phoneHeader}>
               <div className={styles.phoneAvatar}>E</div>
               <div>
-                <p className={styles.phoneGreeting}>Bonjour Édouard 👋</p>
+                <p className={styles.phoneGreeting}>Bonjour 👋</p>
                 <p className={styles.phoneDate}>Avril 2025</p>
               </div>
             </div>

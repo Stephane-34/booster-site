@@ -93,6 +93,10 @@ export default function Confidentialite() {
                 <td>Exécution du contrat / Consentement</td>
               </tr>
               <tr>
+                <td>Réponse aux demandes envoyées via le formulaire de contact</td>
+                <td>Intérêt légitime</td>
+              </tr>
+              <tr>
                 <td>Envoi de communications marketing</td>
                 <td>Consentement</td>
               </tr>
@@ -131,7 +135,8 @@ export default function Confidentialite() {
           <ul>
             <li>
               <strong>Prestataires techniques :</strong> Supabase (base de données, authentification),
-              Vercel (hébergement), HubSpot (CRM et prise de RDV).
+              Vercel (hébergement), Resend (envoi des emails, serveurs situés dans
+              l'Union européenne), HubSpot (CRM et prise de RDV).
             </li>
             <li>
               <strong>Partenaires financiers :</strong> compagnies d'assurance luxembourgeoises
