@@ -18,7 +18,10 @@ const MAX = { name: 100, email: 150, message: 4000 };
  * du travail. */
 const derniers = new Map();
 const FENETRE = 60_000;   // 1 minute
-const MAX_PAR_FENETRE = 3;
+/* 5 et non 3 : à 3, quelqu'un qui envoie un message, se rend compte d'une
+   erreur et renvoie une correction se faisait bloquer. Un robot, lui, est
+   arrêté par le honeypot bien avant d'atteindre ce seuil. */
+const MAX_PAR_FENETRE = 5;
 
 function tropDeRequetes(ip) {
   const maintenant = Date.now();
