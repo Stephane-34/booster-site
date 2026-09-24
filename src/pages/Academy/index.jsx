@@ -37,6 +37,7 @@ import Modal from '../../components/ui/Modal/Modal';
 import { useAcademyProgress } from '../../hooks/useAcademyProgress';
 import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES, WEEK_GUIDES, MODULE_FLASHCARDS } from './data';
 import { academyState, isModuleUnlocked, isWeekGuideUnlocked, formatStartDate } from '../../utils/academyCalendar';
+import { loadWeekQuestions, weekOfModule } from './weeks';
 import styles from './Academy.module.css';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -561,6 +562,31 @@ function ProgressionSection({ academy, completed, onOpenModule }) {
   );
 }
 
+/* Charge les questions du module demandé. Elles ne sont plus dans WEEKS :
+   les 1560 questions pèsent ~950 Ko et ne concernent qu'un module à la fois
+   (cf. weeks.js). Retourne null tant que le chargement est en cours. */
+function useModuleQuestions(moduleId) {
+  const [questions, setQuestions] = useState(null);
+
+  useEffect(() => {
+    if (!moduleId) { setQuestions(null); return; }
+    let vivant = true;
+    setQuestions(null);
+    const semaine = weekOfModule(moduleId);
+    loadWeekQuestions(semaine)
+      .then((parModule) => { if (vivant) setQuestions(parModule?.[moduleId] ?? []); })
+      .catch((err) => {
+        /* Réseau coupé ou chunk absent : on retombe sur une liste vide plutôt
+           que de laisser la vue bloquée sur son écran de chargement. */
+        console.error('[Academy] chargement des questions', err);
+        if (vivant) setQuestions([]);
+      });
+    return () => { vivant = false; };
+  }, [moduleId]);
+
+  return questions;
+}
+
 /* ─── Section "Ma semaine en cours" ───────────────────────── */
 /* `activeModuleId` / `moduleTab` viennent du parent Academy : ils sont
    partagés avec ProgressionSection pour permettre d'ouvrir un module
@@ -577,6 +603,11 @@ function DashboardSection({
   /* Sous-onglets à l'intérieur d'un module ouvert (quiz / flashcards / guide).
      La vue module s'affiche dès que `activeModuleId` est set - indépendant
      de `view`, qui gère seulement dashboard vs leaderboard. */
+
+  /* Appelé inconditionnellement, avant tout retour anticipé : un hook ne peut
+     pas être placé derrière un `if`. Il ne déclenche un chargement que si un
+     module est ouvert. */
+  const moduleQuestions = useModuleQuestions(activeModuleId);
 
   const movingAvg = useMemo(() => {
     const ninetyDaysMs = 90 * DAY_MS;
@@ -631,6 +662,35 @@ function DashboardSection({
       return null;
     }
     const existingRecord = completed[day.id]; // récap si déjà complété
+
+    /* Les questions arrivent en différé : tant qu'elles ne sont pas là, on
+       affiche l'en-tête du module et un message d'attente plutôt qu'une page
+       vide ou un quiz sans contenu. */
+    if (!moduleQuestions) {
+      return (
+        <div className={styles.dashWrap}>
+          <div className={styles.livretRoot}>
+            <header className={styles.moduleHero}>
+              <div className={styles.moduleHeroTop}>
+                <button type="button" onClick={closeModule} className={styles.moduleBackBtn}
+                        aria-label="Retour à ma semaine">
+                  <ChevronLeft size={18} />
+                </button>
+                <div className={styles.moduleHeroText}>
+                  <p className={styles.moduleHeroMeta}>{day.dayName} · {day.theme}</p>
+                  <h2 className={styles.moduleHeroTitle}>{day.title}</h2>
+                </div>
+              </div>
+            </header>
+            <p className={styles.dashLoading}>Chargement du module…</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* Le reste du composant travaille sur un jour complet, questions
+       comprises : on les raccroche ici. */
+    const dayWithQuestions = { ...day, questions: moduleQuestions };
     /* Le Guide ne figure plus ici : il est passé hebdomadaire et vit sur la
        vue semaine (cf. WeekGuideCard). Restent les deux contenus liés au
        module du jour : le quiz et ses fiches mémo. */
@@ -684,9 +744,9 @@ function DashboardSection({
           <div className={styles.livretBody}>
             {moduleTab === 'quiz' && (
               <ModuleQuizView
-                day={day}
+                day={dayWithQuestions}
                 existingRecord={existingRecord}
-                onSubmit={(results) => saveQuizResult(day, results)}
+                onSubmit={(results) => saveQuizResult(dayWithQuestions, results)}
               />
             )}
             {moduleTab === 'flashcards' && (
