@@ -42,3 +42,8 @@ contexte/
 
 # Cache CLI Supabase
 supabase/.temp/
+
+# Sources de contenu (corpus de quiz) : volumineuses et non nécessaires au
+# build. Elles servent d'entrée aux imports, pas au site.
+*.pdf
+*.docx
