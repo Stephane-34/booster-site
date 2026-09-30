@@ -35,7 +35,8 @@ import {
 import Button from '../../components/ui/Button/Button';
 import Modal from '../../components/ui/Modal/Modal';
 import { useAcademyProgress } from '../../hooks/useAcademyProgress';
-import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES, WEEK_GUIDES, MODULE_FLASHCARDS } from './data';
+import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES, WEEK_GUIDES, MODULE_FLASHCARDS,
+         CORPUS_A_JOUR_LABEL } from './data';
 import { academyState, isModuleUnlocked, isWeekGuideUnlocked, formatStartDate } from '../../utils/academyCalendar';
 import { loadWeekQuestions, weekOfModule } from './weeks';
 import styles from './Academy.module.css';
@@ -739,6 +740,13 @@ function DashboardSection({
                 </button>
               ))}
             </div>
+
+            {/* Les questions citent des seuils et des taux qui changent chaque
+                année : on affiche la date de référence plutôt que de laisser
+                croire à un contenu intemporel. */}
+            <p className={styles.moduleHeroDate}>
+              Contenu à jour au regard de la réglementation en vigueur en {CORPUS_A_JOUR_LABEL}.
+            </p>
           </header>
 
           <div className={styles.livretBody}>

@@ -2761,3 +2761,13 @@
   .moduleHeroTitle { font-size: var(--text-2xl); }
   .moduleSwitchBtn { padding: var(--space-3); font-size: var(--text-sm); }
 }
+
+/* Date de référence du corpus, affichée sous le sélecteur de contenu d'un
+   module. Discrète mais présente : les questions citent des seuils et des
+   taux qui évoluent chaque année. */
+.moduleHeroDate {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}

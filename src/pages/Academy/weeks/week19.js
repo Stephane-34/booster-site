@@ -113,7 +113,7 @@ export default {
       options: ['Sous forme de dons associatifs', 'Exclusivement en actions de l\'entreprise', 'Sortir la totalité en "Capital" (en une fois ou en fractionné) OU transformer cette épargne en "Rente viagère" (un revenu garanti versé tous les mois jusqu\'au décès)', 'Il faut payer pour la récupérer'],
       correct: 2, rationale: 'Le nouveau PER français offre cette grande liberté de choix, qui était très attendue par les épargnants.' },
     { q: 'Quelle affirmation est FAUSSE concernant la retraite par capitalisation en France ?',
-      options: ['Elle remplace totalement la Sécurité Sociale (régime de base) depuis 2023', 'L\'État encourage la capitalisation par la déduction fiscale des versements', 'Le PER est l\'outil phare de la capitalisation', 'L\'argent de la capitalisation est bloqué (sauf cas prévus) jusqu\'à la retraite'],
+      options: ['Elle remplace totalement la Sécurité Sociale (régime de base) depuis 2023', 'L\'État encourage la capitalisation par la déduction fiscale des versements', 'Le PER est l\'outil le plus répandu de la capitalisation', 'L\'argent de la capitalisation est bloqué (sauf cas prévus) jusqu\'à la retraite'],
       correct: 0, rationale: 'C\'est totalement faux. Le système français reste fermement ancré sur la Répartition. La capitalisation n\'est qu\'un étage "supplémentaire" (facultatif).' },
     { q: '(Challenge) Aux États-Unis, le système de retraite repose énormément sur la capitalisation. Comment s\'appelle le célèbre compte d\'épargne retraite d\'entreprise américain ?',
       options: ['Le Livret A', 'Le 401(k)', 'Le Dow Jones', 'La Green Card'],

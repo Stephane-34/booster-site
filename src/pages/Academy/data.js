@@ -1,3 +1,20 @@
+/* Date de référence du corpus de quiz.
+ *
+ * Les questions citent des valeurs qui changent presque chaque année :
+ * plafond du quotient familial, taux d'endettement maximal recommandé par le
+ * HCSF, taux du PFU, âge légal de départ à la retraite, franchise
+ * catastrophe naturelle, taux des indemnités journalières… Sans date affichée,
+ * un contenu vieilli enseigne des chiffres faux sans que rien ne le signale.
+ *
+ * À mettre à jour à chaque revue du corpus, en même temps que les valeurs.
+ */
+export const CORPUS_A_JOUR_AU = '2026-01-01';
+
+/* Libellé prêt à afficher : « janvier 2026 ». */
+export const CORPUS_A_JOUR_LABEL = new Intl.DateTimeFormat('fr-FR', {
+  month: 'long', year: 'numeric',
+}).format(new Date(CORPUS_A_JOUR_AU));
+
 /* Données statiques pour la page EXEMPLE.
    Aucune source d'autorité ici : c'est uniquement pour faire vivre la démo.
    Le contenu vient du brief client (cdc_extracted/modif-booster.docx). */
