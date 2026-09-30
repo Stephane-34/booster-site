@@ -141,7 +141,7 @@ export const WEEKS = {
   ],
   3: [
     { id: 'w3-d0', dayName: 'Lundi', theme: 'Enrichissement & Placement', title: 'L\'inflation' },
-    { id: 'w3-d1', dayName: 'Mardi', theme: 'Fiscalité', title: 'Les Tranches Marginales d\'Imposition - TMI' },
+    { id: 'w3-d1', dayName: 'Mardi', theme: 'Fiscalité', title: 'Les Tranches Marginales d\'Imposition (TMI)' },
     { id: 'w3-d2', dayName: 'Mercredi', theme: 'Retraite', title: 'Âge légal et taux plein' },
     { id: 'w3-d3', dayName: 'Jeudi', theme: 'Transmission', title: 'Le rôle du notaire' },
     { id: 'w3-d4', dayName: 'Vendredi', theme: 'IARD & Prévoyance', title: 'MRH pour le locataire' },
@@ -166,10 +166,10 @@ export const WEEKS = {
   6: [
     { id: 'w6-d0', dayName: 'Lundi', theme: 'Enrichissement & Placement', title: 'Le rendement' },
     { id: 'w6-d1', dayName: 'Mardi', theme: 'Fiscalité', title: 'Déclarer ses revenus' },
-    { id: 'w6-d2', dayName: 'Mercredi', theme: 'Retraite', title: 'Le minimum contributif' },
-    { id: 'w6-d3', dayName: 'Jeudi', theme: 'Transmission', title: 'Droits du conjoint survivant' },
-    { id: 'w6-d4', dayName: 'Vendredi', theme: 'IARD & Prévoyance', title: 'Assurance auto - Tiers/Tous risques' },
-    { id: 'w6-d5', dayName: 'Samedi', theme: 'Immobilier', title: 'PTZ et aides à l\'achat' },
+    { id: 'w6-d2', dayName: 'Mercredi', theme: 'Retraite', title: 'Le régime de base - CNAV' },
+    { id: 'w6-d3', dayName: 'Jeudi', theme: 'Transmission', title: 'Les frais de succession' },
+    { id: 'w6-d4', dayName: 'Vendredi', theme: 'IARD & Prévoyance', title: 'Protection juridique' },
+    { id: 'w6-d5', dayName: 'Samedi', theme: 'Immobilier', title: 'Le délai de rétractation - SRU' },
   ],
   7: [
     { id: 'w7-d0', dayName: 'Lundi', theme: 'Enrichissement & Placement', title: 'L\'intérêt' },
@@ -198,10 +198,10 @@ export const WEEKS = {
   10: [
     { id: 'w10-d0', dayName: 'Lundi', theme: 'Enrichissement & Placement', title: 'La liquidité' },
     { id: 'w10-d1', dayName: 'Mardi', theme: 'Fiscalité', title: 'Introduction aux niches fiscales' },
-    { id: 'w10-d2', dayName: 'Mercredi', theme: 'Retraite', title: 'La pension de réversion' },
-    { id: 'w10-d3', dayName: 'Jeudi', theme: 'Transmission', title: 'La donation simple' },
-    { id: 'w10-d4', dayName: 'Vendredi', theme: 'IARD & Prévoyance', title: 'La protection juridique' },
-    { id: 'w10-d5', dayName: 'Samedi', theme: 'Immobilier', title: 'Le délai de rétractation - SRU' },
+    { id: 'w10-d2', dayName: 'Mercredi', theme: 'Retraite', title: 'L\'expatriation - bases' },
+    { id: 'w10-d3', dayName: 'Jeudi', theme: 'Transmission', title: 'Le démembrement - concept' },
+    { id: 'w10-d4', dayName: 'Vendredi', theme: 'IARD & Prévoyance', title: 'Télétravail et assurances' },
+    { id: 'w10-d5', dayName: 'Samedi', theme: 'Immobilier', title: 'Les garanties du crédit - Hypothèque vs Caution' },
   ],
   11: [
     { id: 'w11-d0', dayName: 'Lundi', theme: 'Enrichissement & Placement', title: 'La diversification' },
