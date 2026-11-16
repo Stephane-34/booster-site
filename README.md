@@ -158,12 +158,14 @@ src/
   pages/                  une route = un dossier
     Academy/
       data.js             métadonnées des 26 semaines, guides, fiches mémo
+      memo.js             fiches mémo et récap de semaine dérivés des quiz
       weeks.js            chargement à la demande des questions
       weeks/weekN.js      questions d'une semaine (26 fichiers)
   services/
     supabase.js           client Supabase et toutes les requêtes
   utils/
     academyCalendar.js    calendrier de l'Académie (jours civils)
+    quizShuffle.js        permutation déterministe des réponses
     calculators.js        simulateurs financiers
 supabase/
   config.toml             configuration auth, poussée par `config push`
@@ -246,8 +248,8 @@ Parcours de 52 semaines, six modules par semaine (lundi → samedi, dimanche au 
 | Semaines rédigées | **26** sur 52 |
 | Modules | 156 |
 | Questions | 1560 (10 par module) |
-| Guides hebdomadaires | 2 |
-| Fiches mémo | 60 (5 par module, semaines 1-2) |
+| Guides hebdomadaires rédigés | 2 ; les 24 autres semaines affichent un récap dérivé de leurs quiz |
+| Fiches mémo rédigées | 60 (5 par module, semaines 1-2) ; les autres modules dérivent les leurs de leurs questions |
 | Corpus à jour au | **janvier 2026** (`CORPUS_A_JOUR_AU`) |
 
 ### Règles de déblocage
@@ -256,7 +258,21 @@ Le parcours suit les **jours réels** : lundi = module 1, mardi = module 2… Un
 
 Un module se débloque chaque jour à minuit, indépendamment de la complétion du précédent. Les modules manqués restent accessibles, et les semaines passées sont consultables.
 
-Le **guide hebdomadaire** sort le samedi, une fois les six modules publiés.
+Le **guide hebdomadaire** sort le samedi, une fois les six modules publiés. Il reste ouvert le dimanche puis sur toutes les semaines passées.
+
+`academyState()` ramène la date de démarrage au lundi de sa semaine avant tout calcul. La base pose déjà un lundi (`academy_start_monday`), mais une donnée ancienne ou un compte décalé à la main suffirait sinon à faire glisser tout le semainier : le « samedi » du programme tomberait un mardi et la carte du guide ne s'ouvrirait jamais le week-end.
+
+### Fiches mémo et récap de semaine
+
+Les fiches mémo sont **toujours celles du module ouvert**. Rédigées à la main pour les semaines 1 et 2 (`MODULE_FLASHCARDS`), elles sont sinon dérivées des questions du module : la question au recto, sa bonne réponse et son explication au verso (`fichesDuModule`, dans `memo.js`). Il n'existe plus de corpus de repli : les 13 fiches génériques servaient 144 modules sur 156, ce qui donnait les mêmes fiches après presque tous les quiz.
+
+Même logique pour le samedi : `recapDeLaSemaine()` compose, pour les semaines sans guide rédigé, trois questions-réponses par module, soit dix-huit points pour la semaine.
+
+### Ordre des réponses
+
+`melangerQuestions()` (dans `utils/quizShuffle.js`) permute les options avant affichage. Le corpus place la bonne réponse en B une fois sur deux ; après permutation, les quatre positions tombent à 25 %. Le mélange est déterministe (graine = identifiant du module + rang de la question) : un re-rendu ne réordonne rien sous le doigt de l'utilisateur, et refaire un quiz retrouve le même ordre.
+
+> **Le second repère reste entier :** dans 92 % des questions, la bonne réponse est la **plus longue** des quatre, avec 86 caractères d'écart moyen. Permuter n'y change rien ; seule une réécriture du corpus le corrigerait.
 
 ### Chargement des questions
 
@@ -309,7 +325,7 @@ La CSP autorise nommément Google Fonts, l'API Supabase et l'iframe HubSpot. **T
 | **Validation réglementaire** | la frontière entre éducation financière et conseil en investissement (statut CIF, AMF) n'a pas été validée par un professionnel |
 | **Exactitude du corpus** | seule la structure des 1560 questions a été vérifiée, pas le fond de chacune |
 | **Doublons de contenu** | 5 paires de modules posent les mêmes questions (S6/S7 mercredi et jeudi, S10/S12 jeudi, vendredi et samedi) — vient du document source |
-| **Équilibre des réponses** | la bonne réponse est en B dans 50 % des cas (A 15 %, C 26 %, D 9 %) |
+| **Équilibre des réponses** | position corrigée par le mélange (25 % par option) ; la bonne réponse reste la plus longue dans 92 % des questions, ce qui demande une réécriture du corpus |
 | **Contenu** | 26 semaines sur 52 ; 2 guides sur 26 |
 | **Adresses de contact** | aucune boîte `@boosterfintech.com` n'existe : les pages légales renvoient au courrier postal |
 | **Quota Resend** | 100 emails/jour en plan gratuit |

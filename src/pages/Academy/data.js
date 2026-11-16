@@ -472,22 +472,13 @@ export const QUIZ_DATA = [
   },
 ];
 
-/* ─── Flashcards ──────────────────────────────────────────── */
-export const FLASHCARDS = [
-  { id: 'f1',  front: 'Intérêts simples',          back: 'Intérêts calculés uniquement sur le capital initial, sans tenir compte des intérêts déjà générés.' },
-  { id: 'f2',  front: 'Formule intérêts simples',  back: 'I = C × t × n (Capital × taux × durée).' },
-  { id: 'f3',  front: 'Intérêts composés',         back: "Les intérêts s'ajoutent au capital pour produire de nouveaux intérêts. Effet boule de neige." },
-  { id: 'f4',  front: 'Règle de 72',               back: 'Temps pour doubler un capital ≈ 72 / taux annuel.' },
-  { id: 'f5',  front: 'Inflation',                 back: "Hausse générale des prix entraînant une perte de pouvoir d'achat de la monnaie." },
-  { id: 'f6',  front: 'Rendement réel',            back: 'Rendement réel = Rendement nominal − Inflation.' },
-  { id: 'f7',  front: 'Action',                    back: "Titre de propriété : une part du capital d'une entreprise." },
-  { id: 'f8',  front: 'Obligation',                back: "Titre de créance : un prêt accordé contre paiement d'intérêts." },
-  { id: 'f9',  front: 'Diversification',           back: 'Répartir entre plusieurs actifs pour réduire le risque global.' },
-  { id: 'f10', front: 'ETF (tracker)',             back: "Fonds coté en bourse qui réplique la performance d'un indice." },
-  { id: 'f11', front: "Liquidité d'un actif",      back: 'Facilité à le vendre rapidement sans perte de valeur.' },
-  { id: 'f12', front: "Fonds d'urgence",           back: 'Épargne de précaution, liquide, dédiée aux imprévus.' },
-  { id: 'f13', front: 'Règle 50/30/20',            back: 'Budget : 50 % besoins, 30 % loisirs, 20 % épargne et investissement.' },
-];
+/* ─── Flashcards ──────────────────────────────────────────────────────────
+   Le corpus global de 13 fiches a été retiré : il servait de repli quand un
+   module n'avait pas de fiches rédigées, et c'est précisément ce qui donnait
+   les mêmes fiches sur presque tous les quiz (144 modules sur 156 en
+   dépendaient). Les fiches sont désormais celles du module, rédigées à la
+   main dans MODULE_FLASHCARDS ou dérivées de ses questions par
+   fichesDuModule() (cf. memo.js). */
 
 export const KEY_PRINCIPLES = [
   { title: 'Le pouvoir du temps',     body: "L'effet boule de neige des intérêts composés permet une croissance exponentielle sur le long terme." },

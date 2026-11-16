@@ -37,6 +37,14 @@ export function startMondayFor(date = new Date()) {
   return monday;
 }
 
+/* Lundi de la semaine qui contient `date` (recul d'au plus 6 jours). */
+export function mondayOf(date) {
+  const iso = date.getDay() === 0 ? 7 : date.getDay();
+  const monday = startOfDay(date);
+  monday.setDate(monday.getDate() - (iso - 1));
+  return monday;
+}
+
 /* État du parcours à une date donnée.
  *
  *   started            false tant que le lundi de démarrage n'est pas atteint
@@ -53,7 +61,18 @@ export function academyState(startDate, now = new Date()) {
              unlockedIndex: -1, moduleNumber: 0, startDate: null };
   }
 
-  const start = startDate instanceof Date ? startDate : new Date(startDate);
+  /* Le parcours doit TOUJOURS commencer un lundi : c'est ce qui fait
+     correspondre « module 2 » et « mardi », et ce qui place la sortie du
+     guide hebdomadaire un samedi. La base pose bien un lundi
+     (academy_start_monday, migration 20260917000001), mais une donnée
+     ancienne, un décalage manuel d'un compte de test ou un fuseau à l'ouest
+     de Paris peuvent faire tomber la date un autre jour, et alors tout le
+     semainier glisse : le « samedi » du programme arrive un mardi et la carte
+     du guide ne s'ouvre jamais le week-end. On ramène donc la date au lundi
+     de sa propre semaine, comme le fait le recalage SQL de la migration :
+     le décalage est d'au plus 6 jours vers le passé, personne ne régresse. */
+  const brut  = startDate instanceof Date ? startDate : new Date(startDate);
+  const start = mondayOf(brut);
   const elapsed = daysBetween(start, now);
 
   if (elapsed < 0) {
@@ -100,6 +119,14 @@ export function isWeekGuideUnlocked(weekN, state) {
   if (weekN <  state.week) return true;
   if (weekN >  state.week) return false;
   return state.dayIndex >= GUIDE_DAY_INDEX;
+}
+
+/* Jours restants avant la sortie du guide de la semaine en cours. 0 s'il est
+   déjà publié. Sert à remplacer un « Disponible samedi » immuable, affiché
+   à l'identique du lundi au vendredi, par une attente datée. */
+export function joursAvantGuide(state) {
+  if (!state.started) return null;
+  return Math.max(0, GUIDE_DAY_INDEX - state.dayIndex);
 }
 
 /* « lundi 22 septembre » — pour annoncer la date de démarrage. */

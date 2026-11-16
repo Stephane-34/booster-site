@@ -31,13 +31,17 @@ import {
   Trophy, TrendingUp, Calendar, Gift, Library, FileText,
   HelpCircle, Sparkles, Route, GraduationCap, LineChart,
   Check, X, CheckSquare, Layers, RotateCw, Shuffle,
+  PiggyBank, Shield, Home,
 } from 'lucide-react';
 import Button from '../../components/ui/Button/Button';
 import Modal from '../../components/ui/Modal/Modal';
 import { useAcademyProgress } from '../../hooks/useAcademyProgress';
-import { PROGRAM_52, MOCK_PLAYERS, WEEKS, FLASHCARDS, KEY_PRINCIPLES, WEEK_GUIDES, MODULE_FLASHCARDS,
+import { PROGRAM_52, MOCK_PLAYERS, WEEKS, KEY_PRINCIPLES, WEEK_GUIDES,
          CORPUS_A_JOUR_LABEL } from './data';
-import { academyState, isModuleUnlocked, isWeekGuideUnlocked, formatStartDate } from '../../utils/academyCalendar';
+import { fichesDuModule, recapDeLaSemaine } from './memo';
+import { academyState, isModuleUnlocked, isWeekGuideUnlocked, formatStartDate,
+         joursAvantGuide } from '../../utils/academyCalendar';
+import { melangerQuestions } from '../../utils/quizShuffle';
 import { loadWeekQuestions, weekOfModule } from './weeks';
 import styles from './Academy.module.css';
 
@@ -161,7 +165,12 @@ export default function Academy() {
             <ProgramSection currentWeek={currentWeek} />
           )}
           {section === 'library' && (
-            <BibliothequeSection completed={completed} onGoToWeek={() => setSection('week')} />
+            <BibliothequeSection
+              completed={completed}
+              academy={academy}
+              onOpenModule={openModule}
+              onGoToWeek={() => setSection('week')}
+            />
           )}
           {section === 'help' && (
             <HelpSection goTo={setSection} />
@@ -575,7 +584,11 @@ function useModuleQuestions(moduleId) {
     setQuestions(null);
     const semaine = weekOfModule(moduleId);
     loadWeekQuestions(semaine)
-      .then((parModule) => { if (vivant) setQuestions(parModule?.[moduleId] ?? []); })
+      /* Les options sont permutées à la volée : le corpus place la bonne
+         réponse en B une fois sur deux (cf. utils/quizShuffle.js). */
+      .then((parModule) => {
+        if (vivant) setQuestions(melangerQuestions(parModule?.[moduleId] ?? [], moduleId));
+      })
       .catch((err) => {
         /* Réseau coupé ou chunk absent : on retombe sur une liste vide plutôt
            que de laisser la vue bloquée sur son écran de chargement. */
@@ -760,7 +773,7 @@ function DashboardSection({
             {moduleTab === 'flashcards' && (
               <ModuleFlashcardsView
                 key={day.id}
-                cards={MODULE_FLASHCARDS[day.id] ?? FLASHCARDS}
+                cards={fichesDuModule(day.id, moduleQuestions)}
               />
             )}
           </div>
@@ -808,11 +821,19 @@ function DashboardSection({
   }
 
   if (view === 'guide') {
+    /* Le guide hérite de la palette « Grand Livret » (thème papier clair)
+       comme la vue module : ses variables --paper / --ink ne sont définies
+       que sur .livretRoot. Sans cette enveloppe, le fond papier et les
+       bordures du guide tombaient silencieusement, var() non résolu. */
     return (
-      <WeekGuideView
-        weekN={Math.min(viewedWeek ?? academy.week, academy.week)}
-        onBack={() => setView('dashboard')}
-      />
+      <div className={styles.dashWrap}>
+        <div className={styles.livretRoot}>
+          <WeekGuideView
+            weekN={Math.min(viewedWeek ?? academy.week, academy.week)}
+            onBack={() => setView('dashboard')}
+          />
+        </div>
+      </div>
     );
   }
 
@@ -983,6 +1004,13 @@ function DashboardSection({
           comme un septième module, puisqu'il les récapitule tous. */}
       {(() => {
         const unlocked = isWeekGuideUnlocked(currentWeek, academy);
+        const redige   = WEEK_GUIDES[currentWeek];
+        /* Nombre de jours avant la publication, pour la semaine en cours.
+           L'ancien libellé « Disponible samedi » restait identique du lundi au
+           vendredi : impossible de savoir si la carte allait s'ouvrir un jour,
+           ni quand. */
+        const restant = joursAvantGuide(academy);
+        const attente = restant === 1 ? 'Disponible demain' : `Disponible dans ${restant} jours`;
         return (
           <div className={`${styles.guideCard} ${unlocked ? styles.guideCardUnlocked : ''}`}>
             <div className={styles.guideCardIcon}>
@@ -990,24 +1018,26 @@ function DashboardSection({
             </div>
             <div className={styles.guideCardBody}>
               <p className={styles.guideCardEyebrow}>
-                Guide hebdomadaire
+                {redige ? 'Guide hebdomadaire' : 'Récap de la semaine'}
                 {unlocked && <span className={styles.guideCardBadge}>Nouveau</span>}
               </p>
               <h3 className={styles.guideCardTitle}>
                 {unlocked
-                  ? (WEEK_GUIDES[currentWeek]?.title ?? `Semaine ${currentWeek}`)
-                  : 'Disponible samedi'}
+                  ? (redige?.title ?? `Les six modules de la semaine ${currentWeek}`)
+                  : attente}
               </h3>
               <p className={styles.guideCardText}>
                 {unlocked
-                  ? "La synthèse des six sujets de la semaine, et ce qu'ils ont en commun."
-                  : "Chaque samedi, un récap plus large que les quiz : le concept général derrière les six modules de la semaine."}
+                  ? (redige
+                      ? "La synthèse des six sujets de la semaine, et ce qu'ils ont en commun."
+                      : 'Les questions posées cette semaine et leurs réponses, thème par thème.')
+                  : 'Publié le samedi, une fois les six modules sortis : de quoi revoir la semaine entière en cinq minutes.'}
               </p>
             </div>
             {unlocked && (
               <Button variant="accent" size="lg" onClick={() => setView('guide')}
                       className={styles.guideCardBtn}>
-                <BookOpen size={18} /> Lire le guide
+                <BookOpen size={18} /> {redige ? 'Lire le guide' : 'Lire le récap'}
               </Button>
             )}
           </div>
@@ -1018,10 +1048,15 @@ function DashboardSection({
 }
 
 /* ─── Section Bibliothèque ────────────────────────────────── */
-/* Deux rubriques : les fiches acquises (agrégation dynamique des quiz
-   complétés) et les documents pratiques. La rubrique "Vidéos courtes" a été
-   retirée avant le lancement, faute de contenu vidéo : elle promettait un
-   format qui n'existe pas encore. */
+/* Organisée par THÉMATIQUE, et non plus en liste plate des quiz validés.
+   Le programme tient sur six thèmes, un par jour de la semaine (lundi =
+   Enrichissement & Placement, mardi = Fiscalité, … samedi = Immobilier), et
+   chaque thème revient 26 fois sur les 26 semaines rédigées. Chercher la
+   fiche d'un sujet revenait à la retrouver au milieu de toutes les autres,
+   rangées par date de validation : on entre désormais par le thème.
+
+   La rubrique « Vidéos courtes » a été retirée avant le lancement, faute de
+   contenu vidéo : elle promettait un format qui n'existe pas encore. */
 
 const LIBRARY_DOCS = [
   { title: 'Checklist "Ma première assurance vie"',         type: 'PDF', pages: 4 },
@@ -1030,58 +1065,127 @@ const LIBRARY_DOCS = [
   { title: 'Simulateur "Apport pour mon 1er achat"',        type: 'XLS', pages: 2 },
 ];
 
-function BibliothequeSection({ completed, onGoToWeek }) {
-  const fiches = Object.entries(completed).map(([id, rec]) => ({ id, ...rec }));
+/* Icône par thème. Les libellés viennent de WEEKS et sont stables : six
+   valeurs exactement, vérifiées sur les 156 modules. */
+const THEME_ICONS = {
+  'Enrichissement & Placement': TrendingUp,
+  'Fiscalité':                  FileText,
+  'Retraite':                   PiggyBank,
+  'Transmission':               Gift,
+  'IARD & Prévoyance':          Shield,
+  'Immobilier':                 Home,
+};
+
+/* Tous les modules rédigés, regroupés par thème et classés par semaine.
+   Calculé une fois au chargement du module JS : WEEKS est statique. */
+const MODULES_PAR_THEME = (() => {
+  const parTheme = new Map();
+  Object.entries(WEEKS).forEach(([semaine, modules]) => {
+    modules.forEach((module, dayIdx) => {
+      if (!parTheme.has(module.theme)) parTheme.set(module.theme, []);
+      parTheme.get(module.theme).push({ ...module, week: Number(semaine), dayIdx });
+    });
+  });
+  parTheme.forEach((liste) => liste.sort((a, b) => a.week - b.week));
+  return parTheme;
+})();
+
+/* Ordre d'affichage : celui des jours de la semaine, pas l'ordre alphabétique. */
+const THEMES_ORDONNES = (WEEKS[1] ?? []).map((m) => ({ theme: m.theme, dayName: m.dayName }));
+
+function BibliothequeSection({ completed, academy, onOpenModule, onGoToWeek }) {
+  const [themeOuvert, setThemeOuvert] = useState(null);
+
+  /* Compteurs par thème : ce qui est validé, et ce qui est déjà ouvert par le
+     calendrier. Le total (26) reste affiché pour situer l'effort restant. */
+  const stats = useMemo(() => {
+    const parTheme = {};
+    THEMES_ORDONNES.forEach(({ theme }) => {
+      const modules = MODULES_PAR_THEME.get(theme) ?? [];
+      parTheme[theme] = {
+        total:     modules.length,
+        debloques: modules.filter((m) => isModuleUnlocked(m.week, m.dayIdx, academy)).length,
+        valides:   modules.filter((m) => completed[m.id]).length,
+      };
+    });
+    return parTheme;
+  }, [completed, academy]);
+
+  const totalValide = Object.values(stats).reduce((n, s) => n + s.valides, 0);
+
+  if (themeOuvert) {
+    return (
+      <ThemeFichesView
+        theme={themeOuvert}
+        completed={completed}
+        academy={academy}
+        onOpenModule={onOpenModule}
+        onBack={() => setThemeOuvert(null)}
+      />
+    );
+  }
 
   return (
     <div className={styles.libraryWrap}>
       <p className={styles.sectionLead}>
-        Toutes tes ressources d'apprentissage réunies au même endroit : les fiches mémoire de tes quiz validés,
-        et les documents pratiques à télécharger.
+        Toutes tes ressources d&apos;apprentissage réunies au même endroit : les fiches mémo de tes
+        quiz, rangées par thématique, et les documents pratiques à télécharger.
       </p>
 
       <section className={styles.librarySection}>
         <div className={styles.librarySectionHead}>
           <div>
             <h2 className={styles.librarySectionTitle}>
-              <BookOpen size={20} /> Mes fiches mémoire acquises
+              <BookOpen size={20} /> Mes fiches mémo par thématique
             </h2>
             <p className={styles.librarySectionSub}>
-              {fiches.length} fiche{fiches.length > 1 ? 's' : ''} validée{fiches.length > 1 ? 's' : ''} -
-              se remplit à mesure que tu complètes tes modules quotidiens.
+              Six thématiques, une par jour de la semaine. {totalValide} module
+              {totalValide > 1 ? 's' : ''} validé{totalValide > 1 ? 's' : ''} au total -
+              ouvre une thématique pour retrouver toutes ses fiches.
             </p>
           </div>
         </div>
 
-        {fiches.length === 0 ? (
+        <div className={styles.libraryThemes}>
+          {THEMES_ORDONNES.map(({ theme, dayName }) => {
+            const Icon = THEME_ICONS[theme] ?? BookOpen;
+            const s = stats[theme];
+            const pct = s.total ? Math.round((s.valides / s.total) * 100) : 0;
+            return (
+              <button
+                key={theme}
+                type="button"
+                onClick={() => setThemeOuvert(theme)}
+                className={styles.libraryTheme}
+              >
+                <div className={styles.libraryThemeIcon}><Icon size={22} /></div>
+                <div className={styles.libraryThemeBody}>
+                  <p className={styles.libraryThemeDay}>{dayName}</p>
+                  <h3 className={styles.libraryThemeName}>{theme}</h3>
+                  <p className={styles.libraryThemeMeta}>
+                    {s.valides} fiche{s.valides > 1 ? 's' : ''} sur {s.total} ·{' '}
+                    {s.debloques} module{s.debloques > 1 ? 's' : ''} ouvert{s.debloques > 1 ? 's' : ''}
+                  </p>
+                  <div className={styles.libraryThemeBar}>
+                    <div className={styles.libraryThemeFill} style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+                <ChevronRight size={18} className={styles.libraryThemeArrow} />
+              </button>
+            );
+          })}
+        </div>
+
+        {totalValide === 0 && (
           <div className={styles.libraryEmpty}>
-            <p className={styles.libraryEmptyTitle}>Ta bibliothèque est encore vide</p>
+            <p className={styles.libraryEmptyTitle}>Aucune fiche validée pour l&apos;instant</p>
             <p className={styles.libraryEmptyText}>
-              Valide un premier module quotidien pour voir sa fiche mémoire s'ajouter ici.
+              Les thématiques ci-dessus sont déjà consultables : tu y vois les modules ouverts et
+              ceux qui restent à venir. Valide un premier quiz pour que ses fiches s&apos;y ajoutent.
             </p>
             <Button variant="primary" size="md" onClick={onGoToWeek}>
-              Aller sur "Ma semaine en cours" <ChevronRight size={16} />
+              Aller sur &quot;Ma semaine en cours&quot; <ChevronRight size={16} />
             </Button>
-          </div>
-        ) : (
-          <div className={styles.libraryGrid}>
-            {fiches.map((f) => {
-              const pct = Math.round((f.score / f.total) * 100);
-              return (
-                <div key={f.id} className={styles.libraryFiche}>
-                  <div className={styles.libraryFicheHead}>
-                    <span className={styles.libraryFicheTheme}>{f.theme}</span>
-                    <span className={`${styles.libraryFichePct} ${pct >= 80 ? styles.scoreGood : pct >= 50 ? styles.scoreMid : styles.scoreLow}`}>
-                      {pct}%
-                    </span>
-                  </div>
-                  <h3 className={styles.libraryFicheTitle}>{f.title}</h3>
-                  <p className={styles.libraryFicheDate}>
-                    <Calendar size={12} /> Validé le {f.completedAt}
-                  </p>
-                </div>
-              );
-            })}
           </div>
         )}
       </section>
@@ -1090,10 +1194,10 @@ function BibliothequeSection({ completed, onGoToWeek }) {
         <div className={styles.librarySectionHead}>
           <div>
             <h2 className={styles.librarySectionTitle}>
-              <FileText size={20} /> Documents & simulateurs
+              <FileText size={20} /> Documents &amp; simulateurs
             </h2>
             <p className={styles.librarySectionSub}>
-              Ressources téléchargeables pour passer à l'action.
+              Ressources téléchargeables pour passer à l&apos;action.
             </p>
           </div>
         </div>
@@ -1110,6 +1214,80 @@ function BibliothequeSection({ completed, onGoToWeek }) {
           ))}
         </div>
       </section>
+    </div>
+  );
+}
+
+/* Détail d'une thématique : ses 26 modules, du plus ancien au plus récent.
+   Un module validé mène à ses fiches mémo, un module ouvert mais non fait à
+   son quiz, un module à venir reste affiché pour montrer la suite du
+   parcours. */
+function ThemeFichesView({ theme, completed, academy, onOpenModule, onBack }) {
+  const modules = MODULES_PAR_THEME.get(theme) ?? [];
+  const Icon = THEME_ICONS[theme] ?? BookOpen;
+
+  return (
+    <div className={styles.libraryWrap}>
+      <button className={styles.libraryBack} onClick={onBack}>
+        <ChevronLeft size={16} /> Toutes les thématiques
+      </button>
+
+      <div className={styles.libraryThemeHeader}>
+        <div className={styles.libraryThemeIcon}><Icon size={24} /></div>
+        <div>
+          <h2 className={styles.librarySectionTitle}>{theme}</h2>
+          <p className={styles.librarySectionSub}>
+            {modules.length} module{modules.length > 1 ? 's' : ''} sur les 26 semaines rédigées,
+            un par semaine. Les fiches mémo s&apos;ouvrent une fois le quiz passé.
+          </p>
+        </div>
+      </div>
+
+      <div className={styles.libraryModules}>
+        {modules.map((module) => {
+          const record = completed[module.id];
+          const ouvert = isModuleUnlocked(module.week, module.dayIdx, academy);
+          const pct = record ? Math.round((record.score / record.total) * 100) : null;
+
+          return (
+            <div
+              key={module.id}
+              className={`${styles.libraryModule} ${!ouvert ? styles.libraryModuleLocked : ''}`}
+            >
+              <span className={styles.libraryModuleWeek}>S{module.week}</span>
+              <div className={styles.libraryModuleBody}>
+                <h3 className={styles.libraryModuleTitle}>{module.title}</h3>
+                {record ? (
+                  <p className={styles.libraryModuleMeta}>
+                    <Calendar size={12} /> Validé le {record.completedAt}
+                  </p>
+                ) : (
+                  <p className={styles.libraryModuleMeta}>
+                    {ouvert ? 'Quiz disponible, fiches à débloquer' : `Ouvre en semaine ${module.week}`}
+                  </p>
+                )}
+              </div>
+
+              {record && (
+                <span className={`${styles.libraryFichePct} ${pct >= 80 ? styles.scoreGood : pct >= 50 ? styles.scoreMid : styles.scoreLow}`}>
+                  {pct}%
+                </span>
+              )}
+
+              {!ouvert && <Lock size={16} className={styles.libraryModuleLock} />}
+              {ouvert && (
+                <Button
+                  variant={record ? 'ghost' : 'primary'}
+                  size="sm"
+                  onClick={() => onOpenModule(module.id, record ? 'flashcards' : 'quiz')}
+                >
+                  {record ? <><Layers size={14} /> Fiches mémo</> : <>Faire le quiz <ChevronRight size={14} /></>}
+                </Button>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -1288,11 +1466,12 @@ function ModuleQuizView({ day, existingRecord, onSubmit }) {
   );
 }
 
-/* ── Sous-onglet Fiches mémo (corpus global partagé) ─────── */
-/* Chaque module a désormais ses propres fiches (MODULE_FLASHCARDS, indexé par
-   module_id) : elles reformulent les justifications de SON quiz. Le corpus
-   global FLASHCARDS ne sert plus que de repli si un module n'a pas encore les
-   siennes. */
+/* ── Sous-onglet Fiches mémo ─────────────────────────────── */
+/* Les fiches sont TOUJOURS celles du module affiché : rédigées à la main
+   quand elles existent (semaines 1 et 2), dérivées de ses propres questions
+   sinon (cf. fichesDuModule dans memo.js). Il n'y a plus de corpus global de
+   repli : c'est lui qui servait les mêmes treize fiches génériques sur 144
+   modules, quel que soit le quiz qu'on venait de passer. */
 const shuffleFlashcards = (list) => {
   const c = [...list];
   for (let i = c.length - 1; i > 0; i--) {
@@ -1402,13 +1581,23 @@ function ModuleFlashcardsView({ cards }) {
             <div className={`${styles.flipCard} ${flipped ? styles.flipCardFlipped : ''}`}>
               <div className={`${styles.flipFace} ${styles.flipFront}`}>
                 <RotateCw size={16} className={styles.flipHint} />
-                <p className={styles.livretMono}>Terme</p>
-                <h3 className={styles.flipText}>{current.front}</h3>
+                <p className={styles.livretMono}>
+                  {current.type === 'question' ? 'Question' : 'Terme'}
+                </p>
+                <h3 className={`${styles.flipText} ${current.front.length > 70 ? styles.flipTextLong : ''}`}>
+                  {current.front}
+                </h3>
                 <p className={styles.flipFooter}>Cliquez ou appuyez sur Entrée pour voir la définition</p>
               </div>
               <div className={`${styles.flipFace} ${styles.flipBack}`}>
                 <p className={styles.livretMono}>Définition</p>
                 <p className={styles.flipBackText}>{current.back}</p>
+                {/* Les fiches dérivées d'un quiz portent la réponse au recto
+                    du verso et l'explication en dessous ; les fiches rédigées
+                    à la main n'ont pas ce second niveau. */}
+                {current.detail && (
+                  <p className={styles.flipBackDetail}>{current.detail}</p>
+                )}
               </div>
             </div>
           </div>
@@ -1431,15 +1620,56 @@ function ModuleFlashcardsView({ cards }) {
   );
 }
 
-/* ── Sous-onglet Guide (corpus global partagé) ───────────── */
 /* ─── Guide hebdomadaire ──────────────────────────────────────────────────
    Remplace l'ancien guide quotidien, qui répétait le même contenu générique
    sur les six modules d'une semaine. Le guide est désormais MACRO : il relie
    entre eux les six sujets de la semaine et en dégage le concept général,
    là où les fiches mémo restent MICRO, rattachées à une question de quiz.
-   Publié le samedi, une fois les six modules sortis. */
+   Publié le samedi, une fois les six modules sortis.
+
+   Deux formats cohabitent :
+     - le guide RÉDIGÉ (WEEK_GUIDES), qui dégage un fil rouge entre les six
+       thèmes. Écrit pour les semaines 1 et 2 ;
+     - le RÉCAP dérivé (recapDeLaSemaine), construit à partir des questions
+       réellement posées dans la semaine. Il couvre les 24 autres semaines,
+       qui n'affichaient jusqu'ici qu'un « guide en cours de rédaction »,
+       autant dire rien, le samedi venu. */
+
+/* Questions des six modules d'une semaine, pour le récap. Un seul chunk est
+   téléchargé : loadWeekQuestions renvoie la semaine entière, et le cache de
+   weeks.js évite de la reprendre à chaque ouverture. */
+function useWeekQuestions(weekN) {
+  /* La semaine chargée est stockée AVEC son numéro, et l'état « en cours de
+     chargement » se déduit de la comparaison. Remettre l'état à null en tête
+     d'effet, comme le fait useModuleQuestions, déclencherait un rendu en
+     cascade à chaque changement de semaine. */
+  const [charge, setCharge] = useState({ weekN: null, parModule: null });
+
+  useEffect(() => {
+    if (!weekN) return;
+    let vivant = true;
+    loadWeekQuestions(weekN)
+      .then((q) => { if (vivant) setCharge({ weekN, parModule: q ?? {} }); })
+      .catch((err) => {
+        console.error('[Academy] chargement du récap hebdomadaire', err);
+        if (vivant) setCharge({ weekN, parModule: {} });
+      });
+    return () => { vivant = false; };
+  }, [weekN]);
+
+  return charge.weekN === weekN ? charge.parModule : null;
+}
+
 function WeekGuideView({ weekN, onBack }) {
-  const guide = WEEK_GUIDES[weekN];
+  const redige = WEEK_GUIDES[weekN];
+  /* Le récap n'est construit que si aucun guide n'est rédigé : inutile de
+     charger 60 questions pour les semaines qui ont leur texte. */
+  const parModule = useWeekQuestions(redige ? null : weekN);
+  const recap = useMemo(
+    () => (redige || !parModule ? null : recapDeLaSemaine(weekN, WEEKS[weekN] ?? [], parModule)),
+    [redige, parModule, weekN],
+  );
+  const guide = redige;
 
   return (
     <div className={styles.guideWrap}>
@@ -1448,18 +1678,51 @@ function WeekGuideView({ weekN, onBack }) {
       </button>
 
       <header className={styles.guideHeader}>
-        <p className={styles.livretMono}>Guide hebdomadaire · Semaine {weekN}</p>
-        <h2 className={styles.guideTitle}>{guide ? guide.title : `Semaine ${weekN}`}</h2>
+        <p className={styles.livretMono}>
+          {guide ? 'Guide hebdomadaire' : 'Récap de la semaine'} · Semaine {weekN}
+        </p>
+        <h2 className={styles.guideTitle}>
+          {guide ? guide.title : (recap?.title ?? `Semaine ${weekN}`)}
+        </h2>
         <p className={styles.guideSub}>
-          Le récap macro de ta semaine, publié chaque samedi
+          {guide
+            ? 'Le récap macro de ta semaine, publié chaque samedi'
+            : 'Ce que tes six quiz de la semaine ont posé, publié chaque samedi'}
         </p>
       </header>
 
-      {!guide ? (
+      {/* Trois cas : un guide rédigé, un récap dérivé des six quiz, ou une
+          semaine dont le corpus n'existe pas encore. */}
+      {!guide && !recap ? (
         <p className={styles.guideText}>
-          Le guide de cette semaine est en cours de rédaction. Les fiches mémo de
-          chaque module restent disponibles dans ta bibliothèque.
+          {parModule === null
+            ? 'Chargement du récap…'
+            : "Les quiz de cette semaine ne sont pas encore publiés : il n'y a rien à récapituler pour l'instant."}
         </p>
+      ) : !guide ? (
+        <>
+          <section>
+            <p className={styles.guideIntro}>{recap.intro}</p>
+          </section>
+
+          {recap.sections.map((module) => (
+            <section key={module.id} className={styles.recapModule}>
+              <h3 className={styles.guideSectionTitle}>
+                <span className={styles.recapDay}>{module.dayName}</span>
+                {module.title}
+              </h3>
+              <p className={styles.recapTheme}>{module.theme}</p>
+              <dl className={styles.recapPoints}>
+                {module.points.map((point) => (
+                  <div key={point.question} className={styles.recapPoint}>
+                    <dt className={styles.recapQuestion}>{point.question}</dt>
+                    <dd className={styles.recapAnswer}>{point.reponse}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          ))}
+        </>
       ) : (
         <>
           <section>

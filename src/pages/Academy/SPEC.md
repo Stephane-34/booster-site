@@ -79,9 +79,11 @@ en haut + 3 sous-onglets :
   Une question à la fois, tampon "VALIDÉ / À REVOIR" après réponse,
   explication en dessous, récap final à la fin. Si le module est déjà complété,
   affiche directement le récap avec un bouton "Refaire le quiz".
-- **Fiches mémo** - flashcards du corpus global (FLASHCARDS, 13 fiches).
-  Flip-card retournable au clic ou espace/entrée, actions "À revoir" /
-  "Je connais", filtres Toutes/À revoir/Connues, bouton Mélanger.
+- **Fiches mémo** - flashcards **du module ouvert** : rédigées à la main
+  (MODULE_FLASHCARDS, semaines 1-2) ou dérivées de ses propres questions
+  (`fichesDuModule`, memo.js). Flip-card retournable au clic ou
+  espace/entrée, actions "À revoir" / "Je connais", filtres Toutes/À
+  revoir/Connues, bouton Mélanger.
 - **Guide** - Résumé + 5 principes clés (KEY_PRINCIPLES) + Glossaire.
 
 **Vue classement (au clic sur "Voir le classement")**
@@ -113,10 +115,11 @@ client pour le rythme réel de prod.
 
 Trois rubriques distinctes :
 
-1. **Mes fiches mémoire acquises** - agrégation dynamique du state
-   `completed`. Vide au départ, se remplit à chaque quiz validé. Chaque
-   fiche affiche thème, titre, score en pourcentage, date de validation.
-   État vide → CTA "Aller sur Ma semaine en cours".
+1. **Mes fiches mémo par thématique** - six cartes, une par thème du
+   programme (lundi = Enrichissement & Placement … samedi = Immobilier),
+   chacune portant son avancement. Ouvrir une thématique liste ses 26
+   modules par semaine : fiches mémo pour un module validé, quiz pour un
+   module ouvert, cadenas pour les semaines à venir.
 2. **Vidéos courtes** - 4 placeholders (thème + durée + auteur) pour
    visualiser le concept. À remplacer par le vrai corpus vidéo.
 3. **Documents & simulateurs** - 4 placeholders téléchargeables (PDF / XLS).
@@ -145,8 +148,12 @@ requise pour la démo).
   `wN-dI` préfixé. Utilisé par `DashboardSection` et `ModuleQuizView`.
 - **`MOCK_PLAYERS`** - 12 joueurs simulés avec score, pour illustrer le
   classement.
-- **`FLASHCARDS`** - 13 fiches (`{ id, front, back }`). Corpus global
-  partagé entre tous les modules (choix C du brief).
+- **`MODULE_FLASHCARDS`** - fiches rédigées à la main, indexées par
+  `module_id` (5 par module, semaines 1-2). Les autres modules dérivent les
+  leurs de leurs questions via `fichesDuModule()`. Le corpus global
+  `FLASHCARDS` (13 fiches partagées par tous les modules, choix C du brief)
+  a été retiré : il servait 144 modules sur 156, donnant les mêmes fiches
+  après presque tous les quiz.
 - **`KEY_PRINCIPLES`** - 5 principes clés (`{ title, body }`). Utilisé par
   le sous-onglet Guide et pourrait alimenter la page Aide.
 
